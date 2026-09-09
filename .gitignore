@@ -1,0 +1,27 @@
+# macOS
+.DS_Store
+
+# Dependências e build
+node_modules/
+dist/
+build/
+.expo/
+android/
+ios/
+*.keystore
+*.jks
+
+# Segredos
+.env
+.env.local
+.env.*.local
+
+# Claude Code: o processo é versionado, mas o estado local não.
+# .claude/skills/ e .specify/ ficam NO repositório de propósito — eles SÃO a esteira.
+.claude/settings.local.json
+.claude/plans/
+
+# Logs e temporários
+*.log
+.cache/
+coverage/
