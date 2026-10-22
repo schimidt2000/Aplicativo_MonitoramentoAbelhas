@@ -33,7 +33,7 @@ protocolo do firmware de 2026-10-21. Ela ainda não foi testada com a placa de v
 
 ## Como rodar
 
-Precisa de Node 20 ou mais novo.
+Precisa de Node 22 ou mais novo (o `better-sqlite3` dos testes exige isso).
 
 App de campo:
 
