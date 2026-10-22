@@ -1,8 +1,9 @@
 ---
 paths:
-  - "apps/mobile/src/ui/**"
-  - "apps/web/src/**"
-  - "packages/core/src/i18n/**"
+  - "src/app/**"
+  - "src/ui/**"
+  - "src/core/format/**"
+  - "src/core/i18n/**"
 ---
 
 # Interface

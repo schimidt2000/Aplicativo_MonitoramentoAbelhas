@@ -37,16 +37,22 @@ não fizemos a lição de casa.
 | Termo na UI | O que é | O que NÃO dizer |
 |---|---|---|
 | **nó sensor** | o aparelho dentro da colmeia | "device", "dispositivo", "sensor" sozinho |
+| **placa** | o nó sensor **visto pelo cabo**, na mão de quem coleta: "Aperte o botão da placa", "De qual colmeia é esta placa?", "Configurar placa nova". Só nas telas do cabo (features 004 e 005) | "ESP32", "microcontrolador", "dispositivo", "porta COM" |
 | **coleta** | baixar os dados acumulados do nó para o celular | "download", "sincronizar", "puxar" |
 | **leitura** | um registro de medição, com hora | "amostra", "sample", "dado" |
-| **sincronizar** | enviar do celular para a nuvem | "fazer sync", "upload", "subir" |
+| **enviar** / **enviado** | mandar as leituras do celular para a nuvem / o que já foi mandado e confirmado. Termos de tela. *Sincronizar* é só vocabulário interno de engenharia | "sincronizar", "sincronizado", "fazer sync", "upload", "subir" |
 | **salvo no celular** | o dado está no aparelho, ainda não enviado | "pendente", "offline", "não salvo" |
-| **salvo na nuvem** | o servidor confirmou a gravação | "sincronizado", "ok", "enviado" |
+| **salvo na nuvem** | o servidor confirmou a gravação (o mesmo que **enviado**) | "sincronizado", "ok" |
+| **acertar o relógio** | o celular manda a hora para o nó sensor durante a coleta | "sincronizar", "sync de hora", "timestamp" |
+| **hora estimada** | hora de leitura calculada pelo celular, sem âncora confiável | "hora errada", "hora inválida" |
+| **intervalo da placa** | de quanto em quanto tempo a placa mede (2 h em produção). Com ele o app calcula a hora de cada leitura que chega pelo cabo (feature 005). Não confundir com o intervalo **de coleta**, que é de quanto em quanto tempo o apicultor quer coletar (Ajustes) | "período", "taxa de amostragem", "sample rate" |
+| **sem hora conhecida** | leitura guardada, mas sem como saber quando foi medida (a placa religou e nenhuma coleta viu essa ligada). Fica fora do gráfico e é contada | "hora desconhecida" na tela do apicultor, "erro de hora", "ligada", "âncora", "referência" |
 
-**Coleta e sincronização são coisas diferentes e nunca devem se confundir na UI.** Coleta é
-colmeia → celular, presencial, por BLE ou cabo. Sincronização é celular → nuvem, depois,
-quando houver internet. Um dado pode estar coletado e não sincronizado por semanas — e isso é
-normal, não é erro.
+**Coleta e envio são coisas diferentes e nunca devem se confundir na UI.** Coleta é
+colmeia → celular, presencial, por BLE ou cabo. Envio é celular → nuvem, depois, quando
+houver internet. Um dado pode estar coletado e não enviado por semanas — e isso é normal,
+não é erro. (No código e nos documentos de engenharia o envio também se chama
+*sincronização*; na tela, nunca.)
 
 ## As grandezas medidas
 
@@ -99,3 +105,31 @@ A tensão bruta existe, mas vive na tela técnica.
 | "0 dispositivos encontrados" | "Nenhuma colmeia por perto." |
 | "Dados não salvos" | "Salvo no celular. Falta enviar." |
 | "Bluetooth desabilitado" | "O Bluetooth está desligado. Toque para ligar." |
+
+## Envio e projeto (feature 002)
+
+| Termo na UI | O que é | O que NÃO dizer |
+|---|---|---|
+| **enviar** / **envio** | mandar as leituras do celular para a nuvem | "sincronizar", "upload", "subir" |
+| **código do projeto** | o código `XXXX-XXXX` que a pesquisadora passa ao apicultor | "senha", "login", "token", "chave" |
+| **ligar o celular ao projeto** | digitar o código uma vez, só no fluxo de envio | "fazer login", "entrar", "cadastrar" |
+| **projeto** | o projeto de pesquisa que reúne apicultores e pesquisadoras | "conta", "organização" |
+| **pesquisadora** | quem analisa os dados no painel | "admin", "usuária" |
+| **painel** | o site das pesquisadoras | "dashboard", "web", "admin" |
+| **planilha** | o arquivo que a pesquisadora baixa do painel | "CSV", "export" |
+
+*Enviar*, *enviado* e *salvo na nuvem* são as palavras de tela; a aba entregue se chama
+**Enviar** e toda tela diz "enviar". *Sincronizar* fica como vocabulário interno de
+engenharia (plano aceito da 002). Coletar **nunca** pede o código do projeto.
+
+## Painel (pesquisadoras)
+
+O painel é usado pela pesquisadora no computador, não pelo apicultor no campo. As regras de
+idioma valem para ele também (Princípio V), com estas exceções, que só valem **no painel**:
+
+| Termo no painel | Por que é aceito | Onde continua proibido |
+|---|---|---|
+| **Entrar** | a pesquisadora entra com e-mail e senha; ela não é apicultora e esse é o vocabulário dela | no app de campo ("ligar o celular ao projeto", nunca "entrar") |
+| **E-mail** | campo da tela de entrada | no app de campo, que não pede e-mail |
+| **Senha** | campo da tela de entrada | no app de campo: o código do projeto **não** é senha |
+| **amostra excluída** | termo da constituição (Princípio VI: "contagem de amostras excluídas") para a leitura que ficou fora de um agregado | no app de campo, onde uma medição é sempre **leitura** |

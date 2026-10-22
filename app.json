@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "Bee-sertão",
+    "slug": "bee-sertao",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "beesertao",
+    "userInterfaceStyle": "light",
+    "icon": "./assets/images/icon.png",
+    "android": {
+      "package": "br.beesertao.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#F7F5F0",
+        "foregroundImage": "./assets/images/android-icon-foreground.png"
+      }
+    },
+    "web": {
+      "output": "single",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#F7F5F0",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 120
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

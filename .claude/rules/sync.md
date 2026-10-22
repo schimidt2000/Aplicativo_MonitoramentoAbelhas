@@ -1,8 +1,6 @@
 ---
 paths:
-  - "apps/mobile/src/sync/**"
-  - "apps/mobile/src/data/**"
-  - "packages/db/**"
+  - "src/data/**"
 ---
 
 # Banco local e sincronização
@@ -47,14 +45,17 @@ provável pendente (o aquecimento cruzado descrito em `docs/integracao-firmware.
 
 - Trilha A, leituras: lê do índice parcial de não sincronizados, envia em lote, e grava a
   confirmação **na mesma transação SQLite**. A retomabilidade sai de graça da idempotência.
-- Trilha B, entidades editadas por pessoa: tabela `outbox`, última escrita vence.
+- Trilha B, entidades editadas por pessoa: tabela `outbox`, última escrita vence —
+  **pendente (T072)**: hoje o envio usa cursor pelo relógio do celular.
 - Lote adaptativo: dois timeouts seguidos reduzem pela metade, três sucessos dobram. Sem isso
-  o app simplesmente nunca termina um envio no 2G.
-- Backoff exponencial com jitter total. **Nunca desista permanentemente de uma leitura.**
+  o app simplesmente nunca termina um envio no 2G. **Pendente (T061).**
+- Backoff exponencial com jitter total — **pendente (T061)**: `atrasoDeRetentativa` existe e
+  não é usado. **Nunca desista permanentemente de uma leitura.**
 - Só sincronize com `isInternetReachable === true`. Só `isConnected` dá verdadeiro em portal
-  cativo rural, e aí o envio falha em silêncio.
+  cativo rural, e aí o envio falha em silêncio. Sonda de rede **pendente (T031)**:
+  `expo-network` ainda não está instalado.
 - Uma requisição em voo por vez. Paralelismo piora a vazão no 2G.
-- O botão "Sincronizar agora" é obrigatório e precisa estar visível. Trabalho de fundo é
+- O botão "Enviar agora" é obrigatório e precisa estar visível. Trabalho de fundo é
   cortesia opcional nesses aparelhos, nunca o caminho principal.
 - Perder uma leitura é defeito crítico. Entregar uma leitura duplicada é comportamento
   esperado, absorvido pela chave natural no servidor.

@@ -1,15 +1,15 @@
 ---
 paths:
-  - "apps/mobile/src/transports/**"
-  - "packages/core/src/decode/**"
-  - "packages/core/src/ports/**"
+  - "src/transports/**"
+  - "src/core/decode/**"
+  - "src/core/ports/**"
 ---
 
 # Transportes e decodificação
 
 Este é o **único** lugar do repositório que pode importar SDK de transporte. Se você está
 prestes a importar `react-native-ble-plx`, uma API de serial ou qualquer coisa parecida fora
-de `apps/mobile/src/transports/`, pare: isso viola o Princípio IV e o lint do CI reprova.
+de `src/transports/`, pare: isso viola o Princípio IV e o lint do CI reprova.
 
 ## O payload não é nosso
 
@@ -38,6 +38,12 @@ confirmado ali, **é suposição** — trate como tal e não fixe no código.
 - Toda transferência é retomável. Nunca dependa de uma única conexão contínua bem-sucedida.
 - `preflight()` devolve itens estruturados, e a tela de diagnóstico é renderização pura
   disso. Não espalhe lógica de permissão pela UI.
+- Falha lança `TransportError` com código (`not-found`, `connection-lost`, `timeout`,
+  `permission`, `unavailable`). Nunca uma `Error` genérica com texto do SDK: quem escolhe o
+  texto é `core/coleta/mensagens.ts`, via i18n.
+- `setTime` é **melhor esforço**: devolve `{ ok: false, reason }` em vez de lançar quando o
+  nó recusa, não suporta ou não responde. Nunca use a hora para decidir o que coletar —
+  isso é `seq`.
 
 ## Armadilhas de Android que já custaram tempo
 

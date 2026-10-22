@@ -1,6 +1,48 @@
 <!--
-SYNC IMPACT REPORT
-==================
+SYNC IMPACT REPORT — 1.1.0 (2026-09-16)
+=======================================
+Version change: 1.0.0 → 1.1.0 (MINOR: orientação materialmente expandida e endurecida)
+Motivo: feature 002 (envio para a nuvem e painel das pesquisadoras) introduz um segundo
+artefato, um servidor e uma identidade de apicultor — três coisas que a 1.0.0 não previa.
+
+Princípios alterados (nenhum removido, nenhum renomeado):
+  III. Leituras Imutáveis e Idempotentes
+       + exceção explícita e única para `synced_at` (escrituração de envio, não medição),
+         com o lint do CI obrigado a reprovar qualquer outro UPDATE e qualquer DELETE.
+       + exigência de que no servidor a imutabilidade seja propriedade do banco: a tabela
+         de leituras MUST NOT ter política de UPDATE nem de DELETE.
+       Sem a exceção, o índice parcial `ix_reading_unsynced` construído na 001 seria
+       inutilizável e a alternativa (tabela sombra) custaria migração, índice e desempenho
+       de fila sem ganho de garantia. A regra fica MAIS forte, não mais frouxa.
+  II.  Orçamento de Desempenho
+       + orçamento próprio do painel. Antes, todos os números eram do aparelho de
+         referência e o painel ficava sem gate.
+  V.   Ergonomia de Campo em pt-BR
+       + delimitação de escopo: medidas valem para o app de campo; regras de idioma valem
+         para todos os artefatos. Antes o status do painel era ambíguo.
+
+Seção "Restrições de Plataforma e Dados" alterada:
+  + nomes obrigatórios dos artefatos (a palavra "web" sozinha passa a ser proibida, porque
+    designava dois artefatos incompatíveis — um com banco local, outro proibido de ter).
+  + coordenada: de "precisão reduzida na exportação" para "MUST NOT ser enviada sob
+    nenhuma precisão, e o servidor MUST NOT ter coluna de latitude ou longitude".
+    Endurecimento pedido pelo dono do produto. Coluna ausente é verificável.
+  + direito ao apagamento por LGPD, que prevalece sobre o append-only interno.
+
+Templates dependentes:
+  ✅ plan-template.md — o portão continua sendo a tabela de 7 vereditos definida em
+     Governance. Nenhuma mudança de formato.
+  ✅ spec-template.md, tasks-template.md — sem mudança.
+
+Dívida registrada, herdada da 001 e sendo quitada na Fatia 0 da 002:
+  - `src/core/i18n/` está vazio, apesar de o plan.md da 001 declarar PASS no Princípio V
+    citando esse módulo como evidência.
+  - `tests/` está vazio e não há vitest.config, apesar de o plan.md da 001 declarar PASS
+    no Princípio III citando invariantes "cada uma virando teste no CI".
+  - a 001 não tem tasks.md.
+  Nenhum PASS novo pode citar essas evidências enquanto não existirem.
+
+--- Relatório da ratificação original ---
 Version change: (template não preenchido) → 1.0.0
 Ratification: 2026-09-09
 
@@ -95,6 +137,11 @@ Desempenho é um orçamento numerado, medido no pior aparelho que precisamos ate
   - Artefato de release por ABI: **≤ 40 MB** (interino).
   - Banco local: teto rígido de **150 MB**, com aviso na UI a partir de 120 MB.
   - Lista de 10.000 leituras MUST rolar sem ANR, com memória estável e virtualização.
+- Orçamento do **painel** (artefato separado, usado no computador, mas não isento):
+  - JavaScript do caminho crítico: **≤ 250 KB comprimido**.
+  - Visão do conjunto: **p95 ≤ 1,5 s** para 30 colmeias com 12 meses de histórico.
+  - Gráfico de uma colmeia: **p95 ≤ 1,0 s**, servido a partir dos resumos diários.
+  - Planilha de 50 mil linhas MUST começar a baixar em **≤ 3 s**.
 - Toda dependência nova que aumente o artefato de release em **mais de 500 KB** MUST ser
   justificada em `## Complexity Tracking`, com a alternativa mais simples nomeada e o
   motivo da rejeição.
@@ -122,6 +169,13 @@ A série temporal é o produto científico do projeto. Ela é append-only.
   rodando no CI.
 - O código MUST NOT executar `UPDATE` nem `DELETE` na tabela de leituras. Correção se faz
   por registro novo com marcação de qualidade, ou por tabela separada.
+  A **única** exceção é `synced_at`, que é escrituração de envio e não dado científico:
+  registra que o servidor confirmou a gravação, e não altera nenhuma medição. Qualquer
+  `UPDATE` em `reading` que toque coluna diferente de `synced_at`, e qualquer `DELETE`,
+  MUST ser reprovado pelo lint do CI.
+- No servidor, a imutabilidade MUST ser propriedade do banco e não disciplina de quem
+  escreve o cliente: a tabela de leituras MUST NOT ter política de `UPDATE` nem de
+  `DELETE`.
 - Lacunas em `seq` MUST ser tratadas como normais e inofensivas — o contador só precisa
   ser monotônico e único, nunca contíguo. Lacuna MUST NOT ser interpretada como perda.
 - O contador bruto do nó MUST ser imutável no banco. O timestamp UTC é **derivado** e
@@ -186,6 +240,12 @@ ponto inteiro de um app offline-first.
 
 O ambiente de uso é sol a pino, luvas, uma mão livre e uma colmeia aberta. O idioma é o
 do apicultor.
+
+**Escopo deste princípio.** As **medidas** — alvo de toque, tamanho de tipo, contraste,
+modo sol, ausência de digitação livre — valem para o **app de campo**, porque decorrem da
+luva e do sol. As **regras de idioma** — pt-BR como locale fonte, módulo de i18n,
+glossário vinculante, forma da mensagem de erro, proibição de jargão de computação —
+valem para **todos os artefatos**, inclusive o painel.
 
 - Ações primárias MUST estar no terço inferior da tela, alcançáveis com o polegar. Ação
   destrutiva MUST NOT ficar nessa zona.
@@ -276,8 +336,14 @@ barata de perder uma campanha inteira de coleta, e o custo só aparece depois da
 
 - **Um codebase mobile** atende Android e, futuramente, iOS. Fork de codebase por
   plataforma MUST NOT ser criado.
-- **O painel web é artefato separado, online.** Ele MUST NOT conter banco local nem motor
-  de sincronização. Coleta pela web é possível apenas por cabo, em navegador de desktop.
+- **Nomes dos artefatos.** A palavra "web" MUST NOT ser usada sozinha, porque designa dois
+  artefatos incompatíveis. Os nomes são: **app de campo** (Expo no Android); **app de campo
+  no navegador** (o mesmo artefato rodando na web, que **tem** banco local e serve para
+  demonstração e laboratório); e **painel** (o painel das pesquisadoras).
+- **O painel é artefato separado, online.** Ele MUST NOT conter banco local nem motor
+  de sincronização, e isso MUST ser verificado por comando no CI, não por promessa.
+  Coleta pela web é possível apenas por cabo, em navegador de desktop, e apenas no app de
+  campo no navegador — nunca no painel.
 - **Alvos mínimos:** Android 8.0 (API 26); navegadores Chromium atuais. Elevar um mínimo é
   emenda MINOR desta constituição.
 - **Armazenamento local** é banco embarcado transacional com esquema versionado e migrações
@@ -286,10 +352,15 @@ barata de perder uma campanha inteira de coleta, e o custo só aparece depois da
 - **Permissões** MUST ser pedidas no momento do uso, com justificativa em pt-BR na tela.
   O app MUST NOT pedir permissão que não use.
 - **Sigilo do apicultor e LGPD:** coordenadas de apiário são informação sensível ao negócio,
-  por risco de furto de colmeias, e MUST NOT ser expostas fora da conta do usuário nem
-  enviadas a terceiros. Exportação para pesquisa MUST usar coordenada de precisão reduzida.
+  por risco de furto de colmeias. **Coordenada MUST NOT ser enviada ao servidor sob nenhuma
+  precisão, e o esquema do servidor MUST NOT conter coluna de latitude nem de longitude.**
+  Coluna ausente é verificável; precisão reduzida seria apenas uma promessa.
   CPF, RG e endereço MUST NOT ser coletados. Telemetria MUST NOT existir sem consentimento
   explícito, desligado por padrão.
+- **Direito ao apagamento.** O apicultor pode revogar consentimento e exigir exclusão dos
+  dados dele no servidor, e esse direito prevalece sobre a regra interna de append-only.
+  O procedimento MUST estar documentado e ser executado fora do aplicativo, com registro.
+  A cópia que está no aparelho dele é dado dele, no aparelho dele, e não é afetada.
 - Toda comunicação com o servidor MUST usar TLS. Chave de serviço com privilégio
   administrativo MUST NOT existir no aplicativo. Log MUST NOT conter dado pessoal nem
   coordenada.
@@ -361,4 +432,4 @@ injustificada bloqueia o merge.
 Orçamento que nunca reprovou nada está frouxo demais; princípio violado três vezes sem
 emenda MUST ser corrigido ou removido.
 
-**Version**: 1.0.0 | **Ratified**: 2026-09-09 | **Last Amended**: 2026-09-09
+**Version**: 1.1.0 | **Ratified**: 2026-09-09 | **Last Amended**: 2026-09-16

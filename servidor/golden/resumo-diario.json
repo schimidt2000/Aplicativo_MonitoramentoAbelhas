@@ -1,0 +1,38 @@
+{
+  "_comentario": [
+    "Caso de referência do resumo diário (FR-021, SC-007). O MESMO conjunto de leituras roda contra",
+    "recalcularResumos do celular (tests/resumo-golden.test.ts, better-sqlite3) e contra o gatilho do",
+    "servidor (servidor/teste/rodar.sh, Postgres). Os números esperados foram calculados à mão, não",
+    "copiados da saída de nenhuma das duas implementações.",
+    "O que cada dia prova:",
+    "  GOLD0001 dia 20300: amostra com gás inválido sai das médias de gás, ENTRA na temperatura, e conta",
+    "                      em excluded_count; leitura sem gás (NULL) conta como válida; NULL não vira 0.",
+    "  GOLD0001 dia 20301: só leituras com gás inválido -> o dia NÃO gera linha (é isso que vira lacuna).",
+    "  GOLD0001 dia 20302: lacuna de seq (7 não existe) é normal; leitura exatamente à meia-noite e a",
+    "                      1 ms da meia-noite seguinte caem no mesmo dia; média negativa -149,5 trunca",
+    "                      para -149 (em direção a zero), não para -150.",
+    "  GOLD0001 dia 20303: troca de época de sensor na virada do dia começa resumo novo (época 2).",
+    "  GOLD0002 dia 20300: segundo nó no mesmo dia não se mistura; só gás inválido deixa tvoc NULL.",
+    "Nota: temp_p5/temp_p95 são, hoje, MIN e MAX (nome herdado da 001). Ver specs/002-envio-e-painel/research.md, achado A-2."
+  ],
+  "leituras": [
+    { "device_id": "GOLD0001", "seq": 1,  "t_node": 900,  "t_utc_ms": 1753923600000, "t_quality": 1, "temp_c100": 3400, "rh_x100": 6000, "tvoc_ppb": 800,  "eco2_ppm": 600, "aqi_uba": 1, "gas_status": 0,    "batt_mv": 4000, "flags": 0, "boot_id": "b1", "sensor_epoch": 1, "calib_version": 1, "proto_ver": 1, "src": "golden" },
+    { "device_id": "GOLD0001", "seq": 2,  "t_node": 1800, "t_utc_ms": 1753927200000, "t_quality": 1, "temp_c100": 3500, "rh_x100": 6100, "tvoc_ppb": 1000, "eco2_ppm": 650, "aqi_uba": 1, "gas_status": 0,    "batt_mv": 3990, "flags": 0, "boot_id": "b1", "sensor_epoch": 1, "calib_version": 1, "proto_ver": 1, "src": "golden" },
+    { "device_id": "GOLD0001", "seq": 3,  "t_node": 2700, "t_utc_ms": 1753930800000, "t_quality": 1, "temp_c100": 3603, "rh_x100": null, "tvoc_ppb": 5000, "eco2_ppm": 900, "aqi_uba": 3, "gas_status": 2,    "batt_mv": 3980, "flags": 0, "boot_id": "b1", "sensor_epoch": 1, "calib_version": 1, "proto_ver": 1, "src": "golden" },
+    { "device_id": "GOLD0001", "seq": 4,  "t_node": 3600, "t_utc_ms": 1753934400000, "t_quality": 2, "temp_c100": null, "rh_x100": 6201, "tvoc_ppb": null, "eco2_ppm": null, "aqi_uba": null, "gas_status": null, "batt_mv": null, "flags": 0, "boot_id": "b1", "sensor_epoch": 1, "calib_version": 1, "proto_ver": 1, "src": "golden" },
+    { "device_id": "GOLD0001", "seq": 5,  "t_node": 4500, "t_utc_ms": 1754010000000, "t_quality": 1, "temp_c100": 3300, "rh_x100": 5900, "tvoc_ppb": 700,  "eco2_ppm": 500, "aqi_uba": 1, "gas_status": 1,    "batt_mv": 3900, "flags": 0, "boot_id": "b1", "sensor_epoch": 1, "calib_version": 1, "proto_ver": 1, "src": "golden" },
+    { "device_id": "GOLD0001", "seq": 6,  "t_node": 5400, "t_utc_ms": 1754013600000, "t_quality": 1, "temp_c100": 3310, "rh_x100": 5910, "tvoc_ppb": 710,  "eco2_ppm": 510, "aqi_uba": 1, "gas_status": 3,    "batt_mv": 3900, "flags": 0, "boot_id": "b1", "sensor_epoch": 1, "calib_version": 1, "proto_ver": 1, "src": "golden" },
+    { "device_id": "GOLD0001", "seq": 8,  "t_node": 7200, "t_utc_ms": 1754092800000, "t_quality": 1, "temp_c100": -150, "rh_x100": 9999, "tvoc_ppb": 700,  "eco2_ppm": 450, "aqi_uba": 1, "gas_status": 0,    "batt_mv": 3700, "flags": 0, "boot_id": "b2", "sensor_epoch": 1, "calib_version": 1, "proto_ver": 1, "src": "golden" },
+    { "device_id": "GOLD0001", "seq": 9,  "t_node": 8100, "t_utc_ms": 1754179199999, "t_quality": 1, "temp_c100": -149, "rh_x100": 9998, "tvoc_ppb": 704,  "eco2_ppm": 455, "aqi_uba": 1, "gas_status": 0,    "batt_mv": 3701, "flags": 0, "boot_id": "b2", "sensor_epoch": 1, "calib_version": 1, "proto_ver": 1, "src": "golden" },
+    { "device_id": "GOLD0001", "seq": 10, "t_node": 9000, "t_utc_ms": 1754197200000, "t_quality": 1, "temp_c100": 3000, "rh_x100": 5000, "tvoc_ppb": 300,  "eco2_ppm": 420, "aqi_uba": 1, "gas_status": 0,    "batt_mv": 3650, "flags": 0, "boot_id": "b2", "sensor_epoch": 2, "calib_version": 1, "proto_ver": 1, "src": "golden" },
+    { "device_id": "GOLD0001", "seq": 11, "t_node": 9900, "t_utc_ms": 1754200800000, "t_quality": 1, "temp_c100": 3001, "rh_x100": 5001, "tvoc_ppb": 2000, "eco2_ppm": 800, "aqi_uba": 2, "gas_status": 0,    "batt_mv": 3651, "flags": 0, "boot_id": "b2", "sensor_epoch": 2, "calib_version": 1, "proto_ver": 1, "src": "golden" },
+    { "device_id": "GOLD0002", "seq": 1,  "t_node": 900,  "t_utc_ms": 1753956000000, "t_quality": 1, "temp_c100": 3550, "rh_x100": null, "tvoc_ppb": null, "eco2_ppm": null, "aqi_uba": null, "gas_status": null, "batt_mv": null, "flags": 0, "boot_id": null, "sensor_epoch": 1, "calib_version": 1, "proto_ver": 1, "src": "golden" },
+    { "device_id": "GOLD0002", "seq": 2,  "t_node": 1800, "t_utc_ms": 1753959600000, "t_quality": 1, "temp_c100": 3650, "rh_x100": null, "tvoc_ppb": 9000, "eco2_ppm": 2000, "aqi_uba": 5, "gas_status": 2,    "batt_mv": null, "flags": 0, "boot_id": null, "sensor_epoch": 1, "calib_version": 1, "proto_ver": 1, "src": "golden" }
+  ],
+  "esperado": [
+    { "device_id": "GOLD0001", "day": 20300, "temp_p5": 3400, "temp_med": 3501, "temp_p95": 3603, "rh_med": 6100, "tvoc_med": 900,  "tvoc_amp": 200,  "batt_med": 3990, "sample_count": 3, "excluded_count": 1, "sensor_epoch": 1 },
+    { "device_id": "GOLD0001", "day": 20302, "temp_p5": -150, "temp_med": -149, "temp_p95": -149, "rh_med": 9998, "tvoc_med": 702,  "tvoc_amp": 4,    "batt_med": 3700, "sample_count": 2, "excluded_count": 0, "sensor_epoch": 1 },
+    { "device_id": "GOLD0001", "day": 20303, "temp_p5": 3000, "temp_med": 3000, "temp_p95": 3001, "rh_med": 5000, "tvoc_med": 1150, "tvoc_amp": 1700, "batt_med": 3650, "sample_count": 2, "excluded_count": 0, "sensor_epoch": 2 },
+    { "device_id": "GOLD0002", "day": 20300, "temp_p5": 3550, "temp_med": 3600, "temp_p95": 3650, "rh_med": null, "tvoc_med": null, "tvoc_amp": null, "batt_med": null, "sample_count": 1, "excluded_count": 1, "sensor_epoch": 1 }
+  ]
+}

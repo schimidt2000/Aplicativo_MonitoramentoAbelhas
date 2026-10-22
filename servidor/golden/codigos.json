@@ -1,0 +1,13 @@
+{
+  "_comentario": "Caso de referência do dígito verificador do código do projeto (Luhn mod 32 sobre base32 de Crockford). tests/codigo-projeto.test.ts confere a implementação do app; servidor/teste/rodar.sh confere a do Postgres. Se uma das duas mudar sozinha, um código válido no celular passa a ser recusado no servidor.",
+  "codigos": [
+    { "corpo": "BEE7K3M", "completo": "BEE7K3M6" },
+    { "corpo": "0000000", "completo": "00000000" },
+    { "corpo": "ZZZZZZZ", "completo": "ZZZZZZZ7" },
+    { "corpo": "DEM0A1B", "completo": "DEM0A1B4" },
+    { "corpo": "DEM0B2C", "completo": "DEM0B2CZ" },
+    { "corpo": "PQRSTVW", "completo": "PQRSTVW9" },
+    { "corpo": "1234567", "completo": "1234567M" },
+    { "corpo": "X9Y8Z7W", "completo": "X9Y8Z7WR" }
+  ]
+}
