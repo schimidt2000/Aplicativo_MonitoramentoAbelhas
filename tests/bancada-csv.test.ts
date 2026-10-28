@@ -44,7 +44,7 @@ describe('planilha da sessão', () => {
     expect(topo).toMatch(/ENS160/);
     expect(topo).toMatch(/eCO₂ estimado não é CO₂/);
     expect(topo).toMatch(/relógio deste computador/);
-    expect(topo).toMatch(/Leituras: 3\. Com o sensor de gás fora do normal \(status diferente de 0\): 1\. Linhas ilegíveis: 1\./);
+    expect(topo).toMatch(/Leituras: 3\. Com o sensor de gás fora do normal \(código da situação diferente de 0\): 1\. Linhas ilegíveis: 1\./);
   });
 
   it('uma linha por leitura, na ordem, com o mesmo número de colunas do cabeçalho', () => {

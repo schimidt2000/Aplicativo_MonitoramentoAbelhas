@@ -94,7 +94,7 @@ describe('leitura na tela', () => {
   it('eCO₂ também perde o número enquanto o sensor de gás não está pronto', () => {
     for (const st of ['1 (WARMUP)', '2', '3', '9']) {
       const v = leituraNaTela(leitura(`T=27.10C RH=55.03% Status=${st} AQI=1 TVOC=0ppb eCO2=400ppm`));
-      expect(v.gasEstimado, st).toMatch(/^eCO₂ estimado — não é CO₂: — /);
+      expect(v.gasEstimado, st).toMatch(/^eCO₂ estimado — não é CO₂: sem valor /);
       expect(v.gasEstimado, st).toMatch(/400 ppm/);
       expect(v.gasEstimado, st).not.toMatch(/CO₂: 400/);
     }
@@ -120,11 +120,11 @@ describe('leitura na tela', () => {
     expect(gas('9').texto).toMatch(/desconhecida \(código 9\)/);
   });
 
-  it('valor sem número aparece como "—" com explicação, nunca 0', () => {
+  it('valor sem número aparece como "Sem medição" com explicação, nunca 0', () => {
     const v = leituraNaTela(leitura('T=nanC RH=nan% Status=0 AQI=1 TVOC=5ppb eCO2=400ppm'));
-    expect(v.temperatura).toBe('—');
-    expect(v.temperaturaNota).toMatch(/sem número/);
-    expect(v.umidade).toBe('—');
+    expect(v.temperatura).toBe('Sem medição');
+    expect(v.temperaturaNota).toMatch(/não mandou número/);
+    expect(v.umidade).toBe('Sem medição');
   });
 
   it('registro: ilegível diz por quê, e lixo não desenha caractere de controle', () => {

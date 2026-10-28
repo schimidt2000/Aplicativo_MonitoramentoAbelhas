@@ -1,23 +1,26 @@
 /**
  * Formatação brasileira. Precisão NUNCA superior à exatidão do sensor
  * (Princípio VI, FR-023): temperatura com 1 casa, umidade com 0.
+ *
+ * As palavras vêm do i18n (Princípio V); aqui ficam só as unidades.
  */
+import { t, tp } from '../i18n';
 
 /** Temperatura em centésimos de °C -> "34,7 °C". Offset aplicado só aqui. */
 export function fmtTemp(c100: number | null, offsetC100 = 0): string {
-  if (c100 === null) return '—';
+  if (c100 === null) return t('grandeza.sem_valor');
   return `${((c100 + offsetC100) / 100).toFixed(1).replace('.', ',')} °C`;
 }
 
 /** Umidade sem casa decimal: na colmeia a exatidão é ±3-4 %RH. */
 export function fmtUmidade(x100: number | null): string {
-  if (x100 === null) return '—';
+  if (x100 === null) return t('grandeza.sem_valor');
   return `${Math.round(x100 / 100)} %`;
 }
 
 /** Voláteis. NUNCA rotular como CO2 (Princípio VI, FR-017). */
 export function fmtVolateis(ppb: number | null): string {
-  if (ppb === null) return '—';
+  if (ppb === null) return t('grandeza.sem_valor');
   return `${ppb.toLocaleString('pt-BR')} ppb`;
 }
 
@@ -37,10 +40,10 @@ export function estadoBateria(mv: number | null): EstadoBateria {
 
 export function fmtBateria(mv: number | null): string {
   switch (estadoBateria(mv)) {
-    case 'boa': return 'Boa';
-    case 'trocar-em-breve': return 'Trocar em breve';
-    case 'trocar-agora': return 'Trocar agora';
-    default: return '—';
+    case 'boa': return t('bateria.boa');
+    case 'trocar-em-breve': return t('bateria.trocar_em_breve');
+    case 'trocar-agora': return t('bateria.trocar_agora');
+    default: return t('bateria.nao_informada');
   }
 }
 
@@ -67,11 +70,11 @@ export function nivelColeta(ms: number | null, intervaloDias: number): NivelCole
 
 export function fmtNivelColeta(n: NivelColeta): string {
   switch (n) {
-    case 'sem-coleta': return 'Sem coleta';
-    case 'em-dia': return 'Em dia';
-    case 'chegando': return 'Chegando a hora';
-    case 'atrasada': return 'Coleta atrasada';
-    case 'muito-atrasada': return 'Muito atrasada';
+    case 'sem-coleta': return t('coleta.nivel.sem_coleta');
+    case 'em-dia': return t('coleta.nivel.em_dia');
+    case 'chegando': return t('coleta.nivel.em_breve');
+    case 'atrasada': return t('coleta.nivel.atrasada');
+    case 'muito-atrasada': return t('coleta.nivel.muito_atrasada');
   }
 }
 
@@ -83,17 +86,17 @@ export function diasDesde(ms: number | null): number | null {
 
 /** Frescor em texto. A cor de urgência vem de `nivelColeta`, não daqui. */
 export function fmtFrescor(ms: number | null): string {
-  if (ms === null) return 'Sem leitura ainda';
+  if (ms === null) return t('frescor.sem_leitura');
   const min = Math.floor((Date.now() - ms) / 60000);
-  if (min < 5) return 'Agora há pouco';
-  if (min < 60) return `Há ${min} min`;
+  if (min < 5) return t('frescor.agora');
+  if (min < 60) return tp('frescor.minutos', min);
   const h = Math.floor(min / 60);
-  if (h < 24) return `Há ${h} h`;
+  if (h < 24) return tp('frescor.horas', h);
+  // Sem "Ontem": 25 horas atrás pode ser anteontem no calendário. Conta-se o tempo.
   const d = Math.floor(h / 24);
-  if (d === 1) return 'Ontem';
-  if (d < 14) return `Há ${d} dias`;
-  const sem = Math.floor(d / 7);
-  return `Há ${sem} semanas`;
+  if (d < 14) return tp('frescor.dias', d);
+  if (d < 60) return tp('frescor.semanas', Math.floor(d / 7));
+  return tp('frescor.meses', Math.floor(d / 30));
 }
 
 /** Dado antigo não pode ser apresentado como atual (FR-021). */

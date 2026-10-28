@@ -174,9 +174,12 @@ function LinhaCard({ item, sol, alturaMinima, intervalo }: {
               {item.nome}
             </Text>
             <View style={s.frescorConjunto}>
-              <Text style={[s.cardFrescor, { fontSize: tipo.rotulo * escala }]}>
-                {fmtFrescor(item.ultima_ms)}
-              </Text>
+              {/* Sem leitura, a frase de baixo já diz o que fazer: frescor sobraria. */}
+              {!semDados && (
+                <Text style={[s.cardFrescor, { fontSize: tipo.rotulo * escala }]}>
+                  {fmtFrescor(item.ultima_ms)}
+                </Text>
+              )}
               {alerta && (
                 <Text style={[s.cardNivel, {
                   fontSize: tipo.rotulo * escala, color: corBarra,
@@ -216,7 +219,8 @@ function LinhaCard({ item, sol, alturaMinima, intervalo }: {
                   s.chipBateria,
                   bat === 'trocar-agora' && s.chipPerigo,
                   bat === 'trocar-em-breve' && s.chipAtencao,
-                ])}>
+                ])} accessible
+                  accessibilityLabel={t('colmeias.cartao.bateria', { estado: fmtBateria(item.batt_mv) })}>
                   <IconeBateria estado={bat} />
                   <Text style={[s.chipBateriaTexto, {
                     fontSize: tipo.rotulo * escala,

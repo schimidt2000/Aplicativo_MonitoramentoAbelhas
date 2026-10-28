@@ -198,14 +198,14 @@ describe('módulo de textos', () => {
   });
 
   it('preenche variáveis e escolhe o singular só para 1', () => {
-    expect(t('coleta.transferindo.titulo', { nome: 'Colmeia 07' })).toBe('Coletando de Colmeia 07');
+    expect(t('coleta.transferindo.titulo', { nome: 'Colmeia 07' })).toBe('Coletando da Colmeia 07');
     expect(tp('coleta.sucesso.salvas', 1)).toBe('1 leitura salva');
     expect(tp('coleta.sucesso.salvas', 0)).toBe('0 leituras salvas');
     expect(tp('coleta.sucesso.salvas', 1240)).toBe('1.240 leituras salvas');
   });
 
   it('variável não informada fica visível em vez de sumir', () => {
-    expect(t('coleta.transferindo.titulo')).toBe('Coletando de {nome}');
+    expect(t('coleta.transferindo.titulo')).toBe('Coletando da {nome}');
   });
 });
 

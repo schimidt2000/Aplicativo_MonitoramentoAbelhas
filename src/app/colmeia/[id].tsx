@@ -106,7 +106,9 @@ export default function DetalheColmeia() {
     <ScrollView style={s.tela} contentContainerStyle={{ padding: espaco.lg, gap: espaco.lg, paddingBottom: espaco.lg + bottom }}>
       <View>
         <Text style={s.nome}>{colmeia.nome}</Text>
-        <Text style={s.frescor}>{fmtFrescor(colmeia.ultima_ms)}</Text>
+        {!semDados && (
+          <Text style={s.frescor}>{fmtFrescor(colmeia.ultima_ms)}</Text>
+        )}
         {velho && !semDados && (
           <Text style={s.velho}>{t('colmeia.leituras_antigas')}</Text>
         )}

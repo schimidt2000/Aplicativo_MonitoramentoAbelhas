@@ -58,7 +58,7 @@ describe('mensagens do envio', () => {
   });
 
   it('na tela de ligar o celular, nenhuma mensagem manda tocar em "Enviar agora"', () => {
-    // Lá o botão é "Ligar o celular"; "Enviar agora" fica em outra tela.
+    // Lá o botão é "Ligar ao projeto"; "Enviar agora" fica em outra tela.
     for (const m of MOTIVOS) {
       const msg = mensagemAoLigar(m);
       expect(msg.titulo?.length, m).toBeGreaterThan(8);
@@ -66,7 +66,7 @@ describe('mensagens do envio', () => {
       expect(`${msg.titulo} ${msg.texto}`, m).not.toMatch(/Enviar agora|envio/i);
     }
     expect(mensagemAoLigar('sem-rede').tom).toBe('neutro');
-    expect(mensagemAoLigar('sem-rede').texto).toMatch(/Ligar o celular/);
+    expect(mensagemAoLigar('sem-rede').texto).toMatch(/Ligar ao projeto/);
   });
 
   it('cada motivo da validação local tem frase que diz o que fazer', () => {

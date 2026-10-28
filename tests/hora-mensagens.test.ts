@@ -34,7 +34,7 @@ describe('a pergunta "a data do celular está certa?"', () => {
     expect(p.alvos).toEqual([{ nodeId: 5, refId: 5, deviceId: 'AAAA000000000001', nome: 'Colmeia 07' }]);
     expect(p.titulo).toBe('A data do celular está certa?');
     expect(p.detalhe).toBe(
-      'A hora do celular não bate com o tempo que a Colmeia 07 contou desde a última coleta. '
+      'A hora do celular não combina com o tempo que o nó sensor da Colmeia 07 contou desde a última coleta. '
       + 'Por isso não acertei o relógio dela.',
     );
   });
@@ -45,7 +45,7 @@ describe('a pergunta "a data do celular está certa?"', () => {
       conflito(3, { deviceId: 'C', nome: 'Colmeia 11' }), no({ deviceId: 'D', nome: 'Colmeia 20' }),
     ]))!;
     expect(p.alvos.map((a) => a.refId)).toEqual([1, 2, 3]);
-    expect(p.detalhe).toContain('Colmeia 07, Colmeia 03 e Colmeia 11 contaram');
+    expect(p.detalhe).toContain('os nós sensores de Colmeia 07, Colmeia 03 e Colmeia 11 contaram');
     expect(p.detalhe).toContain('relógio delas');
   });
 
@@ -61,11 +61,11 @@ describe('a pergunta "a data do celular está certa?"', () => {
 
   it('depois da resposta: diz o que aconteceu e o que fazer', () => {
     expect(textoDepoisDaResposta('nao', { gravou: true, acertados: 0, naoAlcancadas: 0 }))
-      .toBe('Acerte a data e a hora nos ajustes do celular. Depois toque em Coletar de novo.');
+      .toBe('Acerte a data e a hora nas Configurações do celular. Depois toque em Coletar de novo.');
     expect(textoDepoisDaResposta('sim', { gravou: true, acertados: 1, naoAlcancadas: 0 }))
       .toBe('Combinado: vale a data deste celular. Relógio do nó sensor acertado.');
     expect(textoDepoisDaResposta('sim', { gravou: true, acertados: 0, naoAlcancadas: 1 }))
-      .toContain('será acertado na próxima coleta');
+      .toContain('Vou tentar de novo na próxima coleta');
     expect(textoDepoisDaResposta('sim', { gravou: false, acertados: 0, naoAlcancadas: 0 }))
       .toContain('Toque de novo');
   });

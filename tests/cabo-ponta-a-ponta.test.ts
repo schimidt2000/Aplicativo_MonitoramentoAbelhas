@@ -134,7 +134,7 @@ describe('US1 — coletar sem perder nada', () => {
     expect(p.inicioS).toBe(T0);
     expect(p.medicoes).toBe(38); // a placa desistiu, mediu e voltou a dormir
     const [aviso] = montarAvisos(c.r);
-    expect(aviso.detalhe).toMatch(/não confirmei para a placa, e ela continua com tudo/);
+    expect(aviso.detalhe).toMatch(/A placa continua com todas as leituras: nada foi apagado dela/);
   });
 
   it('INV-501: o mesmo arquivo de novo não muda nada', async () => {
@@ -265,7 +265,7 @@ describe('US3 — cada falha diz o que aconteceu com a placa', () => {
       const avisos = montarAvisos(c.r);
       if (esperado === 'continua') {
         expect(no(c).problema).toBeNull();
-        expect(avisos.map((a) => a.titulo)).toContain('A placa continua com as leituras desta vez');
+        expect(avisos.map((a) => a.titulo)).toContain('A placa ainda guarda as leituras desta coleta');
       }
       if (esperado === 'apagou') expect(no(c).problema).toBeNull();
       if (esperado === 'sem-arquivo') {
@@ -293,7 +293,7 @@ describe('US3 — cada falha diz o que aconteceu com a placa', () => {
     const c = await coletar(db, p);
     expect(no(c).cabo?.desfecho).toMatchObject({ arquivoNaPlaca: 'nao-se-sabe', gravado: true });
     expect(no(c).relogio).toBe('falhou');
-    expect(montarAvisos(c.r).map((a) => a.titulo)).toContain('Não deu para confirmar se a placa recomeçou');
+    expect(montarAvisos(c.r).map((a) => a.titulo)).toContain('Não deu para saber se a placa ainda tem estas leituras');
     expect(p.inicioS).toBe(AGORA_S);
     // Se a placa tivesse mantido, a próxima coleta não duplicaria; aqui ela traz só o arquivo novo.
   });
@@ -328,8 +328,8 @@ describe('US2 — hora estimada só quando a conta fecha', () => {
     expect(no(c)).toMatchObject({ inseridas: 20, problema: null, relogio: 'acertado' });
     expect(no(c).cabo).toMatchObject({ semHora: 20, conferencia: { veredito: 'a-menos', esperadas: 37 } });
     expect(new Set(horas(db).map((l) => l.t_motivo))).toEqual(new Set(['contagem-a-menos']));
-    const aviso = montarAvisos(c.r).find((a) => a.titulo === 'As horas desta coleta não fecharam')!;
-    expect(aviso.detalhe).toMatch(/A placa mandou 20 medições, e no tempo que passou cabiam cerca de 37\. A placa pode ter ficado sem energia\. As 20 leituras/);
+    const aviso = montarAvisos(c.r).find((a) => a.titulo === 'Não deu para calcular a hora destas leituras')!;
+    expect(aviso.detalhe).toMatch(/A placa mandou só 20 leituras, mas no tempo que passou cabiam cerca de 37\. A placa pode ter ficado sem energia por um tempo\. Por isso, as 20 leituras/);
     expect(resumir(c.r).notas.some((n) => n.startsWith('Horas estimadas'))).toBe(false);
   });
 
@@ -341,8 +341,8 @@ describe('US2 — hora estimada só quando a conta fecha', () => {
     const c1 = await coletar(db1, p1);
     expect(no(c1).cabo).toMatchObject({ semHora: 13, conferencia: { veredito: 'a-mais', medicoes: 13 } });
     expect(new Set(horas(db1).map((l) => l.t_motivo))).toEqual(new Set(['contagem-a-mais']));
-    const aviso = montarAvisos(c1.r).find((a) => a.titulo === 'As horas desta coleta não fecharam')!;
-    expect(aviso.detalhe).toMatch(/botão da placa é apertado sem completar a coleta/);
+    const aviso = montarAvisos(c1.r).find((a) => a.titulo === 'Não deu para calcular a hora destas leituras')!;
+    expect(aviso.detalhe).toMatch(/alguém aperta o botão da placa e não termina a coleta/);
 
     // Três dias (folga 3,6 h): uma medição a mais cabe na folga; quatro, não.
     const db3 = banco();
@@ -416,14 +416,14 @@ describe('colisão de chave (D-519): nunca engolida calada', () => {
     // Reimportar o MESMO arquivo: nenhuma colisão, nada muda.
     const mesma = await coletar(db, new PlacaSimulada({ arquivo: arquivoDaPlaca(0, 5, 1), tempos: TEMPOS_DE_TESTE }));
     expect(no(mesma).cabo?.conflitos).toBe(0);
-    expect(montarAvisos(mesma.r).some((a) => a.titulo.startsWith('Algumas leituras não entraram'))).toBe(false);
+    expect(montarAvisos(mesma.r).some((a) => a.titulo.startsWith('Algumas leituras ficaram salvas à parte'))).toBe(false);
 
     // Outra placa (regravada) que também tomou o HELLO como data 0, com outros valores.
     const outra = await coletar(db, new PlacaSimulada({ arquivo: arquivoDaPlaca(0, 7, 9), tempos: TEMPOS_DE_TESTE }));
     expect(no(outra)).toMatchObject({ inseridas: 2, recebidas: 7 });
     expect(no(outra).cabo?.conflitos).toBe(5);
     expect(leituras(db).slice(0, 5)).toEqual(antes);
-    const aviso = montarAvisos(outra.r).find((a) => a.titulo === 'Algumas leituras não entraram na série da colmeia')!;
+    const aviso = montarAvisos(outra.r).find((a) => a.titulo === 'Algumas leituras ficaram salvas à parte')!;
     expect(aviso.detalhe).toMatch(/^5 leituras desta placa têm o mesmo número/);
     // Nada se perdeu: o arquivo inteiro está no bruto da sessão, e o registro diz por quê.
     const ultima = sessoes(db).at(-1)!;

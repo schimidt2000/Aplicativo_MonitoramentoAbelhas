@@ -199,8 +199,10 @@ estão repetidos aqui.
 
 ### Ainda pendente (encontrado ao pagar, fora desta branch)
 
-- `src/core/format` ainda escreve palavras ("Boa", "Trocar agora", "Há 3 dias", "Coleta
-  atrasada"). Migrar exige quebrar o import circular `i18n → format`.
+- ~~`src/core/format` ainda escreve palavras ("Boa", "Trocar agora", "Há 3 dias", "Coleta
+  atrasada"). Migrar exige quebrar o import circular `i18n → format`.~~ Pago em
+  `fix/001-revisao-do-portugues`: as palavras foram para `pt-BR.ts` e o i18n deixou de
+  importar `format` (formata o número sozinho), então não há mais ciclo.
 - Texto branco sobre `acento` nos botões primários dá 5,9:1, abaixo dos 7:1 de texto
   primário. Pede um `acento` mais escuro ou uma regra explícita para rótulo de botão.
 - O preflight do `mock` afirma "Espaço disponível no aparelho" sem medir.

@@ -163,7 +163,7 @@ describe('preflight do simulado', () => {
   it('os rótulos chegam em pt-BR, vindos do i18n', async () => {
     const itens = await obterTransporte().preflight();
     expect(itens.map((i) => i.label)).toEqual([
-      'Nós sensores simulados ativos', 'Espaço disponível no aparelho',
+      'Modo de demonstração ligado', 'Espaço livre no celular',
     ]);
   });
 });
