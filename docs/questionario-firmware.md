@@ -11,9 +11,9 @@ JÁ RESPONDIDO PELO REPOSITÓRIO E PELOS ÁUDIOS (21/10/2026)
 
 Se algo aqui estiver errado, avisem.
 
-P1. Por onde os dados saem: pelo cabo USB, a 115200. A conversa é HELLO, READY, GET_FILE, FILE_INFO, o arquivo, RECEIVED, TRANSFER_OK, REQUEST_TIMESTAMP e SESSION_COMPLETE, com CRC-32 para conferir o arquivo. Bluetooth ainda não está decidido (ver a pergunta 10 abaixo).
+P1. Por onde os dados saem: pelo cabo USB, a 115200 baud. A conversa é HELLO, READY, GET_FILE, FILE_INFO, o arquivo, RECEIVED, TRANSFER_OK, REQUEST_TIMESTAMP e SESSION_COMPLETE, com CRC-32 para conferir o arquivo. Bluetooth ainda não está decidido (ver o item 10 de O QUE AINDA PRECISAMOS).
 
-P3, em parte. Cada medição tem temperatura, umidade, eCO2, TVOC e o número da medição, e a placa mede a cada 2 horas. Ainda não vêm a bateria, o status do ENS160 nem um número de versão do formato (ver as perguntas 5, 7 e 8 abaixo).
+P3, em parte. Cada medição tem temperatura, umidade, eCO2 (estimado pelo sensor, não é CO₂ de verdade), TVOC e o número da medição, e a placa mede a cada 2 horas. Ainda não vêm a bateria, o status do ENS160 nem um número de versão do formato (ver os itens 5, 7 e 8 de O QUE AINDA PRECISAMOS).
 
 P5. O número da medição começa em 0 e volta a 0 a cada coleta. Não dá para pedir "da 350 em diante": a placa manda o arquivo inteiro. Tudo bem, o app já se ajusta a isso.
 
@@ -23,12 +23,12 @@ P6b. A placa não manda quantos segundos se passaram desde que ligou, nem quanta
 
 P7. A placa apaga o arquivo depois do SESSION_COMPLETE. Por isso o app só responde RECEIVED depois de guardar tudo no celular.
 
-O botão. O apicultor aperta o botão da placa, ela acorda esperando o celular, e aí ele toca no botão do app. Para nós está ótimo assim.
+O botão. O apicultor aperta o botão da placa, a placa acorda e fica esperando o celular, e aí o apicultor toca em Coletar no app. Para nós está ótimo assim.
 
 
 O QUE AINDA PRECISAMOS
 
-Da mais importante para a menos importante. Se alguma não der, tudo bem: o app funciona sem ela, só fica menos certo.
+Do item mais importante para o menos importante. Se algum não der, tudo bem: o app funciona sem ele, só fica menos preciso.
 
 1. Um número fixo de cada placa, que vá junto na coleta.
 Hoje o apicultor tem que escolher na tela de qual colmeia é a placa, e uma escolha errada mistura as colmeias para sempre. O número que vem gravado de fábrica no chip (o MAC) resolve, porque nunca muda. Pode vir no READY ou dentro do arquivo. Sabemos que o arquivo depende do grupo de armazenamento; se for com eles, só nos digam com quem falar.
@@ -47,7 +47,7 @@ No áudio apareceu "milissegundos", mas o documento e o código dizem segundos. 
 Exemplo de resposta: "Segundos."
 
 5. O status do ENS160 em cada medição.
-Nos primeiros minutos (e na primeira vez, por quase uma hora) o ENS160 ainda está esquentando e o TVOC não vale. Sem saber disso, o app deixa os voláteis de fora das médias.
+Nos primeiros minutos depois de ligar (e, na primeira vez que a placa liga, por quase uma hora) o ENS160 ainda está esquentando e o TVOC não vale. Sem essa informação, o app deixa o TVOC fora das médias.
 Exemplo de resposta: "Vai um número a mais em cada medição: 0 pronto, 1 aquecendo."
 
 6. O que sai quando um sensor falha.
@@ -55,7 +55,7 @@ Qualquer coisa serve, desde que a gente saiba qual é. Só não mandem 0: na pla
 Exemplo de resposta: "Sai NaN." Ou: "Sai -999."
 
 7. A bateria, em volts.
-Hoje ela não vem. Em volts é melhor que em porcentagem: a gente converte no app.
+Hoje ela não vem. Em volts (ou milivolts) é melhor que em porcentagem: o app transforma a tensão em três avisos para o apicultor (Boa, Trocar em breve, Trocar agora).
 Exemplo de resposta: "Vai a bateria em volts no FILE_INFO."
 
 8. Um número de versão do formato.
