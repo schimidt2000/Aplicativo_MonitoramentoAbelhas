@@ -98,4 +98,9 @@ das telas, no [glossário](docs/glossario.md).
 
 ## Licença
 
-A definir.
+[MIT](LICENSE). Em português simples: qualquer pessoa pode usar, copiar e modificar este
+código, inclusive em outros projetos, desde que mantenha o aviso de autoria do arquivo
+`LICENSE`. O código vem sem garantia.
+
+A licença vale para o código e a documentação deste repositório. O firmware da placa é de
+outro grupo e tem o seu próprio repositório.
