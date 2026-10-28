@@ -124,7 +124,8 @@ describe('arquivo-0: recusa inteira quando não fecha', () => {
 
   it('formato desconhecido é recusado, nunca tentado', () => {
     expect(() => lerArquivo('arquivo-9', base)).toThrow(FormatoDeArquivoDesconhecidoError);
-    expect(FORMATO_DE_ARQUIVO_ATUAL).toBe('arquivo-0');
+    // O arquivo-0 continua na tabela (para reler o bruto antigo); a coleta usa o do 4cc7ed8.
+    expect(FORMATO_DE_ARQUIVO_ATUAL).toBe('arquivo-1');
   });
 });
 

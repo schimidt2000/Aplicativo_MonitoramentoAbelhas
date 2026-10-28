@@ -97,6 +97,8 @@ export function passoPlacaNova(
 
   const l = lerLinhaDaPlaca(ev.texto);
   if (l.tipo === 'ready') return fim(e, 'ja-configurada');
+  // 4cc7ed8: sem o próprio MAC, a placa não cria o arquivo (e diz isso antes do "ERRO:").
+  if (l.tipo === 'erro' && l.codigo === 'MAC_READ_FAILED') return fim(e, 'placa-nao-salvou');
   if (l.tipo === 'diagnostico') {
     if (l.pista === 'hora-inicial-salva') return fim(e, 'confirmada');
     if (l.pista === 'hora-inicial-falhou') return fim(e, 'placa-nao-salvou');

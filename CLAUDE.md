@@ -101,9 +101,10 @@ airplane-mode test result and a 7-row Constitution Check.
 ## Gotchas — grows by evidence only
 
 - The payload is another team's contract (CONFIRMED vs ASSUMED: `docs/integracao-firmware.md`).
-  Firmware e93f8ad (2026-10-21): o id da medição ZERA a cada coleta e a placa apaga o
-  arquivo após SESSION_COMPLETE; (node_id, id) colide entre coletas — a placa real só entra
-  pela tela "Coletar pelo cabo" (005: seq = início×1e6 + id), nunca pelo Coletar das abas,
+  Firmware 4cc7ed8 (2026-10-28): o arquivo começa com o MAC (17 caracteres + 0x00) antes da
+  hora de início, e a numeração começa em 1 por defeito conhecido; a placa apaga o arquivo
+  após SESSION_COMPLETE e recomeça a contar. A placa real só entra pela tela "Coletar pelo
+  cabo" (005: seq = início×1e6 + POSIÇÃO no arquivo, D-520), nunca pelo Coletar das abas,
   que é o mock. A hora do celular vai DEPOIS da transferência, em segundos Unix.
 - The node has NO clock of its own (firmware group, 2026-10-14). In THIS branch (modelo da
   003, mock) the phone offers UTC time via `setTime` before every pull — best effort, 5 s

@@ -19,6 +19,13 @@ A coleta pelo cabo (feature **005**) segue esse código; ver a seção
 [Firmware de 2026-10-21](#firmware-de-2026-10-21-commit-e93f8ad--coleta-pelo-cabo). O
 Bluetooth continua sem resposta.
 
+**Atualização de 2026-10-28: commit `4cc7ed8`.** O arquivo da placa passou a começar com o
+**MAC** dela (identidade da placa, o pedido 1), e o botão mudou para o GPIO 0 (D0). A
+conversa pelo cabo não mudou. O app já lê o formato novo (`arquivo-1`, D-520); o que mudou,
+o defeito de numeração que veio junto e os riscos novos estão na seção
+[Firmware de 2026-10-28](#firmware-de-2026-10-28-commit-4cc7ed8). Roteiro do primeiro teste
+com a placa: [`teste-com-a-placa.md`](./teste-com-a-placa.md).
+
 **Existem três grupos, não dois** (confirmado por João, 2026-10-21): firmware, aplicativo
 (nós) e **armazenamento**.
 
@@ -57,6 +64,8 @@ disse ou escreveu) do **intermediário** (quem repassou ao grupo do aplicativo).
 | 6 | Hora | A placa não terá marcação de hora própria. O celular manda, **depois** de `TRANSFER_OK`, a hora em **segundos Unix** (`REQUEST_TIMESTAMP` → `<segundos>\n`). A placa guarda só esse instante inicial; a hora de cada medição é **calculada pelo app**: inicial + id × intervalo (2 h em produção). Detalhes em `COMMUNICATION_PROTOCOL.md` do repositório deles. No áudio 2 apareceu "milissegundos"; documento e código dizem segundos — reconfirmar | fonte: repositório `e93f8ad` / áudios do grupo do firmware (grupo do firmware) · intermediário: João Pedro | 2026-10-21 |
 | 1, 5, 7 | Transporte, numeração, apagar | Coleta por **cabo USB** (115200 8N1), protocolo `HELLO/READY/GET_FILE/FILE_INFO/<binário>/RECEIVED/TRANSFER_OK/REQUEST_TIMESTAMP/SESSION_COMPLETE`, CRC-32/ISO-HDLC. O `id` da medição **volta a 0 a cada coleta** e a placa **apaga** o arquivo depois de `SESSION_COMPLETE`. Formato do arquivo: `uint64` inicial + N × 16 bytes `{float temp, float rh, u16 eco2, u16 tvoc, u32 id}`, little-endian, e vai mudar pouco (entra o ID da placa, que depende do grupo de **armazenamento**) | fonte: repositório `e93f8ad` / áudios do grupo do firmware (grupo do firmware) · intermediário: João Pedro | 2026-10-21 |
 | — | Grupos | O grupo de **armazenamento** é um terceiro grupo; o formato do arquivo depende dele (vai entrar o ID da placa) | fonte: áudio 1 do grupo do firmware · intermediário: João Pedro | 2026-10-21 |
+| 2 | ID da placa | O **MAC** da placa (Wi-Fi STA, `esp_read_mac`) entra no começo do arquivo, como texto `AA:BB:CC:11:22:33` + `0x00` (18 bytes), antes da hora de início. O `READY` continua sem MAC | fonte: repositório `4cc7ed8` (código e `COMMUNICATION_PROTOCOL.md`), grupo do firmware · intermediário: João Pedro | 2026-10-28 |
+| — | Botão | Botão no **GPIO 0 (D0)**, com pull-down na placa: solto em LOW, apertado em HIGH; acorda pelo nível alto | fonte: repositório `4cc7ed8` · intermediário: João Pedro | 2026-10-28 |
 
 ## Refutadas pelo firmware `e93f8ad` (2026-10-21)
 
@@ -220,7 +229,9 @@ está marcada. Uso no app: `specs/005-coleta-pelo-cabo/` (contratos em `contract
 ### Dependência: grupo de armazenamento
 
 O formato do arquivo depende do terceiro grupo, de armazenamento. Áudio 1: "a organização do
-arquivo provavelmente vai mudar … mas vai mudar pouco: só vai entrar o ID da placa". Quando
+arquivo provavelmente vai mudar … mas vai mudar pouco: só vai entrar o ID da placa". **Mudou
+em 2026-10-28 (`4cc7ed8`): entrou o MAC na frente; leitor `arquivo-1`.** O texto abaixo é o
+de 21/10. Quando
 mudar, o leitor novo entra na tabela de `src/core/decode/arquivo.ts` (o `arquivo-0` fica). O
 app hoje recusa um arquivo cujo tamanho não seja 8 + múltiplo de 16 ou cuja numeração não seja
 0, 1, 2…: um ID acrescentado no cabeçalho é recusado (nada se perde: a placa não recebe
@@ -272,6 +283,68 @@ Por ordem de importância:
 
 Estado: **não enviados ainda** (2026-10-21). Ao responderem, uma linha na tabela de
 confirmações acima, com data e nome.
+
+---
+
+## Firmware de 2026-10-28 (commit `4cc7ed8`)
+
+**Fontes:** `firmware/firmware.ino`, `teste_de_firmware/teste_de_firmware.ino`,
+`leitura_de_arquivo/leitura_de_arquivo.ino` e `COMMUNICATION_PROTOCOL.md` do commit `4cc7ed8`
+(2026-10-28 13:28 −0300), lidos por nós e **não executados**. Sete commits depois do
+`e93f8ad`. Uso no app: D-520 e `contracts/arquivo-1.md` da feature 005.
+
+### O que mudou
+
+| Assunto | `e93f8ad` (21/10) | `4cc7ed8` (28/10) | No app |
+|---|---|---|---|
+| Arquivo | hora (8) + medições | **MAC em texto + `0x00` (18)** + hora (8) + medições | leitor `arquivo-1`, `proto_ver = 101` |
+| Numeração | 0, 1, 2… | **1, 2, 3…** (defeito, ver abaixo) | chave e hora pela posição; os dois começos valem |
+| Identidade | nenhuma | o MAC, dentro do arquivo | `node.mac`; a placa reconhece a colmeia sozinha |
+| Botão | GPIO 2 | **GPIO 0 (D0)**, pull-down na placa | — |
+| Erros novos | — | `MAC_READ_FAILED`, `TEMP_MAC_WRITE_FAILED` (antes de mexer no arquivo) | a placa fica com o arquivo |
+| `firmware.ino` | só o teste existia | versão de produção: 2 h, e textos curtos (`HELLO`, `TIMEOUT`, "does not exists.") | os dois conjuntos de textos são reconhecidos |
+| Primeiro boot (teste) | "Timestamp inicial salvo com sucesso!" | "MAC e timestamp inicial salvos com sucesso!" | reconhecido: "Configurar placa nova" confirma |
+| Conversa | — | **igual** (`HELLO` … `SESSION_COMPLETE`, CRC, prazos de 30 s) | nada a mudar |
+
+### Defeitos e riscos novos
+
+1. **A numeração começa em 1.** `getNextMeasurementId` ainda compara o tamanho com 8 bytes
+   ("só a hora"). No arquivo novo de 26 bytes, lê o fim do MAC e a hora como se fossem uma
+   medição, e a primeira medição recebe 1. O próprio grupo registrou (§7.2 do protocolo:
+   "precisa ser corrigida"). **Impacto se o app usasse o número:** toda hora uma medição
+   adiantada, 2 h em produção, sem sinal nenhum. O app usa a posição (D-520), então a
+   correção do firmware não muda nada do nosso lado. Correção sugerida: tratar como vazio o
+   arquivo de até 26 bytes.
+2. **O sensor de gás fica ligado durante o sono (a confirmar).** O código põe o ENS160 em
+   modo padrão a cada despertar e nunca o desliga antes do sono profundo. A alimentação de
+   3,3 V da XIAO continua ligada no sono, então o aquecedor fica ligado as 2 h inteiras
+   (cerca de 29 mA, pelas nossas notas), e o AHT21 ao lado pode ler **+4 a +6 °C** (ver
+   "O ENS160 aquece o AHT21"). O AHT21 é lido primeiro a cada despertar, o que só ajuda se o
+   ENS160 tiver dormido. Conferir no teste com um termômetro ao lado; pedir
+   `setMode(ENS160_OPMODE_DEP_SLEEP)` antes de `esp_deep_sleep_start()`.
+3. **`LittleFS.begin(false)` não formata.** Os commits de 08/10 usavam `begin(true)`. Uma placa
+   que nunca teve o sistema de arquivos formatado não cria o arquivo, e "Configurar placa
+   nova" responde que a placa não conseguiu guardar a hora. As placas do grupo já devem estar
+   formatadas; uma placa nova, não.
+4. **Primeiro boot sem conseguir ler o MAC deixa um arquivo vazio.** `saveInitialTimestamp`
+   abre o arquivo antes de ler o MAC. Com `MAC_READ_FAILED`, sobra um arquivo de 0 bytes, e
+   no boot seguinte a placa acha que já está configurada. Raro (o MAC vem de fábrica);
+   reproduzido na placa simulada.
+5. **Continuam valendo** os riscos 1 a 7 da seção de 2026-10-21 (reset ao abrir a porta,
+   porta que some, tempo acordado e deriva, `HELLO` como hora numa placa nova, medição fora do
+   ritmo pelo botão).
+
+### Estado dos pedidos de 2026-10-21
+
+| Pedido | Estado em 28/10 |
+|---|---|
+| 1. MAC da placa | **atendido**, no arquivo (não no `READY`) |
+| 2. Intervalo no `FILE_INFO` | não; o app usa o intervalo escolhido na tela da colmeia (2 h padrão; "25 segundos" para a placa de teste) |
+| 3. Não medir quando a coleta falha | não |
+| 4. Hora em segundos | o documento e o código continuam dizendo segundos |
+| 5. Status do ENS160 | não; voláteis seguem fora das médias |
+
+Pedidos novos e o texto para o grupo: [`mensagem-firmware-2026-10-28.md`](./mensagem-firmware-2026-10-28.md).
 
 ---
 

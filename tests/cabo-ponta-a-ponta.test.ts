@@ -15,7 +15,7 @@ import type { CanalSerial } from '@/core/ports/canal';
 import { crc32, crcEmHex } from '@/core/cabo/crc32';
 import { INICIO_DO_PROJETO_MS } from '@/core/relogio';
 import {
-  PlacaSimulada, TEMPOS_DE_TESTE, arquivoDaPlaca, type ErroDaTroca, type FalhasDaPlaca,
+  PlacaSimulada, TEMPOS_DE_TESTE, arquivoDaPlaca, macSimulado, type ErroDaTroca, type FalhasDaPlaca,
 } from '@/transports/mock/firmware';
 import type { SqlDb } from '@/data/types';
 import { bancoDeTeste } from './apoio/banco';
@@ -42,6 +42,13 @@ function banco(): SqlDb {
 
 function placa(n = 37, falhas: FalhasDaPlaca = {}, inicioS = T0): PlacaSimulada {
   return new PlacaSimulada({ arquivo: arquivoDaPlaca(inicioS, n), falhas, tempos: TEMPOS_DE_TESTE });
+}
+
+/** Uma placa do firmware atual com um MAC escolhido (o MAC vem dentro do arquivo). */
+function placaComMac(mac: string, n = 37, inicioS = T0, falhas: FalhasDaPlaca = {}): PlacaSimulada {
+  return new PlacaSimulada({
+    arquivo: arquivoDaPlaca(inicioS, n, 1, '4cc7ed8', mac), mac, falhas, tempos: TEMPOS_DE_TESTE,
+  });
 }
 
 interface Coleta {
@@ -93,10 +100,12 @@ describe('US1 — coletar sem perder nada', () => {
 
     // Sessão com o arquivo bruto inteiro e o registro da conversa (FR-007).
     const [s] = sessoes(db);
-    expect(s).toMatchObject({ outcome: 'ok', formato: 'arquivo-0', proto_ver: 100, record_count: 37,
+    expect(s).toMatchObject({ outcome: 'ok', formato: 'arquivo-1', proto_ver: 101, record_count: 37,
       fim_da_placa: 'apagou', hora_enviada_s: AGORA_S, crc32: crcEmHex(crc32(original)), src: 'mock' });
     expect(new Uint8Array(s.raw as Buffer)).toEqual(original);
     expect(String(s.registro)).toContain('→ RECEIVED:');
+    // A placa numerou de 1 (4cc7ed8); a hora acima saiu da posição, e o registro diz isso.
+    expect(String(s.registro)).toContain('numerou as medições a partir de 1');
 
     // O resultado fala como toda coleta.
     const resumo = resumir(c.r);
@@ -198,7 +207,7 @@ describe('US3 — cada falha diz o que aconteceu com a placa', () => {
     expect(p.inicioS).toBe(T0);
     // O que chegou fica guardado, mesmo com defeito.
     expect(sessoes(db)[0]).toMatchObject({ outcome: 'dados_corrompidos', fim_da_placa: 'continua' });
-    expect((sessoes(db)[0].raw as Buffer).length).toBe(8 + 37 * 16);
+    expect((sessoes(db)[0].raw as Buffer).length).toBe(26 + 37 * 16);
   });
 
   it('cabo puxado no meio do arquivo: nada gravado, o pedaço que chegou fica guardado', async () => {
@@ -379,29 +388,52 @@ describe('US2 — hora estimada só quando a conta fecha', () => {
 });
 
 describe('US4 — de qual colmeia é esta placa', () => {
-  it('MAC novo fica ligado à colmeia escolhida; depois, o MAC manda', async () => {
+  it('MAC novo (de dentro do arquivo) fica ligado à colmeia escolhida; depois, o MAC manda', async () => {
     const db = banco();
     const MAC = 'AA:BB:CC:DD:EE:01';
-    const c1 = await coletar(db, placa(37, { mac: MAC }), { hiveId: 'h1' });
+    const c1 = await coletar(db, placaComMac(MAC), { hiveId: 'h1' });
     expect(no(c1).cabo?.colmeiaPeloMac).toBe(false);
     expect(db.all('SELECT hive_id, mac FROM node')).toEqual([{ hive_id: 'h1', mac: MAC }]);
 
     // A mesma placa, com a Colmeia 03 marcada por engano: as leituras vão para a 07.
-    const c2 = await coletar(db, placa(3, { mac: MAC }, AGORA_S), { hiveId: 'h2', agora: AGORA + 7 * H * 1000 });
+    const c2 = await coletar(db, placaComMac(MAC, 3, AGORA_S), { hiveId: 'h2', agora: AGORA + 7 * H * 1000 });
     expect(no(c2)).toMatchObject({ nome: 'Colmeia 07' });
     expect(no(c2).cabo?.colmeiaPeloMac).toBe(true);
     expect(montarAvisos(c2.r).map((a) => a.titulo)).toContain('Esta placa é da Colmeia 07');
     expect(db.all('SELECT COUNT(*) AS c FROM node')).toEqual([{ c: 1 }]);
   });
 
-  it('sem MAC, vai para a colmeia escolhida; o nó é criado uma vez só', async () => {
+  it('a mesma placa duas vezes: o nó é criado uma vez só, com o MAC do arquivo', async () => {
     const db = banco();
     await coletar(db, placa(), { hiveId: 'h2' });
     await coletar(db, placa(2, {}, AGORA_S), { hiveId: 'h2', agora: AGORA + 5 * H * 1000 });
     const nos = db.all<{ hive_id: string; device_id: string; mac: string | null }>('SELECT hive_id, device_id, mac FROM node');
     expect(nos).toHaveLength(1);
-    expect(nos[0]).toMatchObject({ hive_id: 'h2', mac: null });
+    expect(nos[0]).toMatchObject({ hive_id: 'h2', mac: macSimulado(1) });
     expect(nos[0].device_id).toMatch(/^placa-[0-9a-f]{16}$/);
+  });
+
+  it('o MAC de dentro do arquivo vale mais que o do READY:<MAC>', async () => {
+    const db = banco();
+    await coletar(db, placaComMac('AA:BB:CC:DD:EE:02', 37, T0, { mac: '11:22:33:44:55:66' }));
+    expect(db.all('SELECT mac FROM node')).toEqual([{ mac: 'AA:BB:CC:DD:EE:02' }]);
+  });
+});
+
+describe('placa com o firmware antigo (e93f8ad, sem MAC no arquivo)', () => {
+  it('o arquivo é recusado inteiro: nada na série, o bruto guardado, a placa fica com tudo', async () => {
+    const db = banco();
+    const p = new PlacaSimulada({
+      firmware: 'e93f8ad', arquivo: arquivoDaPlaca(T0, 37, 1, 'e93f8ad'), tempos: TEMPOS_DE_TESTE,
+    });
+    const original = p.arquivo!.slice();
+    const c = await coletar(db, p);
+    expect(no(c).problema).toBe('formato-desconhecido');
+    expect(no(c).cabo?.desfecho).toMatchObject({ motivo: 'formato-desconhecido', gravado: false, arquivoNaPlaca: 'continua' });
+    expect(c.enviados.some((t) => t.startsWith('RECEIVED'))).toBe(false);
+    expect(contarLeituras(db)).toBe(0);
+    expect(p.inicioS).toBe(T0);
+    expect(new Uint8Array(sessoes(db)[0].raw as Buffer)).toEqual(original);
   });
 });
 

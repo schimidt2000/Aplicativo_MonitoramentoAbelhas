@@ -590,7 +590,7 @@ export const ptBR = {
   'caboColeta.intro': 'Coleta das leituras da placa ligada no cabo USB deste computador.',
   'caboColeta.colmeia.titulo': 'De qual colmeia é esta placa?',
   'caboColeta.colmeia.ajuda':
-    'A placa ainda não diz de qual colmeia ela é. Escolha a colmeia abaixo. O aplicativo guarda a sua escolha para a próxima vez.',
+    'Escolha abaixo a colmeia desta placa. Depois da primeira coleta, o aplicativo reconhece a placa sozinho.',
   'caboColeta.colmeia.nenhuma':
     'Ainda não há colmeia no aplicativo. Sem uma colmeia, não dá para guardar as leituras da placa. Avise a pesquisadora.',
   'caboColeta.passo.rotulo': 'Passo {n}',

@@ -2,7 +2,7 @@
  * A parte da tela de coleta pelo cabo que é conta, não desenho (feature 005,
  * FR-026, FR-027). Pura e testável.
  */
-import { CABECALHO_ARQUIVO_0, REGISTRO_ARQUIVO_0 } from '../decode/arquivo';
+import { CABECALHO_DO_FORMATO, FORMATO_DE_ARQUIVO_ATUAL, REGISTRO_DE_MEDICAO } from '../decode/arquivo';
 import { t, tp, type ChaveTexto } from '../i18n';
 import { INTERVALO_PADRAO_S } from '../hora';
 import type { ProgressoDaSessao } from './sessao';
@@ -21,9 +21,10 @@ export function segundosAteDormir(acordouMs: number | null, agoraMs: number): nu
   return Math.max(0, Math.ceil((acordouMs + PLACA_ACORDADA_MS - agoraMs) / 1000));
 }
 
-/** Quantas leituras inteiras já chegaram, pelos bytes (arquivo-0). */
+/** Quantas leituras inteiras já chegaram, pelos bytes (no formato que a coleta usa). */
 export function leiturasPelosBytes(recebidos: number): number {
-  return Math.max(0, Math.floor((recebidos - CABECALHO_ARQUIVO_0) / REGISTRO_ARQUIVO_0));
+  const cabecalho = CABECALHO_DO_FORMATO[FORMATO_DE_ARQUIVO_ATUAL];
+  return Math.max(0, Math.floor((recebidos - cabecalho) / REGISTRO_DE_MEDICAO));
 }
 
 /** Fração de 0 a 1 para a barra; só existe enquanto o arquivo chega. */

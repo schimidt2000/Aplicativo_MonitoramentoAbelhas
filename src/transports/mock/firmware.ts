@@ -1,7 +1,10 @@
 /**
- * A placa simulada: o `teste_de_firmware.ino` do grupo do firmware (commit
- * e93f8ad, 2026-10-21), traduzido para TypeScript linha por linha no que
- * importa para o cabo (feature 005, D-511). É a base dos testes da coleta pelo
+ * A placa simulada: o `teste_de_firmware.ino` do grupo do firmware, traduzido
+ * para TypeScript linha por linha no que importa para o cabo (feature 005,
+ * D-511). Duas versões: e93f8ad (2026-10-21) e 4cc7ed8 (2026-10-28, a atual),
+ * que põe o MAC da placa na frente do arquivo e, por isso, numera as medições
+ * a partir de 1 (`getNextMeasurementId` ainda compara o tamanho com os 8 bytes
+ * da hora; a tradução fiel reproduz o defeito sozinha, D-520). É a base dos testes da coleta pelo
  * cabo e a "placa simulada" da demonstração. O Princípio IV exige que ela
  * exista ANTES do transporte real: se um caminho de falha não está aqui, ele
  * não está testado.
@@ -26,12 +29,29 @@ import { TransportError } from '@/core/ports/transport';
 import type { CanalSerial } from '@/core/ports/canal';
 import { crc32, crcEmHex } from '@/core/cabo/crc32';
 import {
-  CABECALHO_ARQUIVO_0, REGISTRO_ARQUIVO_0, codificarArquivo0, type MedicaoBruta,
+  CABECALHO_DO_FORMATO, REGISTRO_DE_MEDICAO, codificarArquivo0, codificarArquivo1, codificarMedicao,
+  type FormatoDeArquivo, type MedicaoBruta,
 } from '@/core/decode/arquivo';
 import { EntradaDeBytes, canalSobre } from '../cable/entrada';
 
+/** O commit do firmware que a placa simulada imita. */
+export type VersaoDoFirmware = 'e93f8ad' | '4cc7ed8';
+export const FIRMWARE_ATUAL: VersaoDoFirmware = '4cc7ed8';
+
+const FORMATO_DO_FIRMWARE: Record<VersaoDoFirmware, FormatoDeArquivo> = {
+  'e93f8ad': 'arquivo-0',
+  '4cc7ed8': 'arquivo-1',
+};
+
+/** Um MAC de Espressif, fixo pela semente: a mesma placa simulada tem sempre o mesmo. */
+export function macSimulado(semente = 1): string {
+  const h = (n: number) => (n & 0xff).toString(16).toUpperCase().padStart(2, '0');
+  return `F0:F5:BD:5A:${h(semente >> 8)}:${h(semente)}`;
+}
+
 export type ErroDaTroca =
-  | 'REMOVE_TEMP_FAILED' | 'TEMP_OPEN_FAILED' | 'TEMP_WRITE_FAILED'
+  | 'REMOVE_TEMP_FAILED' | 'TEMP_OPEN_FAILED' | 'MAC_READ_FAILED' | 'TEMP_MAC_WRITE_FAILED'
+  | 'TEMP_WRITE_FAILED'
   | 'TEMP_VERIFY_OPEN_FAILED' | 'TEMP_VERIFY_FAILED' | 'REMOVE_BACKUP_FAILED'
   | 'OLD_FILE_RENAME_FAILED' | 'NEW_FILE_RENAME_FAILED' | 'FILE_RESTORE_FAILED'
   | 'BACKUP_CLEANUP_FAILED';
@@ -65,6 +85,8 @@ export interface FalhasDaPlaca {
   ouveDepoisDeMs?: number;
   /** `getNextMeasurementId` falha ao abrir o arquivo e devolve 0 (defeito do firmware). */
   idZeradoNaProximaMedicao?: boolean;
+  /** 4cc7ed8: `getBoardMacAddress` falha (no primeiro boot e na troca do arquivo). */
+  macIlegivel?: boolean;
 }
 
 export interface TemposDaPlaca {
@@ -118,9 +140,18 @@ export function medicaoSimulada(id: number, semente = 1): Omit<MedicaoBruta, 'id
   };
 }
 
-/** Um `/measurements.bin` com `n` medições, como a placa teria gravado. */
-export function arquivoDaPlaca(inicioS: number, n: number, semente = 1): Uint8Array {
-  return codificarArquivo0(inicioS, Array.from({ length: n }, (_, id) => ({ ...medicaoSimulada(id, semente), id })));
+/**
+ * Um `/measurements.bin` com `n` medições, como a placa teria gravado: no
+ * e93f8ad, numeradas de 0; no 4cc7ed8, com o MAC na frente e numeradas de 1.
+ */
+export function arquivoDaPlaca(
+  inicioS: number, n: number, semente = 1, firmware: VersaoDoFirmware = FIRMWARE_ATUAL,
+  mac = macSimulado(semente),
+): Uint8Array {
+  if (firmware === 'e93f8ad') {
+    return codificarArquivo0(inicioS, Array.from({ length: n }, (_, id) => ({ ...medicaoSimulada(id, semente), id })));
+  }
+  return codificarArquivo1(mac, inicioS, Array.from({ length: n }, (_, k) => ({ ...medicaoSimulada(k + 1, semente), id: k + 1 })));
 }
 
 /** `strtoul`/`strtoull` da libc: espaço, sinal, "0x" na base 16, para no primeiro inválido. */
@@ -161,6 +192,10 @@ interface Ligacao {
 export interface OpcoesPlacaSimulada {
   /** `/measurements.bin`. `null`: placa nova (primeiro boot). */
   arquivo?: Uint8Array | null;
+  /** Padrão: o atual (4cc7ed8). */
+  firmware?: VersaoDoFirmware;
+  /** O MAC que a placa lê de si mesma. Padrão: `macSimulado(semente)`. */
+  mac?: string;
   falhas?: FalhasDaPlaca;
   tempos?: Partial<TemposDaPlaca>;
   semente?: number;
@@ -169,6 +204,8 @@ export interface OpcoesPlacaSimulada {
 export class PlacaSimulada {
   arquivo: Uint8Array | null;
   falhas: FalhasDaPlaca;
+  readonly firmware: VersaoDoFirmware;
+  readonly mac: string;
   readonly tempos: TemposDaPlaca;
   /** Tudo o que a placa imprimiu, para depurar teste. */
   readonly impresso: string[] = [];
@@ -179,21 +216,40 @@ export class PlacaSimulada {
   private sorteio: number;
 
   constructor(opcoes: OpcoesPlacaSimulada = {}) {
-    this.arquivo = opcoes.arquivo === undefined ? arquivoDaPlaca(Math.floor(Date.now() / 1000), 0) : opcoes.arquivo;
+    this.firmware = opcoes.firmware ?? FIRMWARE_ATUAL;
+    this.semente = opcoes.semente ?? 1;
+    this.mac = opcoes.mac ?? macSimulado(this.semente);
+    this.arquivo = opcoes.arquivo === undefined
+      ? this.arquivoNovo(Math.floor(Date.now() / 1000))
+      : opcoes.arquivo;
     this.falhas = opcoes.falhas ?? {};
     this.tempos = { ...TEMPOS_DA_PLACA, ...opcoes.tempos };
-    this.semente = opcoes.semente ?? 1;
     this.sorteio = (this.semente * 2654435761) >>> 0;
+  }
+
+  /** O formato que este firmware grava. */
+  get formato(): FormatoDeArquivo {
+    return FORMATO_DO_FIRMWARE[this.firmware];
+  }
+
+  private get cabecalho(): number {
+    return CABECALHO_DO_FORMATO[this.formato];
+  }
+
+  /** Um arquivo só com o cabeçalho, como a placa cria (primeiro boot ou troca). */
+  private arquivoNovo(ts: number): Uint8Array {
+    return this.firmware === 'e93f8ad' ? codificarArquivo0(ts, []) : codificarArquivo1(this.mac, ts, []);
   }
 
   /** Quantas medições o arquivo tem agora. */
   get medicoes(): number {
-    return this.arquivo ? (this.arquivo.length - CABECALHO_ARQUIVO_0) / REGISTRO_ARQUIVO_0 : 0;
+    return this.arquivo ? Math.max(0, Math.floor((this.arquivo.length - this.cabecalho) / REGISTRO_DE_MEDICAO)) : 0;
   }
 
-  /** Hora de início do arquivo atual, ou null sem arquivo. */
+  /** Hora de início do arquivo atual, ou null sem arquivo (ou sem cabeçalho inteiro). */
   get inicioS(): number | null {
-    return this.arquivo ? new DataView(this.arquivo.buffer, this.arquivo.byteOffset).getUint32(0, true) : null;
+    if (!this.arquivo || this.arquivo.length < this.cabecalho) return null;
+    return new DataView(this.arquivo.buffer, this.arquivo.byteOffset).getUint32(this.cabecalho - 8, true);
   }
 
   /**
@@ -344,8 +400,8 @@ export class PlacaSimulada {
       return;
     }
     const id = this.getNextMeasurementId();
-    const m = codificarArquivo0(0, [{ ...medicaoSimulada(id, this.semente), id }]).subarray(CABECALHO_ARQUIVO_0);
-    const novo = new Uint8Array(this.arquivo.length + REGISTRO_ARQUIVO_0);
+    const m = codificarMedicao({ ...medicaoSimulada(id, this.semente), id });
+    const novo = new Uint8Array(this.arquivo.length + REGISTRO_DE_MEDICAO);
     novo.set(this.arquivo);
     novo.set(m, this.arquivo.length);
     this.arquivo = novo;
@@ -359,7 +415,14 @@ export class PlacaSimulada {
       return 0;
     }
     const a = this.arquivo as Uint8Array;
-    if (a.length === CABECALHO_ARQUIVO_0) return 0;
+    // `fileSize == sizeof(uint64_t)`: 8 nas duas versões. No 4cc7ed8 o arquivo
+    // vazio tem 26 bytes, e a "última medição" lida é o fim do MAC e a hora:
+    // o número dela sai da metade alta da hora (0), e a primeira medição vira 1.
+    if (a.length === 8) return 0;
+    if (a.length < REGISTRO_DE_MEDICAO) {
+      this.println('ERRO: nao foi possivel ler o ultimo Measurement!');
+      return 0;
+    }
     return new DataView(a.buffer, a.byteOffset).getUint32(a.length - 4, true) + 1;
   }
 
@@ -395,8 +458,21 @@ export class PlacaSimulada {
     this.println(`Timestamp inicial recebido: ${ts}`);
     this.println('Primeiro boot configurado!');
     this.println(`Timestamp inicial: ${ts}`);
-    this.arquivo = codificarArquivo0(ts, []);
-    this.println('Timestamp inicial salvo com sucesso!');
+    if (this.firmware === 'e93f8ad') {
+      this.arquivo = codificarArquivo0(ts, []);
+      this.println('Timestamp inicial salvo com sucesso!');
+      return;
+    }
+    // saveInitialTimestamp() do 4cc7ed8: abre o arquivo ANTES de ler o MAC.
+    if (this.falhas.macIlegivel) {
+      this.arquivo = new Uint8Array(0); // criado com FILE_WRITE e fechado vazio
+      this.println('ERROR:MAC_READ_FAILED');
+      this.println('ERRO: Falha ao salvar o timestamp inicial!');
+      return;
+    }
+    this.arquivo = codificarArquivo1(this.mac, ts, []);
+    this.println(`MAC da placa: ${this.mac}`);
+    this.println('MAC e timestamp inicial salvos com sucesso!');
   }
 
   /* ---------- a conversa ---------- */
@@ -438,7 +514,7 @@ export class PlacaSimulada {
         if (message.trim() === 'HELLO') {
           if (this.falhas.travaEm === 'ready') { await this.travar(); return 'travou'; }
           this.println(this.falhas.mac ? `READY:${this.falhas.mac}` : 'READY');
-          this.println('Handshake estabelecido!');
+          if (this.firmware === 'e93f8ad') this.println('Handshake estabelecido!');
           return true;
         }
         message = '';
@@ -552,10 +628,19 @@ export class PlacaSimulada {
   /** A troca do arquivo, com cada ERROR:* no ponto em que o código o emite. */
   private replaceMeasurementFileWithTimestamp(ts: number): boolean {
     const e = this.falhas.erroNaTroca;
-    const antes: ErroDaTroca[] = [
-      'REMOVE_TEMP_FAILED', 'TEMP_OPEN_FAILED', 'TEMP_WRITE_FAILED', 'TEMP_VERIFY_OPEN_FAILED',
-      'TEMP_VERIFY_FAILED', 'REMOVE_BACKUP_FAILED', 'OLD_FILE_RENAME_FAILED',
-    ];
+    const antes: ErroDaTroca[] = this.firmware === 'e93f8ad'
+      ? ['REMOVE_TEMP_FAILED', 'TEMP_OPEN_FAILED', 'TEMP_WRITE_FAILED', 'TEMP_VERIFY_OPEN_FAILED',
+        'TEMP_VERIFY_FAILED', 'REMOVE_BACKUP_FAILED', 'OLD_FILE_RENAME_FAILED']
+      : ['REMOVE_TEMP_FAILED', 'TEMP_OPEN_FAILED', 'MAC_READ_FAILED', 'TEMP_MAC_WRITE_FAILED',
+        'TEMP_WRITE_FAILED', 'TEMP_VERIFY_OPEN_FAILED', 'TEMP_VERIFY_FAILED', 'REMOVE_BACKUP_FAILED',
+        'OLD_FILE_RENAME_FAILED'];
+    // O que sai primeiro, na ordem do código: um erro anterior à leitura do MAC,
+    // a leitura do MAC (4cc7ed8), ou o erro pedido.
+    if (e === 'REMOVE_TEMP_FAILED' || e === 'TEMP_OPEN_FAILED') { this.println(`ERROR:${e}`); return false; }
+    if (this.firmware !== 'e93f8ad' && this.falhas.macIlegivel) {
+      this.println('ERROR:MAC_READ_FAILED');
+      return false;
+    }
     if (e && antes.includes(e)) { this.println(`ERROR:${e}`); return false; }
     if (e === 'NEW_FILE_RENAME_FAILED') {
       // O backup volta para o lugar: o arquivo antigo continua.
@@ -568,12 +653,17 @@ export class PlacaSimulada {
       this.println('ERROR:FILE_RESTORE_FAILED');
       return false;
     }
-    this.arquivo = codificarArquivo0(ts, []);
+    this.arquivo = this.arquivoNovo(ts);
     if (e === 'BACKUP_CLEANUP_FAILED') {
       this.println('ERROR:BACKUP_CLEANUP_FAILED');
       return false;
     }
-    this.println('Novo arquivo de medicoes criado com sucesso!');
+    if (this.firmware === 'e93f8ad') {
+      this.println('Novo arquivo de medicoes criado com sucesso!');
+    } else {
+      this.println(`MAC da placa: ${this.mac}`);
+      this.println('Novo arquivo criado com MAC e timestamp!');
+    }
     return true;
   }
 }

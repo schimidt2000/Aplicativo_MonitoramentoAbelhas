@@ -195,6 +195,8 @@ const ERROS_QUE_MANTEM_O_ARQUIVO: ReadonlySet<CodigoErroDaPlaca> = new Set<Codig
   'REMOVE_TEMP_FAILED', 'TEMP_OPEN_FAILED', 'TEMP_WRITE_FAILED',
   'TEMP_VERIFY_OPEN_FAILED', 'TEMP_VERIFY_FAILED', 'REMOVE_BACKUP_FAILED',
   'OLD_FILE_RENAME_FAILED', 'NEW_FILE_RENAME_FAILED',
+  // 4cc7ed8: os dois acontecem no arquivo temporário, antes de tocar no principal.
+  'MAC_READ_FAILED', 'TEMP_MAC_WRITE_FAILED',
 ]);
 
 /**

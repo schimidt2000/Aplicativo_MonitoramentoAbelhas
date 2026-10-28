@@ -1,12 +1,13 @@
 /**
- * A placa simulada é fiel ao teste_de_firmware.ino (commit e93f8ad)? Estes
- * testes falam com ela "na mão", linha a linha, sem a máquina de estados do
- * app, e conferem o que o código do firmware faria. E depois a conversa do
- * app (máquina + executor) contra ela, sem banco.
+ * A placa simulada é fiel ao teste_de_firmware.ino (commits e93f8ad e 4cc7ed8)?
+ * Estes testes falam com ela "na mão", linha a linha, sem a máquina de estados
+ * do app, e conferem o que o código do firmware faria. E depois a conversa do
+ * app (máquina + executor) contra ela, sem banco, com o firmware atual.
  */
 import { describe, expect, it } from 'vitest';
 import {
-  PlacaSimulada, TEMPOS_DE_TESTE, arquivoDaPlaca, strtoul, type OpcoesPlacaSimulada,
+  FIRMWARE_ATUAL, PlacaSimulada, TEMPOS_DE_TESTE, arquivoDaPlaca, macSimulado, strtoul,
+  type OpcoesPlacaSimulada,
 } from '@/transports/mock/firmware';
 import { crc32, crcEmHex } from '@/core/cabo/crc32';
 import { executarSessao, executarPlacaNova } from '@/core/cabo/sessao';
@@ -14,8 +15,14 @@ import { lerArquivo } from '@/core/decode/arquivo';
 import type { CanalSerial } from '@/core/ports/canal';
 
 const T0 = 1792152000;
+/** A placa do firmware atual (4cc7ed8): MAC na frente, 26 + 16 × 5 = 106 bytes. */
 const placa = (o: OpcoesPlacaSimulada = {}) =>
   new PlacaSimulada({ arquivo: arquivoDaPlaca(T0, 5), tempos: TEMPOS_DE_TESTE, ...o });
+/** A placa do firmware de 2026-10-21 (e93f8ad): 8 + 16 × 5 = 88 bytes. */
+const placaE93 = (o: OpcoesPlacaSimulada = {}) =>
+  new PlacaSimulada({
+    firmware: 'e93f8ad', arquivo: arquivoDaPlaca(T0, 5, 1, 'e93f8ad'), tempos: TEMPOS_DE_TESTE, ...o,
+  });
 
 /** Lê linhas até achar `alvo` (ou o prazo). Devolve as linhas vistas. */
 async function ateAchar(canal: CanalSerial, alvo: (l: string) => boolean, prazo = 300): Promise<string[]> {
@@ -35,9 +42,9 @@ async function pedirArquivo(canal: CanalSerial): Promise<string> {
   return (await ateAchar(canal, (l) => l.startsWith('FILE_INFO'))).pop()!;
 }
 
-describe('placa simulada: fidelidade ao .ino', () => {
+describe('placa simulada: fidelidade ao .ino de e93f8ad', () => {
   it('boot pelo botão: diagnósticos na mesma serial, na ordem do código', async () => {
-    const p = placa();
+    const p = placaE93();
     const { canal, terminou } = p.acordar('botao');
     const vistas = await ateAchar(canal, (l) => l === 'Aguardando handshake USB...');
     expect(vistas).toEqual([
@@ -48,7 +55,7 @@ describe('placa simulada: fidelidade ao .ino', () => {
   });
 
   it('ignora linha que não é HELLO; READY e "Handshake estabelecido!"; FILE_INFO com %08lX e \\n', async () => {
-    const p = placa();
+    const p = placaE93();
     const { canal, terminou } = p.acordar('botao');
     await ateAchar(canal, (l) => l.startsWith('Aguardando handshake'));
     await canal.escrever('OI\nHELLO\r\n');
@@ -75,7 +82,7 @@ describe('placa simulada: fidelidade ao .ino', () => {
   });
 
   it('botão apertado sem coleta: desiste em 30 s e mede fora do ritmo (id seguido)', async () => {
-    const p = placa();
+    const p = placaE93();
     const { canal, terminou } = p.acordar('botao');
     await terminou;
     expect(p.impresso).toContain('Timeout aguardando handshake.\r\n');
@@ -86,7 +93,7 @@ describe('placa simulada: fidelidade ao .ino', () => {
   });
 
   it('falta de energia: ao religar mede na hora, com id seguido; o buraco não fica em lugar nenhum', async () => {
-    const p = placa();
+    const p = placaE93();
     await p.acordar('desconhecida').terminou;
     expect(p.impresso).toContain('Wake-up causado motivo desconhecido.\r\n');
     const a = lerArquivo('arquivo-0', p.arquivo!);
@@ -94,7 +101,7 @@ describe('placa simulada: fidelidade ao .ino', () => {
   });
 
   it('readProtocolLine: 128 caracteres sem fim de linha → ERROR:BAD_COMMAND', async () => {
-    const p = placa();
+    const p = placaE93();
     const { canal, terminou } = p.acordar('botao');
     await ateAchar(canal, (l) => l.startsWith('Aguardando handshake'));
     await canal.escrever('HELLO\n');
@@ -105,7 +112,7 @@ describe('placa simulada: fidelidade ao .ino', () => {
   });
 
   it('dois HELLO: o segundo vira o pedido de arquivo e dá ERROR:BAD_COMMAND (D-506)', async () => {
-    const p = placa();
+    const p = placaE93();
     const { canal, terminou } = p.acordar('botao');
     await canal.escrever('HELLO\nHELLO\n');
     expect(await ateAchar(canal, (l) => l.startsWith('ERROR:'))).toContain('ERROR:BAD_COMMAND');
@@ -119,7 +126,7 @@ describe('placa simulada: fidelidade ao .ino', () => {
       ['RECEIVED:88:DEADBEEF', 'ERROR:BAD_CONFIRMATION'],
       ['OK', 'ERROR:BAD_CONFIRMATION'],
     ] as const) {
-      const p = placa();
+      const p = placaE93();
       const { canal, terminou } = p.acordar('botao');
       await pedirArquivo(canal);
       await canal.lerBytes(88, 300);
@@ -128,7 +135,7 @@ describe('placa simulada: fidelidade ao .ino', () => {
       await terminou;
       expect(p.inicioS).toBe(T0); // não apagou
     }
-    const p = placa();
+    const p = placaE93();
     const { canal, terminou } = p.acordar('botao');
     await pedirArquivo(canal);
     await canal.lerBytes(88, 300);
@@ -140,7 +147,7 @@ describe('placa simulada: fidelidade ao .ino', () => {
 
   it('hora com letra → INVALID_TIMESTAMP; sem hora → TIMESTAMP_TIMEOUT; o arquivo fica', async () => {
     for (const [hora, esperado] of [['17925x', 'ERROR:INVALID_TIMESTAMP'], [null, 'ERROR:TIMESTAMP_TIMEOUT']] as const) {
-      const p = placa();
+      const p = placaE93();
       const { canal, terminou } = p.acordar('botao');
       const info = await pedirArquivo(canal);
       const bytes = await canal.lerBytes(88, 300);
@@ -156,7 +163,7 @@ describe('placa simulada: fidelidade ao .ino', () => {
   });
 
   it('primeiro boot: espera a hora sem conversa; HELLO vira data 0', async () => {
-    const p = new PlacaSimulada({ arquivo: null, tempos: TEMPOS_DE_TESTE });
+    const p = new PlacaSimulada({ firmware: 'e93f8ad', arquivo: null, tempos: TEMPOS_DE_TESTE });
     const { canal, terminou } = p.acordar('desconhecida');
     expect(await ateAchar(canal, (l) => l.startsWith('Aguardando timestamp'))).toContain('Measurement file does not exist.');
     await canal.escrever('HELLO\n');
@@ -175,6 +182,96 @@ describe('placa simulada: fidelidade ao .ino', () => {
     expect(strtoul('abc', 10)).toEqual({ valor: 0, consumiuTudo: false });
     expect(strtoul('99999999999', 10).valor).toBe(0xffffffff);
     expect(strtoul('HELLO', 10, 64).valor).toBe(0);
+  });
+});
+
+describe('placa simulada: fidelidade ao .ino de 4cc7ed8 (o atual)', () => {
+  it('é o firmware que a placa simulada imita por padrão', () => {
+    expect(FIRMWARE_ATUAL).toBe('4cc7ed8');
+    expect(new PlacaSimulada({ tempos: TEMPOS_DE_TESTE }).formato).toBe('arquivo-1');
+  });
+
+  it('o arquivo começa com o MAC em texto, o 0x00 e a hora; FILE_INFO conta os 26 bytes', async () => {
+    const p = placa();
+    const a = p.arquivo!;
+    expect(new TextDecoder().decode(a.subarray(0, 17))).toBe(macSimulado(1));
+    expect(a[17]).toBe(0);
+    expect(new DataView(a.buffer, a.byteOffset).getUint32(18, true)).toBe(T0);
+    const { canal, terminou } = p.acordar('botao');
+    const info = await pedirArquivo(canal);
+    expect(info).toBe(`FILE_INFO:106:${crcEmHex(crc32(a))}`);
+    const bytes = await canal.lerBytes(106, 300);
+    expect(bytes).toEqual(a);
+    await canal.escrever(`RECEIVED:106:${crcEmHex(crc32(bytes))}\n`);
+    expect(await canal.lerLinha(300)).toBe('TRANSFER_OK');
+    expect(await canal.lerLinha(300)).toBe('REQUEST_TIMESTAMP');
+    await canal.escrever('1792500000\n');
+    expect(await ateAchar(canal, (l) => l === 'SESSION_COMPLETE')).toEqual([
+      'Timestamp recebido: 1792500000', `MAC da placa: ${macSimulado(1)}`,
+      'Novo arquivo criado com MAC e timestamp!', 'SESSION_COMPLETE',
+    ]);
+    await terminou;
+    expect(p.inicioS).toBe(1792500000);
+    expect(p.medicoes).toBe(1);
+  });
+
+  it('getNextMeasurementId não desconta o MAC: a primeira medição do arquivo novo tem o número 1', async () => {
+    const p = placa({ arquivo: arquivoDaPlaca(T0, 0) });
+    await p.acordar('temporizador').terminou;
+    await p.acordar('temporizador').terminou;
+    expect(p.impresso).toContain('Medida salva com ID: 1\r\n');
+    expect(p.impresso).toContain('Medida salva com ID: 2\r\n');
+    const a = lerArquivo('arquivo-1', p.arquivo!);
+    expect(a.medicoes.map((m) => m.id)).toEqual([1, 2]);
+    expect(a.numeracaoComecaEm).toBe(1);
+    expect(a.leituras.map((l) => l.tNode)).toEqual([0, 1]);
+    expect(a.mac).toBe(macSimulado(1));
+  });
+
+  it('primeiro boot: grava o MAC e a hora; a confirmação mudou de texto', async () => {
+    const p = new PlacaSimulada({ arquivo: null, tempos: TEMPOS_DE_TESTE, semente: 7 });
+    const { canal, terminou } = p.acordar('desconhecida');
+    await ateAchar(canal, (l) => l.startsWith('Aguardando timestamp'));
+    await canal.escrever('1792152000\n');
+    const vistas = await ateAchar(canal, (l) => l.startsWith('MAC e timestamp'));
+    expect(vistas).toEqual(['Timestamp inicial recebido: 1792152000', 'Primeiro boot configurado!',
+      'Timestamp inicial: 1792152000', `MAC da placa: ${macSimulado(7)}`, 'MAC e timestamp inicial salvos com sucesso!']);
+    await terminou;
+    expect(p.inicioS).toBe(1792152000);
+    expect(lerArquivo('arquivo-1', p.arquivo!).medicoes.map((m) => m.id)).toEqual([1]);
+  });
+
+  it('primeiro boot sem conseguir ler o MAC: ERROR:MAC_READ_FAILED e um arquivo VAZIO fica para trás', async () => {
+    const p = new PlacaSimulada({ arquivo: null, tempos: TEMPOS_DE_TESTE, falhas: { macIlegivel: true } });
+    const { canal, terminou } = p.acordar('desconhecida');
+    await ateAchar(canal, (l) => l.startsWith('Aguardando timestamp'));
+    await canal.escrever('1792152000\n');
+    expect(await ateAchar(canal, (l) => l.startsWith('ERRO: Falha ao salvar'))).toContain('ERROR:MAC_READ_FAILED');
+    await terminou;
+    // saveInitialTimestamp abriu o arquivo antes de ler o MAC: ele existe, vazio, e a medição não consegue o número.
+    expect(p.impresso).toContain('ERRO: nao foi possivel ler o ultimo Measurement!\r\n');
+    expect(p.inicioS).toBeNull();
+  });
+
+  it('troca do arquivo sem o MAC: ERROR:MAC_READ_FAILED e o arquivo antigo fica', async () => {
+    for (const falhas of [{ macIlegivel: true }, { erroNaTroca: 'TEMP_MAC_WRITE_FAILED' as const }]) {
+      const p = placa({ falhas });
+      const { canal, terminou } = p.acordar('botao');
+      await pedirArquivo(canal);
+      const bytes = await canal.lerBytes(106, 300);
+      await canal.escrever(`RECEIVED:106:${crcEmHex(crc32(bytes))}\n`);
+      await ateAchar(canal, (l) => l === 'REQUEST_TIMESTAMP');
+      await canal.escrever('1792500000\n');
+      const esperado = falhas.macIlegivel ? 'ERROR:MAC_READ_FAILED' : 'ERROR:TEMP_MAC_WRITE_FAILED';
+      expect(await ateAchar(canal, (l) => l.startsWith('ERROR:'), 1000)).toContain(esperado);
+      await terminou;
+      expect(p.inicioS).toBe(T0);
+      expect(p.medicoes).toBe(6);
+    }
+  });
+
+  it('o arquivo de e93f8ad não é lido como o atual (o tamanho não fecha)', () => {
+    expect(() => lerArquivo('arquivo-1', arquivoDaPlaca(T0, 5, 1, 'e93f8ad'))).toThrow(/tamanho-nao-multiplo/);
   });
 });
 
@@ -199,7 +296,8 @@ describe('a conversa do app contra a placa simulada (sem banco)', () => {
     expect(p.inicioS).toBe(1792600000);
     expect(r.registro).toContain('→ HELLO');
     expect(r.registro).toContain('← READY');
-    expect(r.registro).toContain('[arquivo: 4808 bytes]');
+    // 26 de cabeçalho (MAC e hora) + 300 × 16.
+    expect(r.registro).toContain('[arquivo: 4826 bytes]');
   });
 
   it('o primeiro HELLO se perde (serial ainda não ouvia) e o reenvio resolve', async () => {

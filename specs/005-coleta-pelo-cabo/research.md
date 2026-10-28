@@ -320,3 +320,36 @@ durável, e recusar a confirmação deixaria a placa presa no arquivo de data 0 
 Alternativa rejeitada: um `seq` que mude por sessão quando o início é implausível — deixaria de
 ser determinístico, e a reimportação do mesmo arquivo duplicaria.
 
+## D-520 — `arquivo-1`: o MAC no arquivo, e a hora pela posição (2026-10-28)
+
+O firmware `4cc7ed8` (2026-10-28) põe na frente do arquivo o MAC da placa, como texto de 17
+caracteres mais `0x00`, antes da hora de início: cabeçalho de 26 bytes. Atende o pedido 1
+(identidade da placa) por outro caminho: o `READY` continua sem MAC. Contrato em
+`contracts/arquivo-1.md`.
+
+O mesmo commit tem um defeito que o próprio grupo do firmware registrou (§7.2 do protocolo):
+`getNextMeasurementId` ainda trata 8 bytes como "arquivo sem medições". Num arquivo novo de
+26 bytes, o número da primeira medição sai da metade alta da hora de início (0) mais 1. A
+numeração fica 1, 2, 3…, quando a conta da hora pede 0, 1, 2…
+
+Decisão:
+
+- leitor novo `arquivo-1` (`proto_ver = 101`) na tabela, e `FORMATO_DE_ARQUIVO_ATUAL` passa a
+  ser ele. O `arquivo-0` fica, para reler o bruto de sessões antigas. Sem tentativa: a placa
+  com o firmware antigo é recusada inteira pelo tamanho (8 + 16n nunca é 26 + 16n), sem
+  gravar e sem confirmar, e o bruto fica guardado;
+- a chave e a contagem saem da **posição** `k` no arquivo: `seq = início × 1e6 + k`,
+  `t_node = k`. A placa grava uma medição por despertar, em ordem, e é a posição que a conta
+  `início + k × intervalo` pede. Com a numeração de hoje (de 1) ou a corrigida (de 0), o mesmo
+  arquivo dá as mesmas chaves, e a correção do firmware não muda nada no app;
+- a numeração continua conferida: começa em 0 ou 1 e cresce de 1 em 1. É o que pega um
+  formato mudado cujo tamanho fecha por acaso, e o 0 no meio quando `getNextMeasurementId`
+  não abre o arquivo;
+- o MAC do arquivo identifica a placa (`node.mac`) e vale mais que o `READY:<MAC>`;
+- quando a numeração começa em 1, o registro da sessão diz isso, para quem auditar o bruto.
+
+Alternativas rejeitadas: usar o número gravado (toda hora ficaria um intervalo adiantada,
+duas horas em produção, sem nenhum sinal na tela); recusar a numeração de 1 até o firmware
+corrigir (nenhuma coleta com a placa atual, e o teste físico fica impossível); detectar o
+formato pelo conteúdo (o Princípio IV pede a escolha explícita do leitor).
+

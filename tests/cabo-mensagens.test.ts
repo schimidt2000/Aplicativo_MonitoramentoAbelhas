@@ -248,12 +248,12 @@ describe('a conta da tela (passos.ts)', () => {
     expect(segundosAteDormir(1_000, 99_000)).toBe(0);
   });
 
-  it('leituras pelos bytes do arquivo-0: só as inteiras', () => {
+  it('leituras pelos bytes do arquivo-1 (26 de cabeçalho): só as inteiras', () => {
     expect(leiturasPelosBytes(0)).toBe(0);
-    expect(leiturasPelosBytes(8)).toBe(0);
-    expect(leiturasPelosBytes(23)).toBe(0);
-    expect(leiturasPelosBytes(24)).toBe(1);
-    expect(leiturasPelosBytes(1368)).toBe(85);
+    expect(leiturasPelosBytes(26)).toBe(0);
+    expect(leiturasPelosBytes(41)).toBe(0);
+    expect(leiturasPelosBytes(42)).toBe(1);
+    expect(leiturasPelosBytes(26 + 85 * 16)).toBe(85);
   });
 
   it('a barra só existe enquanto o arquivo chega', () => {

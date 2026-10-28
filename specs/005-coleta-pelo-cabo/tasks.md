@@ -119,6 +119,23 @@ que pega (lista em plan.md, "Verificação").
 - [x] T549 Sem cabo e sem demonstração, a tela não mostra a escolha de colmeia (nada a fazer
   com ela) — só a explicação do caminho (FR-032)
 
+## Phase 9: Firmware 4cc7ed8 (2026-10-28)
+
+- [x] T550 Leitor `arquivo-1` (MAC + `0x00` + hora, 26 bytes) com `proto_ver = 101`; vira o
+  `FORMATO_DE_ARQUIVO_ATUAL`; chave e hora pela posição (D-520, `contracts/arquivo-1.md`)
+- [x] T551 Coleta usa o MAC de dentro do arquivo para achar o nó (vale mais que o
+  `READY:<MAC>`); o registro da sessão anota a numeração que começa em 1
+- [x] T552 Erros novos `MAC_READ_FAILED` e `TEMP_MAC_WRITE_FAILED` (a placa fica com o
+  arquivo); diagnósticos do `firmware.ino` (`HELLO`, `TIMEOUT`, "does not exists.") e do
+  teste ("MAC e timestamp inicial salvos com sucesso!"); progresso pelos bytes com 26 de
+  cabeçalho
+- [x] T553 Placa simulada com as duas versões (`e93f8ad` e `4cc7ed8`, a padrão), o MAC, a
+  numeração que começa em 1 e as falhas de MAC; testes `tests/arquivo1.test.ts`, fidelidade
+  ao 4cc7ed8 em `tests/firmware-simulado.test.ts`, placa antiga recusada em
+  `tests/cabo-ponta-a-ponta.test.ts`; mutação nos cinco pontos críticos pega
+- [ ] T554 Primeiro teste com a placa real (`docs/teste-com-a-placa.md`): é o T546 com o
+  firmware 4cc7ed8 — **precisa da placa e do grupo do firmware**
+
 ## Dependencies & Execution Order
 
 - Fase 2 bloqueia tudo. T512 depende de T510 e T505; T514 de T511 e T512; T509 de T506 e T505.

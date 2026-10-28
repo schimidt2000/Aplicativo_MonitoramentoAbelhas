@@ -101,10 +101,12 @@ export async function coletarPeloCabo(
       } catch { /* o desfecho já diz que nada foi gravado */ }
       return { ok: false, motivo: 'formato' };
     }
+    // O MAC que vale: o de dentro do arquivo (4cc7ed8); senão, o do READY:<MAC>.
+    const mac = arquivo.mac ?? a.mac;
     try {
       let g: Gravado | null = null;
       db.transaction(() => {
-        const no = noDaPlaca(db, opts.hiveId, a.mac);
+        const no = noDaPlaca(db, opts.hiveId, mac);
         const ultimaAntesMs = ultimaAncoraConfiavelMs(db, no.nodeId);
         db.run(
           `INSERT INTO pull_session
@@ -168,9 +170,13 @@ export async function coletarPeloCabo(
   /* ---------- Depois da conversa: escrituração, sem nunca lançar ---------- */
   try {
     db.transaction(() => {
-      const registro = g && g.conflitos > 0
-        ? `${sessao.registro}\n· ${g.conflitos} leituras com a chave de outras já gravadas, com conteúdo diferente: fora da série, no bruto desta sessão`
-        : sessao.registro;
+      let registro = sessao.registro;
+      if (g && g.arquivo.numeracaoComecaEm === 1) {
+        registro += '\n· a placa numerou as medições a partir de 1 (defeito conhecido do firmware 4cc7ed8): a hora usa a posição no arquivo';
+      }
+      if (g && g.conflitos > 0) {
+        registro += `\n· ${g.conflitos} leituras com a chave de outras já gravadas, com conteúdo diferente: fora da série, no bruto desta sessão`;
+      }
       const comum = [agora(), outcomeDoDesfecho(d), d.arquivoNaPlaca, d.erroDaPlaca, d.horaEnviadaS, registro];
       if (g) {
         db.run(

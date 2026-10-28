@@ -44,8 +44,8 @@ describe('desempenho da coleta pelo cabo (Node, não o aparelho)', () => {
   const arquivo = arquivoDaPlaca(T0, N);
 
   it(`ler e conferir o CRC de ${N} medições (${arquivo.length} bytes)`, () => {
-    const ms = medir(() => { crc32(arquivo); lerArquivo('arquivo-0', arquivo); });
-    console.log(`[005] CRC + leitor arquivo-0, ${N} medições: ${ms.toFixed(1)} ms`);
+    const ms = medir(() => { crc32(arquivo); lerArquivo('arquivo-1', arquivo); });
+    console.log(`[005] CRC + leitor arquivo-1, ${N} medições: ${ms.toFixed(1)} ms`);
     expect(ms).toBeLessThan(1_000);
   });
 
