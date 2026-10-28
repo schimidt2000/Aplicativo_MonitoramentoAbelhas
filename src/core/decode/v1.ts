@@ -7,7 +7,7 @@
  * um `0` chega à análise das especialistas parecendo medição real.
  */
 import type { Reading } from '../ports/transport';
-import { QuadroInvalidoError } from './index';
+import { QuadroInvalidoError } from './erros';
 
 export const RECORD_SIZE_V1 = 24;
 export const FRAME_HEADER_SIZE = 4;

@@ -17,13 +17,7 @@ export class VersaoDesconhecidaError extends Error {
   }
 }
 
-export class QuadroInvalidoError extends Error {
-  constructor(msg: string) {
-    super(msg);
-    this.name = 'QuadroInvalidoError';
-    Object.setPrototypeOf(this, new.target.prototype);
-  }
-}
+export { QuadroInvalidoError } from './erros';
 
 const DECODERS: Record<number, Decoder> = {
   1: decodeV1,

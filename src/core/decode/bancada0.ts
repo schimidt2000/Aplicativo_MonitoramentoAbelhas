@@ -18,9 +18,8 @@
  *    NULL com motivo. Nunca zero;
  *  - nada aqui lança. Linha que não é leitura vira texto ou ilegível.
  */
-import {
-  TAMANHO_MAXIMO_DE_LINHA, type EstadoGas, type LinhaInterpretada,
-} from './linhas';
+import { TAMANHO_MAXIMO_DE_LINHA } from './limites';
+import type { EstadoGas, LinhaInterpretada } from './linhas';
 
 /** Decimal com até 2 casas, ou o que o Arduino imprime quando o float não é número. */
 const NUM = String.raw`(-?\d{1,5}(?:\.\d{1,2})?|nan|inf|-inf|ovf)`;

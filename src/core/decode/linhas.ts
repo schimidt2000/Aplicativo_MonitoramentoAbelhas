@@ -13,12 +13,7 @@
  */
 import { lerLinhaBancada0 } from './bancada0';
 
-/**
- * Maior linha que alguém guarda na memória. Uma linha `bancada-0` tem ~60
- * caracteres; uma mensagem de texto da placa, ~80. Acima disto é lixo (placa
- * em outra velocidade, fim de linha perdido) e não pode crescer sem limite.
- */
-export const TAMANHO_MAXIMO_DE_LINHA = 512;
+export { TAMANHO_MAXIMO_DE_LINHA } from './limites';
 
 /** Situação do sensor de gás (ENS160), pelo `Status` que ele mesmo informa. */
 export type EstadoGas =
