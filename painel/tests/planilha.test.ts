@@ -149,7 +149,7 @@ describe('cabeçalho de proveniência', () => {
   const linha = (rotulo: string) => cab.find((l) => l.startsWith(`${rotulo};`)) ?? '';
 
   it('declara sensor e versões do formato que estão no arquivo', () => {
-    expect(linha('Nó sensor')).toContain('N1;AHT21 + ENS160;formato v1, v2');
+    expect(linha('Nó sensor')).toContain('N1;AHT21 + ENS160;versão do formato de dados: v1, v2');
     expect(linha('Nó sensor')).toContain('-0,50 °C');
   });
 

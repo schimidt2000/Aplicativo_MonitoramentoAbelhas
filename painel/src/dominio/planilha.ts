@@ -96,6 +96,7 @@ export function gerarPlanilha(e: EntradaPlanilha): string {
     [t('planilha.cab.derivadas'), t('planilha.cab.derivadas_eco2'), t('planilha.cab.derivadas_hora')],
     [t('planilha.cab.volateis'), t('planilha.cab.volateis_texto')],
     [t('planilha.cab.valores'), t('planilha.cab.valores_texto')],
+    [t('planilha.col.seq'), t('planilha.cab.numero_leitura')],
     [t('planilha.cab.aquecimento'), t('planilha.cab.aquecimento_texto')],
     [t('planilha.cab.coordenadas'), t('planilha.cab.coordenadas_texto')],
     [t('planilha.cab.pessoas'), t('planilha.cab.pessoas_texto')],

@@ -79,7 +79,7 @@ export const ptBR = {
   'visao.sem_municipio': 'Município não informado',
 
   'criacao.apis': 'Apis mellifera',
-  'criacao.meliponineo': 'Sem ferrão',
+  'criacao.meliponineo': 'Meliponíneo (sem ferrão)',
   'criacao.desconhecida': 'Criação não informada',
 
   /* ---------- Frescor (idade do dado em palavras) ---------- */
@@ -104,7 +104,7 @@ export const ptBR = {
   'colmeia.periodo.livre': 'Escolher datas',
   'colmeia.periodo.inicio': 'De',
   'colmeia.periodo.fim': 'Até',
-  'colmeia.periodo.mostrando': 'Mostrando de {de} a {ate} (dias em UTC).',
+  'colmeia.periodo.mostrando': 'Mostrando de {de} a {ate}. Cada dia vai de 0h a 24h em UTC, ou seja, das 21h da véspera às 21h no horário de Brasília.',
   'colmeia.periodo.invalido':
     'A data inicial precisa ser uma data válida e vir antes da final. Ajuste as datas.',
   'colmeia.periodo.longo':
@@ -114,19 +114,19 @@ export const ptBR = {
   'colmeia.sem_dados':
     'Nenhuma leitura válida neste período. Escolha um período maior ou outras datas.',
   'colmeia.lacunas.um':
-    '{n} dia sem leitura válida neste período. Ele aparece como falha na linha, nunca como linha inventada.',
+    '{n} dia sem leitura válida neste período. Nos gráficos, ele aparece como um vão na linha: os pontos vizinhos não são ligados.',
   'colmeia.lacunas.outros':
-    '{n} dias sem leitura válida neste período. Eles aparecem como falha na linha, nunca como linha inventada.',
+    '{n} dias sem leitura válida neste período. Nos gráficos, eles aparecem como vãos na linha: os pontos vizinhos não são ligados.',
   'colmeia.troca_sensor':
-    'Troca de sensor em {data}: a série é interrompida aqui e nenhum resumo atravessa a troca.',
-  'colmeia.baixar_planilha': 'Baixar planilha deste período',
+    'Troca de sensor em {data}: as linhas dos gráficos são interrompidas nesse dia, e nenhum resumo junta dados de antes e de depois da troca.',
+  'colmeia.baixar_planilha': 'Montar planilha deste período',
 
   'colmeia.trilha.epoca': 'Época {epoca} do sensor',
   'colmeia.trilha.no_epoca': 'Nó sensor {no}, época {epoca}',
 
   'colmeia.resumo.titulo': 'Resumo do período',
   'colmeia.resumo.explicacao':
-    'Um bloco por época do sensor: nenhum número aqui mistura duas épocas. Temperatura com a correção do nó sensor já aplicada. Amostra excluída é a leitura em que o sensor de gás se declarou inválido: ela fica fora dos voláteis. Dia em que todas as amostras foram excluídas não tem resumo diário: aparece como dia sem leitura válida e as amostras dele não entram nesta contagem. A planilha traz todas, marcadas.',
+    'Uma linha por época do sensor. Época do sensor é um trecho contínuo da série: uma troca de sensor começa uma época nova. Nenhum número aqui mistura duas épocas. A temperatura já tem a correção do nó sensor aplicada. Amostra excluída é a leitura em que o sensor de gás marcou o próprio valor como inválido: ela fica fora dos voláteis, mas a temperatura e a umidade dela entram. Se todas as amostras de um dia foram excluídas, o dia fica sem resumo: aparece como dia sem leitura válida e não entra nesta contagem. A planilha traz todas as leituras, com as excluídas marcadas.',
   'colmeia.resumo.trilha': 'Época',
   'colmeia.resumo.dias': 'Dias com leitura',
   'colmeia.resumo.temp': 'Temperatura: menor e maior do período',
@@ -163,9 +163,9 @@ export const ptBR = {
     'Assinatura de odor do ninho: cera, própolis, mel e feromônios. Não é CO₂. Mostrado como índice desta colmeia: 100 é a mediana dela nesta época do sensor, dentro do período escolhido. Serve para ver mudanças nesta colmeia, não para comparar colmeias.',
   'grafico.vol.indice': 'Índice de voláteis',
   'grafico.vol.sem_base':
-    '{trilha}: menos de {n} dias com voláteis válidos no período, sem linha de base. Escolha um período maior.',
+    '{trilha}: o índice de voláteis não aparece no gráfico, porque o período tem menos de {n} dias com voláteis válidos para calcular a linha de base. Escolha um período maior.',
   'grafico.legenda.lacuna':
-    'Falha na linha = dia sem leitura válida ou troca de sensor. Linha contínua = média; linhas tracejadas = menor e maior do dia.',
+    'Vão na linha = dia sem leitura válida ou troca de sensor. Linha contínua = média; linhas tracejadas = menor e maior do dia.',
 
   /* ---------- Qualidade da hora (feature 003) ---------- */
   'hora.ancorada': 'ancorada',
@@ -175,9 +175,9 @@ export const ptBR = {
   /* ---------- Planilha (tela) ---------- */
   'planilha.titulo': 'Baixar planilha',
   'planilha.explicacao':
-    'Escolha as colmeias e o período. A planilha abre direto em programa configurado para português do Brasil: ponto e vírgula entre colunas e vírgula nos decimais.',
+    'Escolha as colmeias e o período. A planilha abre direto num programa de planilhas configurado para português do Brasil: as colunas são separadas por ponto e vírgula, e os decimais usam vírgula.',
   'planilha.colmeias': 'Colmeias',
-  'planilha.filtro': 'Mostrar só as colmeias do apicultor',
+  'planilha.filtro': 'Procurar por apicultor',
   'planilha.marcar_todas': 'Marcar todas as mostradas',
   'planilha.desmarcar_todas': 'Desmarcar todas',
   'planilha.marcadas.um': '{n} colmeia marcada',
@@ -191,9 +191,9 @@ export const ptBR = {
   'planilha.grande':
     'O recorte passa de {limite} leituras e ficaria pesado demais para abrir. Escolha um período menor ou menos colmeias.',
   'planilha.vazia':
-    'Não há leituras nas colmeias e no período escolhidos. Escolha outras datas.',
+    'Não há leituras nas colmeias e no período escolhidos. Escolha outras datas ou outras colmeias.',
   'planilha.sobre':
-    'No topo, a planilha diz de onde veio o dado: o sensor, a versão do formato, quais grandezas são derivadas, quantas amostras foram excluídas, a qualidade da hora e a declaração de que coordenadas não são coletadas. Ela não traz nome de pessoa.',
+    'No topo, a planilha diz de onde veio o dado: o nó sensor, a versão do formato de dados, quais grandezas são derivadas, quantas amostras foram excluídas, a qualidade da hora e a declaração de que coordenadas não são coletadas. Ela não traz o nome do apicultor.',
   'planilha.arquivo': 'bee-sertao-leituras-{de}-a-{ate}.csv',
   'planilha.sim': 'sim',
   'planilha.nao': 'não',
@@ -208,20 +208,22 @@ export const ptBR = {
   'planilha.cab.leituras': 'Leituras',
   'planilha.cab.excluidas': 'Amostras excluídas',
   'planilha.cab.excluidas_explicacao':
-    'Leituras em que o sensor de gás informou situação diferente de 0. Estão na planilha, marcadas na coluna amostra_excluida, e ficam fora dos resumos diários de voláteis.',
+    'Leituras em que o sensor de gás marcou o próprio valor como inválido (coluna situacao_sensor_gas diferente de 0). Estão na planilha, com "sim" na coluna amostra_excluida, e ficam fora dos resumos diários de voláteis.',
   'planilha.cab.qualidade_hora': 'Qualidade da hora',
   'planilha.cab.derivadas': 'Grandezas derivadas',
   'planilha.cab.derivadas_eco2':
-    'eCO₂ é estimado pelo próprio sensor a partir dos voláteis (COVs). Não é CO₂ medido.',
+    'eCO₂ é estimado pelo próprio sensor de gás a partir dos voláteis (COVs). Não é CO₂ medido.',
   'planilha.cab.derivadas_hora':
-    'A hora UTC é derivada do contador do nó sensor e de uma referência de hora do celular; a qualidade de cada uma está na coluna qualidade_hora.',
+    'A hora UTC de cada leitura é calculada a partir do contador do nó sensor e de uma hora de referência vinda do celular. Na coluna qualidade_hora: "ancorada" = calculada a partir de uma referência confiável; "estimada" = calculada sem referência confiável, pode ter desvio; "desconhecida" = não há como garantir a qualidade dessa hora. Leituras sem hora conhecida não entram nesta planilha, porque não há como saber em que dia caem.',
   'planilha.cab.volateis': 'Voláteis',
   'planilha.cab.volateis_texto':
     'O valor absoluto de voláteis não é comparável entre colmeias nem entre épocas do sensor. Compare cada colmeia com o histórico dela mesma, na mesma época.',
   'planilha.cab.valores': 'Valores',
   'planilha.cab.valores_texto':
-    'Brutos, na resolução gravada, sem arredondar. A exatidão do sensor é menor: temperatura cerca de ±0,3 °C, umidade cerca de ±3 a 4 %. Temperatura corrigida = temperatura_bruta + correcao_temperatura.',
-  'planilha.cab.aquecimento': 'Atenção',
+    'Brutos, na resolução gravada, sem arredondar. A exatidão do sensor é menor: temperatura cerca de ±0,3 °C, umidade cerca de ±3 a 4 pontos percentuais. Temperatura corrigida = temperatura_bruta_c + correcao_temperatura_c.',
+  'planilha.cab.numero_leitura':
+    'A coluna numero_da_leitura identifica cada leitura dentro do nó sensor e serve para pôr as leituras em ordem. Um salto na numeração é normal e, sozinho, não quer dizer que uma leitura se perdeu. Além disso, as leituras sem hora conhecida ficam fora desta planilha e também deixam saltos.',
+  'planilha.cab.aquecimento': 'Aquecimento pelo sensor de gás',
   'planilha.cab.aquecimento_texto':
     'Em placas que juntam os dois sensores, o sensor de gás pode aquecer o de temperatura em +4 a +6 °C. O desvio ainda não foi caracterizado neste projeto.',
   'planilha.cab.coordenadas': 'Coordenadas',
@@ -229,10 +231,10 @@ export const ptBR = {
     'Não são coletadas. Nem o celular nem o servidor guardam latitude ou longitude.',
   'planilha.cab.pessoas': 'Pessoas',
   'planilha.cab.pessoas_texto':
-    'A planilha não traz nome de pessoa. Use o código da colmeia para cruzar com o painel.',
+    'A planilha não traz o nome do apicultor. Os nomes de colmeia e de apiário ou meliponário vão como o apicultor digitou e podem conter nome de pessoa. Use o código da colmeia para cruzar com o painel.',
   'planilha.cab.sensor': 'Nó sensor',
-  'planilha.cab.nao_informado': 'não informado pelo servidor',
-  'planilha.cab.formato': 'formato {versoes}',
+  'planilha.cab.nao_informado': 'modelo do sensor não informado',
+  'planilha.cab.formato': 'versão do formato de dados: {versoes}',
   'planilha.cab.correcao': 'correção de temperatura {valor} °C',
 
   /* ---------- Planilha (arquivo: nomes das colunas) ---------- */
