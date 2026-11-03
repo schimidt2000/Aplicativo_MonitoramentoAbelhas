@@ -320,7 +320,7 @@ export const ptBR = {
   'diagnostico.item.rotulo_acessivel_dica': '{estado}. {rotulo}. {dica}',
   'diagnostico.nesta_versao.titulo': 'Nesta versão',
   'diagnostico.nesta_versao.texto':
-    'O aplicativo usa nós sensores simulados. Não precisa de nó sensor de verdade nem de Bluetooth. No computador, já dá para ver as leituras ao vivo pelo cabo (veja abaixo). A coleta pelo cabo e pelo Bluetooth ainda vai chegar. Quando chegar, esta tela vai mostrar se o Bluetooth e a Localização estão ligados.',
+    'A tela Coletar usa nós sensores simulados, sem Bluetooth. A placa de verdade já pode ser coletada pelo cabo, num computador (veja abaixo). A coleta pelo Bluetooth ainda vai chegar. Quando chegar, esta tela vai mostrar se o Bluetooth e a Localização estão ligados.',
   'diagnostico.nao_verificou.titulo': 'Não consegui fazer a verificação agora',
   'diagnostico.nao_verificou.detalhe':
     'Toque em Verificar de novo. Se continuar assim, feche o aplicativo, abra de novo e avise a pesquisadora.',

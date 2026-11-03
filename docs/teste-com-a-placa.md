@@ -30,9 +30,15 @@ Depois abra http://localhost:8081 no Chrome.
 Logo depois de gravado o programa, a placa fica esperando a hora e ainda não mede.
 
 1. Ligue a placa no computador pelo cabo.
-2. No app: aba **Coletar**, depois **Coletar pelo cabo**, depois **Configurar placa nova**.
+2. No app: aba **Ajustes**, depois **Abrir diagnóstico**, depois **Configurar placa nova**.
+   Se a tela estiver na placa simulada, toque em **Usar a placa de verdade**.
 3. Confira a data e a hora do computador e toque em **Acertar o relógio**.
 4. O Chrome abre uma lista. Escolha a placa, que aparece como "USB JTAG/serial debug unit".
+
+**Não comece pelo Coletar numa placa recém-gravada.** Ela toma a primeira mensagem do app
+como data de início, e as leituras até a coleta seguinte ficam sem hora. Se isso
+acontecer, o app avisa "Esta placa começou a contar de uma data errada": colete de novo e
+siga em frente.
 
 O que pode aparecer:
 
