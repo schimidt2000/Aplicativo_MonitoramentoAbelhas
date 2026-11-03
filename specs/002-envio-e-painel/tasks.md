@@ -110,6 +110,10 @@ o Postgres descartável (`npm run servidor:teste`) e contra o Supabase falso dos
 - [ ] T071 [US1][US2] Contraste do botão primário: rótulo branco sobre `cores.acento` (#8A5A00) dá 5,93:1, abaixo de 7:1 (Princípio V). Escurecer o token e corrigir o comentário dele, com a frente `fix/001-dividas-de-tela` — `src/ui/tokens.ts`
 - [ ] T072 [US1] Trilha B por tabela `outbox` (regra de `sync.md`) no lugar do cursor por relógio do celular — achado A-8 — `src/data/sync.ts`, `src/data/repo.ts`
 - [ ] T070 Achado A-2: renomear `temp_p5`/`temp_p95` ou calcular percentis de verdade, nos dois lados e no caso de referência
+- [x] T073 [US2] Campo do código no Android (2026-11-03): reescrever o valor a cada tecla (hífen, O→0)
+  deslocava o cursor e brigava com o teclado que monta a palavra; "dem0a1b4" virava "DDEM-DDEM" no
+  emulador. Agora só maiúsculas ao digitar, teclado `visible-password` no Android, formato
+  XXXX-XXXX ao sair do campo; a validação continua igual — `src/app/vincular.tsx`
 
 ---
 

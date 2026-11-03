@@ -390,7 +390,7 @@ export const ptBR = {
   /* ---------- Ligar o celular ao projeto ---------- */
   'vinculo.titulo': 'Ligar o celular ao projeto',
   'vinculo.explicacao':
-    'A pesquisadora do projeto passa um código de 8 letras e números, em dois grupos de 4. O tracinho do meio aparece sozinho. Você digita uma vez só. Depois, o celular envia as leituras sempre que você tocar em Enviar agora.',
+    'A pesquisadora do projeto passa um código de 8 letras e números, em dois grupos de 4. Pode digitar com ou sem o tracinho do meio. Você digita uma vez só. Depois, o celular envia as leituras sempre que você tocar em Enviar agora.',
   'vinculo.coleta_livre': 'Coletar nunca precisa deste código.',
   'vinculo.privacidade':
     'O projeto recebe suas leituras. Recebe também o nome e o município de cada apiário ou meliponário, e o nome e o tipo de abelha de cada colmeia. O aplicativo não guarda a localização das suas colmeias.',

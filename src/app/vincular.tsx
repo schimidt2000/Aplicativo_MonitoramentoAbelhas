@@ -10,7 +10,7 @@
  * qualquer rede: erro de digitação não gasta tentativa no servidor (FR-012).
  */
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { formatarCodigo, TAMANHO_CODIGO, validarCodigo } from '@/core/codigo-projeto';
@@ -34,13 +34,25 @@ export default function Vincular() {
   const [aviso, setAviso] = useState<Aviso | null>(null);
   const [ligado, setLigado] = useState<Vinculo | null>(null);
 
+  /**
+   * Enquanto a pessoa digita, só maiúsculas: o texto não muda de tamanho.
+   * Reescrever o campo a cada tecla (hífen, O→0) deslocava o cursor e, no
+   * Android, embaralhava as letras que o teclado ainda estava montando
+   * ("dem0a1b4" virava "DDEM-DDEM"). O formato XXXX-XXXX entra ao sair do campo.
+   */
   function digitar(texto: string) {
-    setCodigo(formatarCodigo(texto));
+    setCodigo(texto.toUpperCase());
     setAviso(null);
+  }
+
+  /** XXXX-XXXX, com O→0 e I/L→1, quando a pessoa termina de digitar. */
+  function arrumar() {
+    setCodigo((atual) => formatarCodigo(atual) || atual);
   }
 
   async function ligar() {
     if (ligando) return;
+    arrumar();
     const local = validarCodigo(codigo);
     if (!local.ok) {
       setAviso({ titulo: null, texto: mensagemDeCodigoLocal(local.motivo), tom: 'atencao' });
@@ -89,6 +101,7 @@ export default function Vincular() {
             <TextInput
               value={codigo}
               onChangeText={digitar}
+              onEndEditing={arrumar}
               onSubmitEditing={ligar}
               placeholder={t('vinculo.campo.exemplo')}
               placeholderTextColor={cores.textoFraco}
@@ -96,7 +109,11 @@ export default function Vincular() {
               autoCorrect={false}
               autoComplete="off"
               spellCheck={false}
-              // 8 símbolos + o hífen que a própria tela insere.
+              // No Android, o teclado de senha visível mostra letras e números e
+              // não fica montando palavra com sugestões. É o que impede o
+              // teclado de embaralhar o código.
+              keyboardType={Platform.OS === 'android' ? 'visible-password' : 'default'}
+              // 8 símbolos + o hífen, que a pessoa pode digitar ou não.
               maxLength={TAMANHO_CODIGO + 1}
               returnKeyType="done"
               editable={!ligando}
