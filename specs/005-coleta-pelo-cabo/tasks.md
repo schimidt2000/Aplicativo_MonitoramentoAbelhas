@@ -134,7 +134,11 @@ que pega (lista em plan.md, "Verificação").
   ao 4cc7ed8 em `tests/firmware-simulado.test.ts`, placa antiga recusada em
   `tests/cabo-ponta-a-ponta.test.ts`; mutação nos cinco pontos críticos pega
 - [ ] T554 Primeiro teste com a placa real (`docs/teste-com-a-placa.md`): é o T546 com o
-  firmware 4cc7ed8 — **precisa da placa e do grupo do firmware**
+  firmware 4cc7ed8 — **parcial (2026-11-04):** primeira coleta real pelo cabo no Chrome do
+  macOS, 13 leituras, conversa completa, MAC no arquivo, placa recomeçou com a hora enviada
+  (resultado em `docs/integracao-firmware.md`, "Primeiro teste com a placa real"). **Falta:**
+  a hora fechar numa coleta em ritmo (2 h sem apertar o botão, ou o `teste_de_firmware`),
+  Configurar placa nova com a placa real e a temperatura ao lado de um termômetro
 
 ## Dependencies & Execution Order
 

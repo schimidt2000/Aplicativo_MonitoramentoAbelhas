@@ -346,6 +346,28 @@ confirmações acima, com data e nome.
 
 Pedidos novos e o texto para o grupo: [`mensagem-firmware-2026-10-28.md`](./mensagem-firmware-2026-10-28.md).
 
+### Primeiro teste com a placa real (2026-11-04)
+
+Placa do grupo do firmware, MAC `58:E6:C5:16:5E:48`, com bateria, ligada por cabo USB-C direto
+no MacBook (macOS), app no Chrome (`npm run web`). A placa aparece no macOS como "USB
+JTAG/serial debug unit", Espressif (VID 0x303A, PID 0x1001), em `/dev/cu.usbmodem*`; no
+começo não aparecia por causa da ligação (cabo ou permissão de acessório do macOS), não do app.
+
+| Item | Resultado |
+|---|---|
+| Conversa completa | ✅ `HELLO` → `READY` em 96 ms → `FILE_INFO:234:02E9F323` → 234 bytes → `RECEIVED` → `TRANSFER_OK` → `REQUEST_TIMESTAMP` → hora → `SESSION_COMPLETE`, tudo em 0,5 s |
+| Formato `arquivo-1` | ✅ 26 + 13 × 16 bytes; MAC em texto com o `0x00`; hora de início com a metade alta zero |
+| Numeração | ✅ **0 a 12**: a placa já tem a correção de `getNextMeasurementId` que o repositório (4cc7ed8) ainda não tem. Pedir que publiquem a versão que está na placa |
+| Identidade | ✅ o MAC ligou a placa à Colmeia 03 (`node.mac`) |
+| Reset ao abrir a porta (risco 1) | ✅ não reiniciou: a placa acordada pelo botão respondeu `READY` ao primeiro `HELLO` |
+| Valores | ✅ plausíveis: 28,6–32,5 °C, 52–62 % (uma leitura com 31 %), TVOC 21–67 ppb, eCO₂ 400–490 (sensor de gás aquecendo) |
+| Hora estimada | ⏳ **não fechou, como devia**: arquivo iniciado em 03/11 às 19h27 (−03), 13 medições em 18 h 45 min, quando a 2 h cabem 10. As 3 a mais são despertares pelo botão sem coleta completa (duas tentativas desta sessão terminaram assim). As leituras ficaram sem hora. A placa está com o programa de produção (2 h): em 75 s de observação a USB não apareceu nenhuma vez |
+| Tentativas que falharam | 1ª: `ERROR:BAD_COMMAND` logo depois do `HELLO` (a placa já estava no meio de uma conversa). 2ª: nenhuma resposta em 8 s e a porta sumiu (a placa não tinha sido acordada pelo botão). As duas deixaram o arquivo na placa, como o app disse |
+
+**Falta conferir:** a hora fechar numa coleta em ritmo; "Configurar placa nova" com a placa
+real; a temperatura ao lado de um termômetro (aquecimento pelo ENS160); quanto tempo entre o
+botão e a porta aparecer.
+
 ---
 
 ## Notas técnicas
