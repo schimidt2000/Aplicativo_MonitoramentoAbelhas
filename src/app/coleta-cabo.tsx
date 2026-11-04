@@ -277,7 +277,7 @@ export default function ColetaPeloCabo() {
           <Progresso progresso={estado.progresso} />
         ) : !(podeColetarDeVerdade || temDemo) ? null : (
           <>
-            <Text style={s.corpo}>{t('caboColeta.intro')}</Text>
+            <Text style={s.corpo}>{t(cabo?.origem === 'aparelho' ? 'caboColeta.intro_celular' : 'caboColeta.intro')}</Text>
 
             {podeColetarDeVerdade && temDemo && (
               <View style={s.opcoesLinha} accessibilityRole="radiogroup">
@@ -310,7 +310,7 @@ export default function ColetaPeloCabo() {
             )}
 
             {(podeColetarDeVerdade || temDemo) && (
-              <Passos simulada={usandoSimulada} placaLigada={placaLigada} restam={restam} />
+              <Passos noCelular={cabo?.origem === 'aparelho'} simulada={usandoSimulada} placaLigada={placaLigada} restam={restam} />
             )}
 
             {estado.fase === 'escolhendo' && (
@@ -364,11 +364,11 @@ function SemCabo({ motivo, comDemo }: { motivo: Parameters<typeof textoSemCaboPa
   );
 }
 
-function Passos({ simulada, placaLigada, restam }: {
-  simulada: boolean; placaLigada: boolean; restam: number | null;
+function Passos({ simulada, placaLigada, restam, noCelular }: {
+  simulada: boolean; placaLigada: boolean; restam: number | null; noCelular: boolean;
 }) {
   const passos = [
-    { n: 1, texto: t('caboColeta.passo.cabo'), feito: placaLigada },
+    { n: 1, texto: t(noCelular ? 'caboColeta.passo.cabo_celular' : 'caboColeta.passo.cabo'), feito: placaLigada },
     { n: 2, texto: t(simulada ? 'caboColeta.simulada.botao_junto' : 'caboColeta.passo.botao'), feito: restam !== null && restam > 0 },
     { n: 3, texto: t('caboColeta.passo.coletar'), feito: false },
   ];

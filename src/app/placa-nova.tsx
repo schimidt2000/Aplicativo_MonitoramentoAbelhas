@@ -164,11 +164,11 @@ export default function PlacaNova() {
           </View>
         )}
 
-        <Text style={s.corpo}>{t('placaNova.passo.cabo')}</Text>
+        <Text style={s.corpo}>{t(cabo?.origem === 'aparelho' ? 'placaNova.passo.cabo_celular' : 'placaNova.passo.cabo')}</Text>
         <Text style={s.corpo}>{t('placaNova.passo.enviar')}</Text>
 
         <View style={s.cartao}>
-          <Text style={s.ajuda}>{t('placaNova.computador_marca')}</Text>
+          <Text style={s.ajuda}>{t(cabo?.origem === 'aparelho' ? 'placaNova.celular_marca' : 'placaNova.computador_marca')}</Text>
           <Text style={s.hora}>{t('hora.data_hora', partes)}</Text>
         </View>
 
@@ -176,7 +176,7 @@ export default function PlacaNova() {
           <View style={[s.cartao, s.cartaoProblema]} accessible accessibilityRole="alert">
             <View style={s.linhaIcone}>
               <IconeAlerta cor={cores.perigo} tamanho={24} />
-              <Text style={s.cartaoTitulo}>{t('placaNova.relogio_errado.titulo')}</Text>
+              <Text style={s.cartaoTitulo}>{t(cabo?.origem === 'aparelho' ? 'placaNova.relogio_errado.titulo_celular' : 'placaNova.relogio_errado.titulo')}</Text>
             </View>
             <Text style={s.corpo}>{t('placaNova.relogio_errado.detalhe')}</Text>
           </View>

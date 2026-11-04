@@ -18,7 +18,17 @@ Aparelho com bloqueio de administrador (de escola ou empresa) pode recusar a ins
 
 Precisa do Android Studio (pelo SDK do Android) e do **Java 17**. O Java que vem com o
 Android Studio é o 25, e com ele a compilação de partes nativas do React Native falha com
-"A restricted method in java.lang.System has been called". Na pasta do projeto:
+"A restricted method in java.lang.System has been called".
+
+**A compilação precisa de uma pasta sem acento.** Com o projeto em "Bee-sertão", a montagem do
+código JavaScript falha com "Unable to resolve module .../expo-router/entry": o macOS guarda o
+"ã" de um jeito e o empacotador procura de outro. Por isso, compile numa cópia:
+
+```bash
+git clone --branch feat/006-cabo-android ~/Desktop/Bee-sertão ~/bee-sertao-android && cp ~/Desktop/Bee-sertão/.env.local ~/bee-sertao-android/ && cd ~/bee-sertao-android && npm ci
+```
+
+Para atualizar a cópia depois de mudanças: `cd ~/bee-sertao-android && git pull`. Dentro dela:
 
 ```bash
 export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home" ANDROID_HOME="$HOME/Library/Android/sdk"

@@ -588,6 +588,7 @@ export const ptBR = {
   'titulo.placa_nova': 'Configurar placa nova',
 
   'caboColeta.intro': 'Coleta das leituras da placa ligada no cabo USB deste computador.',
+  'caboColeta.intro_celular': 'Coleta das leituras da placa ligada no cabo USB deste celular.',
   'caboColeta.colmeia.titulo': 'De qual colmeia é esta placa?',
   'caboColeta.colmeia.ajuda':
     'Escolha abaixo a colmeia desta placa. Depois da primeira coleta, o aplicativo reconhece a placa sozinho.',
@@ -596,6 +597,7 @@ export const ptBR = {
   'caboColeta.passo.rotulo': 'Passo {n}',
   'caboColeta.passo.rotulo_acessivel': 'Passo {n}. {texto}',
   'caboColeta.passo.cabo': 'Ligue o cabo na placa e no computador.',
+  'caboColeta.passo.cabo_celular': 'Ligue o cabo na placa e na entrada do celular.',
   'caboColeta.passo.botao': 'Aperte o botão da placa. Ela fica acordada esperando por 30 segundos.',
   'caboColeta.passo.coletar': 'Toque em Coletar em até 30 segundos.',
   'caboColeta.contagem.restam.um': 'Falta 1 segundo para a placa voltar a dormir',
@@ -735,13 +737,16 @@ export const ptBR = {
   'placaNova.intro':
     'Use só com uma placa que acabou de receber o programa e ainda não mediu nada. Ela fica esperando a data e a hora pelo cabo.',
   'placaNova.passo.cabo': 'Ligue a placa nova no cabo, neste computador.',
+  'placaNova.passo.cabo_celular': 'Ligue a placa nova no cabo, na entrada deste celular.',
   'placaNova.passo.enviar': 'Confira a data e a hora abaixo e toque em Acertar o relógio.',
   'placaNova.computador_marca': 'Este computador está marcando:',
+  'placaNova.celular_marca': 'Este celular está marcando:',
   'placaNova.botao.enviar': 'Acertar o relógio',
   'placaNova.botao.de_novo': 'Acertar de novo',
   'placaNova.botao.ir_coleta': 'Ir para Coletar pelo cabo',
   'placaNova.estado.enviando': 'Acertando o relógio da placa…',
   'placaNova.relogio_errado.titulo': 'A data ou a hora deste computador parece errada',
+  'placaNova.relogio_errado.titulo_celular': 'A data ou a hora deste celular parece errada',
   'placaNova.relogio_errado.detalhe':
     'Com uma data errada, todas as leituras do primeiro arquivo da placa ficariam sem hora. Acerte a data e a hora do computador e volte a esta tela.',
   'placaNova.confirmada.titulo': 'A placa confirmou e começou a medir',
