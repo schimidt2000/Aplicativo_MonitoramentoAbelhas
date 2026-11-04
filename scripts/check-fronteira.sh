@@ -21,6 +21,12 @@ serial=$(grep -rnE "\.serial\b|\[[[:space:]]*['\"]serial['\"][[:space:]]*\]|['\"
 [ -n "$serial" ] && erro "porta serial acessada fora de transports/:
 $serial"
 
+# Princípio IV e feature 006 — o módulo nativo de USB do Android só em transports/.
+usbnat=$(grep -rnE "bee-usb-serial" src --include='*.ts' --include='*.tsx' 2>/dev/null \
+          | grep -vE '^src/transports/' || true)
+[ -n "$usbnat" ] && erro "módulo nativo de USB importado fora de transports/:
+$usbnat"
+
 # CLAUDE.md e feature 005 — `src/core` é domínio puro: zero import de plataforma
 # (react, react-native, expo-*), de transporte, de banco, de tela. A máquina de
 # estados do cabo só é testável sem porta porque mora aqui.

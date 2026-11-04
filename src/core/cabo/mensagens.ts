@@ -128,7 +128,7 @@ export function notasDoCabo(no: ResultadoNo): string[] {
 export function textoSemCaboParaColeta(m: MotivoSemCabo): { titulo: string; detalhe: string } {
   switch (m) {
     case 'app-no-celular':
-      return { titulo: t('cabo.sem_suporte.titulo.computador'), detalhe: t('caboColeta.sem_suporte.app_no_celular') };
+      return { titulo: t('caboColeta.sem_suporte.titulo.app'), detalhe: t('caboColeta.sem_suporte.app_no_celular') };
     case 'navegador-de-celular':
       return { titulo: t('cabo.sem_suporte.titulo.computador'), detalhe: t('caboColeta.sem_suporte.navegador_de_celular') };
     case 'endereco-nao-seguro':
@@ -139,13 +139,14 @@ export function textoSemCaboParaColeta(m: MotivoSemCabo): { titulo: string; deta
 }
 
 /** Problema antes da conversa: escolher ou abrir a porta. */
-export type ProblemaDaPorta = 'nenhuma' | 'nao-apareceu' | 'ocupada' | 'sem-permissao';
+export type ProblemaDaPorta = 'nenhuma' | 'nao-apareceu' | 'ocupada' | 'sem-permissao' | 'sem-permissao-usb';
 
 const PORTA: Record<ProblemaDaPorta, Par> = {
   'nenhuma': { titulo: 'caboColeta.porta.nenhuma.titulo', detalhe: 'caboColeta.porta.nenhuma.detalhe' },
   'nao-apareceu': { titulo: 'caboColeta.porta.nao_apareceu.titulo', detalhe: 'caboColeta.porta.nao_apareceu.detalhe' },
   'ocupada': { titulo: 'caboColeta.porta.ocupada.titulo', detalhe: 'caboColeta.porta.ocupada.detalhe' },
   'sem-permissao': { titulo: 'caboColeta.porta.sem_permissao.titulo', detalhe: 'caboColeta.porta.sem_permissao.detalhe' },
+  'sem-permissao-usb': { titulo: 'caboColeta.porta.sem_permissao_usb.titulo', detalhe: 'caboColeta.porta.sem_permissao_usb.detalhe' },
 };
 
 export function textoDoProblemaDaPorta(p: ProblemaDaPorta): { titulo: string; detalhe: string } {
@@ -159,8 +160,11 @@ export function textoDoProblemaDaPorta(p: ProblemaDaPorta): { titulo: string; de
  */
 export function problemaDaPortaPorErro(
   codigo: TransportErrorCode | null, fase: 'escolher' | 'abrir',
+  origem: 'navegador' | 'aparelho' = 'navegador',
 ): ProblemaDaPorta {
-  if (codigo === 'permission') return 'sem-permissao';
+  if (codigo === 'permission') return origem === 'aparelho' ? 'sem-permissao-usb' : 'sem-permissao';
+  // No Android não há lista para escolher: placa ausente é placa que não apareceu (006).
+  if (origem === 'aparelho' && codigo === 'not-found') return 'nao-apareceu';
   if (fase === 'escolher') return 'nenhuma';
   return codigo === 'unavailable' ? 'ocupada' : 'nao-apareceu';
 }

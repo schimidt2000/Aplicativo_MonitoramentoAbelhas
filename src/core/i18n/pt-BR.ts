@@ -625,8 +625,9 @@ export const ptBR = {
   'caboColeta.progresso.leituras.um': '{n} leitura',
   'caboColeta.progresso.leituras.outros': '{n} leituras',
 
+  'caboColeta.sem_suporte.titulo.app': 'Esta versão do aplicativo não lê a placa pelo cabo',
   'caboColeta.sem_suporte.app_no_celular':
-    'No celular, ainda não dá para coletar pelo cabo. Por enquanto, use um computador: abra o aplicativo no Chrome ou no Edge e ligue a placa no cabo USB.',
+    'O cabo funciona no aplicativo instalado por arquivo num celular ou tablet Android, ou no Chrome ou no Edge de um computador. Nesta versão, use a tela Coletar.',
   'caboColeta.sem_suporte.navegador_de_celular':
     'A coleta pelo cabo funciona no Chrome ou no Edge de um computador. Abra este mesmo endereço lá, com a placa ligada no cabo USB.',
 
@@ -643,6 +644,9 @@ export const ptBR = {
   'caboColeta.porta.sem_permissao.titulo': 'O navegador não deixou usar o cabo',
   'caboColeta.porta.sem_permissao.detalhe':
     'Nas configurações do navegador, procure a permissão "Portas seriais" e libere este endereço. Depois toque em Tentar de novo.',
+  'caboColeta.porta.sem_permissao_usb.titulo': 'O Android não deixou usar a placa',
+  'caboColeta.porta.sem_permissao_usb.detalhe':
+    'Aperte o botão da placa e toque em Tentar de novo. Quando o Android perguntar se o Bee-sertão pode usar a placa, toque em OK.',
 
   /* Resultado: problemas (nada novo ficou salvo, ou há algo a fazer na placa). */
   'caboColeta.problema.nao_respondeu.titulo': 'A placa da {nome} não respondeu',

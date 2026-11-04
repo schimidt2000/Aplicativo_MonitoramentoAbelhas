@@ -13,8 +13,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import {
-  abrirCanal, escolherPortaDeColeta, portaJaAutorizada, serialDeColeta, verificarCabo, vigiarPortas,
-  type PortaDeColeta,
+  caboDeColeta, verificarCaboDeColeta, type PortaDoCabo,
 } from '@/transports/cable';
 import { placaNovaDeDemonstracao, TRANSPORTE_ATIVO } from '@/transports';
 import { t } from '@/core/i18n';
@@ -40,12 +39,14 @@ type Estado =
 
 export default function PlacaNova() {
   const router = useRouter();
-  const disponibilidade = useMemo(() => verificarCabo(), []);
+  const disponibilidade = useMemo(() => verificarCaboDeColeta(), []);
+  // Feature 006: o cabo do navegador ou o do aparelho Android.
+  const cabo = useMemo(() => caboDeColeta(), []);
   const temDemo = TRANSPORTE_ATIVO === 'mock';
   const [simulada, setSimulada] = useState(!disponibilidade.ok);
   const [estado, setEstado] = useState<Estado>({ fase: 'pronto' });
   const [agora, setAgora] = useState(() => Date.now());
-  const porta = useRef<PortaDeColeta | null>(null);
+  const porta = useRef<PortaDoCabo | null>(null);
   const montada = useRef(true);
   const emAndamento = useRef(false);
 
@@ -56,12 +57,11 @@ export default function PlacaNova() {
   }, []);
 
   useEffect(() => {
-    if (!disponibilidade.ok) return;
-    const serial = serialDeColeta();
-    void portaJaAutorizada(serial).then((p) => { if (p && montada.current) porta.current = p; });
-    return vigiarPortas(serial, (p) => { porta.current = p; },
+    if (!disponibilidade.ok || !cabo) return;
+    void cabo.portaJaAutorizada().then((p) => { if (p && montada.current) porta.current = p; });
+    return cabo.vigiar((p) => { porta.current = p; },
       (p) => { if (porta.current === p) porta.current = null; });
-  }, [disponibilidade.ok]);
+  }, [disponibilidade.ok, cabo]);
 
   const plausivel = avaliarRelogioDoCelular(agora, null).plausivel;
   const usandoSimulada = simulada || !disponibilidade.ok;
@@ -74,7 +74,7 @@ export default function PlacaNova() {
       canal = await abrir();
     } catch (e) {
       if (montada.current) {
-        setEstado({ fase: 'porta', problema: problemaDaPortaPorErro(e instanceof TransportError ? e.code : null, 'abrir') });
+        setEstado({ fase: 'porta', problema: problemaDaPortaPorErro(e instanceof TransportError ? e.code : null, 'abrir', cabo?.origem) });
         bipar(2);
       }
       return;
@@ -106,20 +106,20 @@ export default function PlacaNova() {
     }
     const conhecida = porta.current;
     // Sem placa autorizada à vista, a lista do navegador TEM de abrir direto do toque.
-    const pedido = conhecida ? Promise.resolve(conhecida) : escolherPortaDeColeta(serialDeColeta());
+    const pedido = conhecida ? Promise.resolve(conhecida) : (cabo ? cabo.escolher() : Promise.reject(new TransportError('unavailable')));
     void (async () => {
-      let p: PortaDeColeta;
+      let p: PortaDoCabo;
       try {
         p = await pedido;
       } catch (e) {
         if (montada.current) {
-          setEstado({ fase: 'porta', problema: problemaDaPortaPorErro(e instanceof TransportError ? e.code : null, 'escolher') });
+          setEstado({ fase: 'porta', problema: problemaDaPortaPorErro(e instanceof TransportError ? e.code : null, 'escolher', cabo?.origem) });
           bipar(2);
         }
         return;
       }
       porta.current = p;
-      await enviarPor(() => abrirCanal(p));
+      await enviarPor(() => (cabo as NonNullable<typeof cabo>).abrir(p));
     })().finally(fim);
   }
 

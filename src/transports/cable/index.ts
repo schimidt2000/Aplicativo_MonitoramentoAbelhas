@@ -11,6 +11,9 @@ import {
 } from './disponibilidade';
 import type { SerialDoNavegador } from './serial';
 import type { SerialDeColeta } from './coleta';
+import { moduloUsbSerial } from '../../../modules/bee-usb-serial';
+import { caboDoAparelho } from './android';
+import { caboDoNavegador, type CaboDeColeta } from './cabo';
 
 interface NavegadorComSerial {
   serial?: SerialDoNavegador;
@@ -33,8 +36,21 @@ export function lerAmbienteDoCabo(): AmbienteDoCabo {
   };
 }
 
+/** A tela de bancada (004): só no computador. */
 export function verificarCabo(): DisponibilidadeDoCabo {
   return disponibilidadeDoCabo(lerAmbienteDoCabo());
+}
+
+/** As telas de COLETA (005, 006): o computador ou o app instalado no Android. */
+export function verificarCaboDeColeta(): DisponibilidadeDoCabo {
+  return disponibilidadeDoCabo({ ...lerAmbienteDoCabo(), temUsbNativo: moduloUsbSerial !== null });
+}
+
+/** O cabo da coleta aqui: o do navegador, o do aparelho Android, ou null. */
+export function caboDeColeta(): CaboDeColeta | null {
+  if (Platform.OS === 'android') return moduloUsbSerial ? caboDoAparelho(moduloUsbSerial) : null;
+  const serial = serialDeColeta();
+  return serial ? caboDoNavegador(serial) : null;
 }
 
 /** A porta serial do navegador, ou null onde não existe. */
@@ -60,3 +76,5 @@ export {
   abrirCanal, aguardarPorta, escolherPortaDeColeta, portaJaAutorizada, vigiarPortas,
   type PortaDeColeta, type SerialDeColeta,
 } from './coleta';
+export { caboDoNavegador, type CaboDeColeta, type PortaDoCabo } from './cabo';
+export { caboDoAparelho } from './android';

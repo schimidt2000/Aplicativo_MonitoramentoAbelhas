@@ -27,11 +27,18 @@ export interface AmbienteDoCabo {
   userAgent: string;
   /** `navigator.userAgentData.mobile`, quando o navegador informa. */
   celularPelaDica?: boolean;
+  /**
+   * Feature 006: o app instalado no Android tem o módulo nativo de USB. Só a
+   * COLETA pelo cabo usa isto; a tela de bancada (004) segue só no computador.
+   */
+  temUsbNativo?: boolean;
 }
 
 const UA_DE_CELULAR = /Android|iPhone|iPad|iPod|Mobile/i;
 
 export function disponibilidadeDoCabo(a: AmbienteDoCabo): DisponibilidadeDoCabo {
+  // Feature 006: no app instalado no Android, a porta USB do aparelho.
+  if (a.plataforma === 'android' && a.temUsbNativo === true) return { ok: true };
   if (a.plataforma !== 'web') return { ok: false, motivo: 'app-no-celular' };
   if (a.celularPelaDica === true || UA_DE_CELULAR.test(a.userAgent)) {
     return { ok: false, motivo: 'navegador-de-celular' };

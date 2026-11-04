@@ -22,8 +22,7 @@ import { useDb } from '@/data/provider';
 import { coletarPeloCabo } from '@/data/coletaCabo';
 import { CHAVE_ULTIMA_COLMEIA_DO_CABO, lerConfig, listarColmeias } from '@/data/repo';
 import {
-  abrirCanal, escolherPortaDeColeta, portaJaAutorizada, serialDeColeta, verificarCabo, vigiarPortas,
-  type PortaDeColeta,
+  caboDeColeta, verificarCaboDeColeta, type PortaDoCabo,
 } from '@/transports/cable';
 import {
   falhasDaPlacaDemo, placaDeDemonstracao, relogioDoCelular, TRANSPORTE_ATIVO,
@@ -92,7 +91,9 @@ export default function ColetaPeloCabo() {
   const { db } = useDb();
   const router = useRouter();
   // O ambiente não muda com a tela aberta.
-  const disponibilidade = useMemo(() => verificarCabo(), []);
+  const disponibilidade = useMemo(() => verificarCaboDeColeta(), []);
+  // Feature 006: o cabo do navegador ou o do aparelho Android.
+  const cabo = useMemo(() => caboDeColeta(), []);
   const temDemo = TRANSPORTE_ATIVO === 'mock';
 
   const [colmeias, setColmeias] = useState<Colmeia[]>([]);
@@ -103,7 +104,7 @@ export default function ColetaPeloCabo() {
   const [placaLigada, setPlacaLigada] = useState(false);
   const [agora, setAgora] = useState(() => Date.now());
 
-  const porta = useRef<PortaDeColeta | null>(null);
+  const porta = useRef<PortaDoCabo | null>(null);
   const emAndamento = useRef(false);
   const montada = useRef(true);
   // A placa simulada termina o ciclo dela (medir, dormir) depois da conversa.
@@ -133,21 +134,20 @@ export default function ColetaPeloCabo() {
 
   // A placa que acorda faz a porta aparecer; a que dorme, sumir (D-512).
   useEffect(() => {
-    if (!disponibilidade.ok) return;
-    const serial = serialDeColeta();
-    void portaJaAutorizada(serial).then((p) => {
+    if (!disponibilidade.ok || !cabo) return;
+    void cabo.portaJaAutorizada().then((p) => {
       if (!montada.current || !p) return;
       porta.current = p;
       setPlacaLigada(true);
     });
-    return vigiarPortas(serial,
+    return cabo.vigiar(
       (p) => { porta.current = p; setPlacaLigada(true); setAcordouMs(Date.now()); },
       (p) => {
         if (porta.current === p) porta.current = null;
         setPlacaLigada(false);
         setAcordouMs(null);
       });
-  }, [disponibilidade.ok]);
+  }, [disponibilidade.ok, cabo]);
 
   // A contagem dos 30 s só anda quando há o que contar.
   useEffect(() => {
@@ -164,7 +164,7 @@ export default function ColetaPeloCabo() {
       canal = await abrir();
     } catch (e) {
       if (montada.current) {
-        setEstado({ fase: 'porta', problema: problemaDaPortaPorErro(e instanceof TransportError ? e.code : null, 'abrir') });
+        setEstado({ fase: 'porta', problema: problemaDaPortaPorErro(e instanceof TransportError ? e.code : null, 'abrir', cabo?.origem) });
         bipar(2);
       }
       return;
@@ -209,21 +209,23 @@ export default function ColetaPeloCabo() {
 
     const conhecida = porta.current;
     // Sem placa autorizada à vista, a lista do navegador TEM de abrir direto do toque.
-    const pedido = conhecida ? Promise.resolve(conhecida) : escolherPortaDeColeta(serialDeColeta());
-    setEstado(conhecida ? { fase: 'coletando', progresso: { fase: 'conversando' } } : { fase: 'escolhendo' });
+    const pedido = conhecida ? Promise.resolve(conhecida) : (cabo ? cabo.escolher() : Promise.reject(new TransportError('unavailable')));
+    // No Android não há lista para escolher (006): a placa já está à vista ou não está.
+    setEstado(conhecida || cabo?.origem === 'aparelho'
+      ? { fase: 'coletando', progresso: { fase: 'conversando' } } : { fase: 'escolhendo' });
     void (async () => {
-      let p: PortaDeColeta;
+      let p: PortaDoCabo;
       try {
         p = await pedido;
       } catch (e) {
         if (montada.current) {
-          setEstado({ fase: 'porta', problema: problemaDaPortaPorErro(e instanceof TransportError ? e.code : null, 'escolher') });
+          setEstado({ fase: 'porta', problema: problemaDaPortaPorErro(e instanceof TransportError ? e.code : null, 'escolher', cabo?.origem) });
           bipar(2);
         }
         return;
       }
       porta.current = p;
-      await coletarCom(() => abrirCanal(p), false, falha, escolhida);
+      await coletarCom(() => (cabo as NonNullable<typeof cabo>).abrir(p), false, falha, escolhida);
     })().finally(fim);
   }
 
