@@ -6,8 +6,8 @@ node_modules
 dist/
 build/
 .expo/
-android/
-ios/
+/android/
+/ios/
 *.keystore
 *.jks
 
