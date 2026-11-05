@@ -15,7 +15,8 @@
 import type { ClienteNuvem } from '@/core/ports/nuvem';
 import { envDoExpo, lerConfigNuvem, type EnvNuvem } from './config';
 import { NuvemMock } from './mock/cliente';
-import { cofreEmMemoria, type Cofre } from './supabase/cofre';
+import type { Cofre } from './supabase/cofre';
+import { cofrePadrao } from './cofrePadrao';
 import { NuvemSupabase } from './supabase/cliente';
 
 export interface DependenciasNuvem {
@@ -36,7 +37,7 @@ export function criarNuvem(env: EnvNuvem, deps: DependenciasNuvem = {}): Cliente
   }
   return new NuvemSupabase({
     config: lida.config,
-    cofre: deps.cofre ?? cofreEmMemoria(),
+    cofre: deps.cofre ?? cofrePadrao(),
     fetch: deps.fetch,
   });
 }
