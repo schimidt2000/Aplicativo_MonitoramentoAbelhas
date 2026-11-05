@@ -71,7 +71,7 @@ o Postgres descartável (`npm run servidor:teste`) e contra o Supabase falso dos
 - [x] T031 [US1] Instalar `expo-network` e ligar `sondaDeRede` (`isInternetReachable`, camada 1 da guarda de portal) — `src/nuvem/sondaPadrao.native.ts`; no navegador, nenhuma
 - [ ] T032 Criar o projeto Supabase em `sa-east-1` (depende da decisão de hospedagem): anonymous sign-ins, limite por IP, scripts 001/002/004, pesquisadora — `quickstart.md` §3
 - [ ] T033 [US1][US2] Demonstração da Fatia 1 contra o Supabase real (enviar duas vezes, contagem igual)
-- [ ] T034 [US1] Teste em modo avião no aparelho (Enviar e Ligar), relatado no PR
+- [ ] T034 [US1] Teste em modo avião no aparelho (Enviar e Ligar), relatado no PR — **parcial (2026-11-05, emulador Android 9):** em modo avião o app abre, lista as colmeias, abre o detalhe, coleta ("Salvo no celular. Vai enviar quando tiver internet.") e a aba Enviar mostra as contagens sem erro; falta no aparelho
 - [ ] T035 `/speckit-clarify`: código "de uso único" × reinstalação e segundo celular (research.md R-004)
 - [ ] T036 [US1] Reiniciar o cursor do cadastro quando o vínculo muda de apicultor (achado A-5) — `src/data/sync.ts`
 
@@ -102,7 +102,7 @@ o Postgres descartável (`npm run servidor:teste`) e contra o Supabase falso dos
 - [x] T062 [US1] Nó recusado para sempre não bloqueia os outros nós — achado A-4 (pulado só naquele envio; o próximo tenta de novo)
 - [ ] T063 [US2] Teste de negação com dois apicultores no Supabase real, por HTTP (repete `servidor/teste/rls.sql` pela API)
 - [ ] T064 [US1] 100 mil leituras em EDGE, com portal cativo e interrupções, no aparelho de referência: nada perdido, nada duplicado (SC-006)
-- [ ] T065 Arranque a frio p50/p95 e PSS com o cliente real; re-ratificação do Princípio II
+- [ ] T065 Arranque a frio p50/p95 e PSS com o cliente real; re-ratificação do Princípio II — **parcial (2026-11-05, emulador Android 9, 2 GB, arm64 num Mac; não substitui o aparelho de referência):** APK release com R8, 9.315 leituras no banco: `am start -W` ~0,92 s (5 arranques a frio, 0,87–1,01 s), PSS total ~108 MB no arranque e ~116 MB depois de uma coleta. O emulador não conta memória de gráficos (Graphics: 0) e a CPU do Mac é várias vezes mais rápida que um Snapdragon 425
 - [ ] T066 [P] Nuvem simulada com 401 e 409 injetáveis (o plano pedia; hoje só o Supabase falso dos testes cobre)
 - [ ] T067 [P] Manter o projeto acordado (Action a cada 3 dias), runbook com "confira isto PRIMEIRO", `pg_dump` semanal fora do repositório
 - [ ] T068 [P] Rodar `npm run servidor:teste` no CI (job com Postgres). Job `servidor` escrito em `.github/workflows/ci.yml` (2026-10-22), **ainda não executado**

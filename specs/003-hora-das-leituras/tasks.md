@@ -147,7 +147,7 @@ mutação (quebrar de propósito, ver o teste falhar, restaurar).
   `reading`. Num Snapdragon 425 o fim da coleta pode passar de 100 ms por colmeia: se a
   medição confirmar, avaliar só a partir da ligada mais antiga tocada e refazer só os dias
   afetados
-- [ ] T042 Teste em modo avião no aparelho, relatado no PR
+- [ ] T042 Teste em modo avião no aparelho, relatado no PR — **parcial (2026-11-05, emulador Android 9):** em modo avião o app abre, lista as colmeias, abre o detalhe, coleta ("Salvo no celular. Vai enviar quando tiver internet.") e a aba Enviar mostra as contagens sem erro; falta no aparelho
 - [ ] T043 Planilha: qualidade em palavra por linha e contagens no cabeçalho (FR-018,
   SC-003) — frente da 002
 - [ ] T044 Gráfico: trecho de hora estimada diferente do ancorado sem depender só da cor
