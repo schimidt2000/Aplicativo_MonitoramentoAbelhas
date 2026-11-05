@@ -94,7 +94,7 @@ da nuvem, não a de transporte; a matriz de transporte da 001 não muda.
 |---|---|---|---|
 | Nuvem simulada | suportado | descopado | suportado |
 | Nuvem real (`fetch` → Supabase) | suportado, **não verificado em aparelho** | descopado | suportado (o Supabase responde CORS), **não verificado** |
-| Guarda de portal, camada 1 (`isInternetReachable`) | **pendente** (expo-network, T031); hoje só camadas 2 e 3 | descopado | não existe (`navigator.onLine` não valida internet): camadas 2 e 3 |
+| Guarda de portal, camada 1 (`isInternetReachable`) | ✅ expo-network (T031, 2026-11-05): `false` para antes de qualquer pedido, `null` segue para as camadas 2 e 3 | descopado | não existe (`navigator.onLine` não valida internet): camadas 2 e 3 |
 | Cofre protegido da sessão (FR-015) | ✅ expo-secure-store (T030, 2026-11-05) | ✅ Keystore do Android | não existe no navegador: memória |
 
 Onde a peça não existe, a UI não oferece botão inerte: a sessão em memória só custa pedir

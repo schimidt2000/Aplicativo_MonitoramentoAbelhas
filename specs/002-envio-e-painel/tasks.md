@@ -68,7 +68,7 @@ o Postgres descartável (`npm run servidor:teste`) e contra o Supabase falso dos
 - [X] T037 [P] Testes do cliente com `fetch` falso e de ponta a ponta com o motor de envio — `tests/nuvem-supabase.test.ts`, `tests/nuvem-config.test.ts`, `tests/envio-mensagens.test.ts`, `tests/apoio/supabase-falso.ts`
 - [X] T038 [P] Encanamento conferido por teste (Metro ancorado na raiz, `tsconfig`, vitest, sem `@supabase/*` no app) e `check:fronteira` ampliado (SDK do Supabase, chave embutida, coordenada e política de UPDATE/DELETE no servidor, conferido por `tests/fronteira-servidor.test.ts`); scripts `servidor:teste`, `painel:test` — `tests/encanamento.test.ts`, `scripts/check-fronteira.sh`, `metro.config.js`, `package.json`
 - [x] T030 [US2] Instalar `expo-secure-store` (`npx expo install`, versão exata no plan.md) e implementar `Cofre` protegido (FR-015). Feito em 2026-11-05: `expo-secure-store ~57.0.4`, `cofreProtegido` no celular (`src/nuvem/cofrePadrao.native.ts`), memória no navegador; se o cofre do sistema falhar, a sessão segue pela memória (`tests/cofre.test.ts`)
-- [ ] T031 [US1] Instalar `expo-network` e ligar `sondaDeRede` (`isInternetReachable`, camada 1 da guarda de portal)
+- [x] T031 [US1] Instalar `expo-network` e ligar `sondaDeRede` (`isInternetReachable`, camada 1 da guarda de portal) — `src/nuvem/sondaPadrao.native.ts`; no navegador, nenhuma
 - [ ] T032 Criar o projeto Supabase em `sa-east-1` (depende da decisão de hospedagem): anonymous sign-ins, limite por IP, scripts 001/002/004, pesquisadora — `quickstart.md` §3
 - [ ] T033 [US1][US2] Demonstração da Fatia 1 contra o Supabase real (enviar duas vezes, contagem igual)
 - [ ] T034 [US1] Teste em modo avião no aparelho (Enviar e Ligar), relatado no PR

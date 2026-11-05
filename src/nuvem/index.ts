@@ -17,12 +17,15 @@ import { envDoExpo, lerConfigNuvem, type EnvNuvem } from './config';
 import { NuvemMock } from './mock/cliente';
 import type { Cofre } from './supabase/cofre';
 import { cofrePadrao } from './cofrePadrao';
+import { sondaPadrao } from './sondaPadrao';
 import { NuvemSupabase } from './supabase/cliente';
 
 export interface DependenciasNuvem {
   cofre?: Cofre;
   fetch?: typeof fetch;
   avisar?: (mensagem: string) => void;
+  /** A sonda de internet validada; `null` desliga a camada 1 (T031). */
+  sondaDeRede?: (() => Promise<boolean | null>) | null;
 }
 
 export function criarNuvem(env: EnvNuvem, deps: DependenciasNuvem = {}): ClienteNuvem {
@@ -39,6 +42,7 @@ export function criarNuvem(env: EnvNuvem, deps: DependenciasNuvem = {}): Cliente
     config: lida.config,
     cofre: deps.cofre ?? cofrePadrao(),
     fetch: deps.fetch,
+    sondaDeRede: deps.sondaDeRede === null ? undefined : (deps.sondaDeRede ?? sondaPadrao()),
   });
 }
 

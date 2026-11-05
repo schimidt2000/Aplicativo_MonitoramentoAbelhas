@@ -54,8 +54,8 @@ provável pendente (o aquecimento cruzado descrito em `docs/integracao-firmware.
   `tempo-esgotado`, até `TENTATIVAS_POR_ENVIO` vezes no mesmo envio; o resto fica para o
   próximo. **Nunca desista permanentemente de uma leitura.**
 - Só sincronize com `isInternetReachable === true`. Só `isConnected` dá verdadeiro em portal
-  cativo rural, e aí o envio falha em silêncio. Sonda de rede **pendente (T031)**:
-  `expo-network` ainda não está instalado.
+  cativo rural, e aí o envio falha em silêncio. A sonda (`src/nuvem/sondaPadrao.native.ts`,
+  T031) é a camada 1; a saúde do Auth e o esquema da resposta são as camadas 2 e 3.
 - Uma requisição em voo por vez. Paralelismo piora a vazão no 2G.
 - O botão "Enviar agora" é obrigatório e precisa estar visível. Trabalho de fundo é
   cortesia opcional nesses aparelhos, nunca o caminho principal.
