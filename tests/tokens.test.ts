@@ -39,6 +39,12 @@ describe('contraste dos tokens sobre os dois fundos', () => {
     });
   }
 
+  it('botão principal: rótulo branco sobre `acento` >= 7:1, e `acento` >= 7:1 sobre os dois fundos (T071)', () => {
+    expect(contraste(cores.superficie, cores.acento)).toBeGreaterThanOrEqual(7);
+    expect(contraste(cores.acento, cores.fundo)).toBeGreaterThanOrEqual(7);
+    expect(contraste(cores.acento, cores.superficie)).toBeGreaterThanOrEqual(7);
+  });
+
   it('`linha` é só divisória: não passa de 3:1, por isso não delimita controle', () => {
     // Se alguém escurecer `linha` até 3:1, este teste avisa que o token novo
     // pode ter virado redundante — e não o contrário, em silêncio.

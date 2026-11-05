@@ -107,7 +107,7 @@ o Postgres descartável (`npm run servidor:teste`) e contra o Supabase falso dos
 - [ ] T067 [P] Manter o projeto acordado (Action a cada 3 dias), runbook com "confira isto PRIMEIRO", `pg_dump` semanal fora do repositório
 - [ ] T068 [P] Rodar `npm run servidor:teste` no CI (job com Postgres). Job `servidor` escrito em `.github/workflows/ci.yml` (2026-10-22), **ainda não executado**
 - [ ] T069 `/speckit-analyze` sobre spec, plano e tarefas da 002 quando `feature.json` apontar para ela
-- [ ] T071 [US1][US2] Contraste do botão primário: rótulo branco sobre `cores.acento` (#8A5A00) dá 5,93:1, abaixo de 7:1 (Princípio V). Escurecer o token e corrigir o comentário dele, com a frente `fix/001-dividas-de-tela` — `src/ui/tokens.ts`
+- [x] T071 [US1][US2] Contraste do botão primário: rótulo branco sobre `cores.acento` (#8A5A00) dá 5,93:1, abaixo de 7:1 (Princípio V). Escurecer o token e corrigir o comentário dele, com a frente `fix/001-dividas-de-tela` — `src/ui/tokens.ts`. Feito em 2026-11-05: `#734A00`, 7,75:1 sobre branco e 7,1:1 sobre o fundo
 - [ ] T072 [US1] Trilha B por tabela `outbox` (regra de `sync.md`) no lugar do cursor por relógio do celular — achado A-8 — `src/data/sync.ts`, `src/data/repo.ts`
 - [ ] T070 Achado A-2: renomear `temp_p5`/`temp_p95` ou calcular percentis de verdade, nos dois lados e no caso de referência
 - [x] T073 [US2] Campo do código no Android (2026-11-03): reescrever o valor a cada tecla (hífen, O→0)

@@ -17,11 +17,12 @@ export const cores = {
   // Borda de botão, opção e card tocável quando a borda é o único limite visual
   // do alvo: 3,7:1 / 3,4:1 (>= 3:1, Princípio V).
   bordaControle: '#8A8578',
-  // As cores abaixo NÃO chegam a 7:1: servem a texto secundário (>= 4,5:1),
-  // ícone e borda. Texto primário deveria usar `texto`; os usos herdados como
-  // texto primário estão listados no Complexity Tracking de
-  // specs/001-coleta-offline/plan.md.
-  acento: '#8A5A00',       // âmbar escuro, 5,9:1 / 5,4:1
+  // `acento` chega a 7:1: é o fundo do botão principal, com rótulo branco
+  // (T071, 2026-11-05; era #8A5A00, 5,9:1). As cores abaixo dele NÃO chegam a
+  // 7:1: servem a texto secundário (>= 4,5:1), ícone e borda. Texto primário
+  // deveria usar `texto`; os usos herdados como texto primário estão listados
+  // no Complexity Tracking de specs/001-coleta-offline/plan.md.
+  acento: '#734A00',       // âmbar escuro, 7,75:1 sobre branco / 7,1:1 sobre o fundo
   ok: '#166534',           // 7,1:1 / 6,5:1
   atencao: '#B45309',      // 5,0:1 / 4,6:1 — sempre acompanhado de ícone e palavra
   perigo: '#B91C1C',       // 6,5:1 / 5,9:1
