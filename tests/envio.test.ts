@@ -120,6 +120,31 @@ describe('envio', () => {
     expect(lerConfig(db, 'envio_tamanho_lote', '')).toBe(String(LOTE_INICIAL / 2));
   });
 
+  it('nó recusado pelo servidor não trava os outros nós, e volta a ser tentado no próximo envio', async () => {
+    const { db } = cenario(30); // nó AA00
+    garantirColmeia(db, 'h-2', 'ap-1', 'Colmeia 02');
+    const outro = garantirNode(db, 'BB00', 'h-2', 900);
+    ingerirLote(db, outro, Array.from({ length: 20 }, (_, i) => ({
+      seq: i + 1, tNode: (i + 1) * 900, tempC100: 3400, rhX100: 6000, tvocPpb: null, eco2Ppm: null,
+      aqiUba: null, gasStatus: null, battMv: 4000, flags: 0,
+    })), { clockMode: 'uptime' }, 1, 'mock');
+    const nuvem = await nuvemVinculada();
+    const original = nuvem.enviarLeituras.bind(nuvem);
+    nuvem.enviarLeituras = async (lote: Parameters<typeof original>[0]) =>
+      lote[0].deviceId === 'AA00' ? { ok: false, motivo: 'recusado' } : original(lote);
+
+    const r = await enviarPendentes(db, nuvem, { esperar: async () => {} });
+
+    expect(r.parou).toBe('recusado');
+    expect(r.enviadas).toBe(20);       // o nó BB00 subiu inteiro
+    expect(totalPendentes(db)).toBe(30); // o AA00 continua na fila, nada perdido
+
+    nuvem.enviarLeituras = original;
+    const segunda = await enviarPendentes(db, nuvem);
+    expect(segunda.parou).toBeNull();
+    expect(nuvem.total()).toBe(50);
+  });
+
   it('cai no meio e a rede some: retoma do ponto no próximo envio, sem perder e sem duplicar', async () => {
     const { db } = cenario(300);
     const nuvem = await nuvemVinculada({ cortarApos: 180 });

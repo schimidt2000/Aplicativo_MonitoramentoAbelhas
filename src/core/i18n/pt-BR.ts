@@ -396,7 +396,7 @@ export const ptBR = {
   'envio.parada.servidor.titulo': 'A nuvem do projeto não respondeu',
   'envio.parada.servidor.texto': 'Nada se perdeu: as leituras continuam no celular. Daqui a pouco, toque em Enviar agora de novo.',
   'envio.parada.recusado.titulo': 'A nuvem do projeto não aceitou o envio',
-  'envio.parada.recusado.texto': 'As leituras continuam salvas no celular. Avise a pesquisadora.',
+  'envio.parada.recusado.texto': 'As leituras que ela não aceitou continuam salvas no celular e vão de novo no próximo envio. Avise a pesquisadora.',
   'envio.parada.tempo_esgotado.titulo': 'O envio parou antes de terminar',
   'envio.parada.tempo_esgotado.texto':
     'A internet ficou fraca ou caiu. O que já foi enviado está salvo na nuvem. Toque em Enviar agora para continuar.',

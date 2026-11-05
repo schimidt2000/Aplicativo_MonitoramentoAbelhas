@@ -122,12 +122,15 @@ export async function enviarPendentes(
   let sucessosSeguidos = 0;
   let tempoEsgotadoSeguidos = 0;
   let tentativa = 0;
+  // Nó que o servidor recusou fica de fora SÓ nesta execução: os outros nós
+  // seguem (achado A-4, T062), e o próximo envio tenta esse nó de novo.
+  const recusados: number[] = [];
 
   for (;;) {
     if (opts.sinal?.aborted) break;
     if (opts.maximo !== undefined && enviadas >= opts.maximo) break;
 
-    const nodeId = proximoNoComPendentes(db);
+    const nodeId = proximoNoComPendentes(db, recusados);
     if (nodeId === null) break;
 
     const limite = opts.maximo !== undefined
@@ -154,6 +157,11 @@ export async function enviarPendentes(
         // sobrar fica para o próximo envio, pela fila de não enviadas.
         await esperar(atrasoDeRetentativa(tentativa));
         tentativa += 1;
+        continue;
+      }
+      if (r.motivo === 'recusado') {
+        recusados.push(nodeId);
+        tentativa = 0;
         continue;
       }
       return { enviadas, restantes: restantes(), parou: r.motivo };
@@ -186,7 +194,7 @@ export async function enviarPendentes(
   try {
     await db.persist();
   } catch { /* reenvio idempotente cobre */ }
-  return { enviadas, restantes: restantes(), parou: null };
+  return { enviadas, restantes: restantes(), parou: recusados.length ? 'recusado' : null };
 }
 
 /**

@@ -223,10 +223,12 @@ export function pendenteMaisAntiga(db: SqlDb): number | null {
  * Próximo nó que ainda tem leitura por enviar. O envio é por nó porque
  * `marcarEnviadas` usa faixa de `seq`, que só é inequívoca dentro de um nó.
  */
-export function proximoNoComPendentes(db: SqlDb): number | null {
+export function proximoNoComPendentes(db: SqlDb, pulando: readonly number[] = []): number | null {
+  const fora = pulando.length ? `AND node_id NOT IN (${pulando.map(() => '?').join(',')})` : '';
   const r = db.all<{ node_id: number }>(
-    `SELECT node_id FROM reading WHERE synced_at IS NULL
+    `SELECT node_id FROM reading WHERE synced_at IS NULL ${fora}
       GROUP BY node_id ORDER BY node_id LIMIT 1`,
+    [...pulando],
   );
   return r[0]?.node_id ?? null;
 }
