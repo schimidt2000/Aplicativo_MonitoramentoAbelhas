@@ -11,7 +11,10 @@ import { useCallback, useMemo, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Link, useFocusEffect } from 'expo-router';
 import { useDb } from '@/data/provider';
-import { lerConfig, listarColmeias, nomeDoApiario, type LinhaColmeia } from '@/data/repo';
+import { diasDeVolateis, lerConfig, listarColmeias, nomeDoApiario, type LinhaColmeia } from '@/data/repo';
+import {
+  classificarVolateis, diaDeReferencia, JANELA_DO_NORMAL_DIAS, normalDaColmeia, type NormalDaColmeia,
+} from '@/core/volateis';
 import { CHAVE_INTERVALO, INTERVALO_PADRAO } from '@/core/preferencias';
 import { t, tp } from '@/core/i18n';
 import { IconeAlerta } from '@/ui/Icones';
@@ -19,7 +22,7 @@ import { useModoSol } from '@/ui/ModoSol';
 import { alvo, cores, espaco, raio, tipo } from '@/ui/tokens';
 import {
   diasDesde, estadoBateria, fmtBateria, fmtFrescor, fmtNivelColeta, fmtNumero,
-  fmtTemp, fmtUmidade, fmtVolateis, nivelColeta,
+  fmtTemp, fmtUmidade, fmtVolateisRelativo, nivelColeta,
   type EstadoBateria, type NivelColeta,
 } from '@/core/format';
 
@@ -41,12 +44,24 @@ export default function Colmeias() {
   const { db } = useDb();
   const { sol, alternar } = useModoSol();
   const [linhas, setLinhas] = useState<LinhaColmeia[]>([]);
+  // Feature 007: o normal de voláteis de cada colmeia, calculado ao carregar, nunca no render.
+  const [normais, setNormais] = useState<Map<string, NormalDaColmeia>>(new Map());
   const [local, setLocal] = useState<string | null>(null);
   const [intervalo, setIntervalo] = useState(INTERVALO_PADRAO);
 
   useFocusEffect(
     useCallback(() => {
-      setLinhas(listarColmeias(db));
+      const lista = listarColmeias(db);
+      setLinhas(lista);
+      const m = new Map<string, NormalDaColmeia>();
+      for (const c of lista) {
+        if (c.node_id === null) continue;
+        try {
+          const ref = diaDeReferencia(c.ultima_ms, Date.now());
+          m.set(c.hive_id, normalDaColmeia(diasDeVolateis(db, c.node_id, ref, JANELA_DO_NORMAL_DIAS), ref));
+        } catch { /* sem normal: a linha diz que está aprendendo */ }
+      }
+      setNormais(m);
       setLocal(nomeDoApiario(db));
       setIntervalo(Number(lerConfig(db, CHAVE_INTERVALO, String(INTERVALO_PADRAO))));
     }, [db]),
@@ -139,7 +154,7 @@ export default function Colmeias() {
         contentContainerStyle={{ paddingBottom: espaco.xl }}
         renderItem={({ item }) => (
           <LinhaCard item={item} sol={sol} alturaMinima={alturaMinima}
-            intervalo={intervalo} />
+            intervalo={intervalo} normal={normais.get(item.hive_id) ?? SEM_NORMAL} />
         )}
       />
 
@@ -147,8 +162,10 @@ export default function Colmeias() {
   );
 }
 
-function LinhaCard({ item, sol, alturaMinima, intervalo }: {
-  item: LinhaColmeia; sol: boolean; alturaMinima: number; intervalo: number;
+const SEM_NORMAL: NormalDaColmeia = { ppb: null, dias: 0 };
+
+function LinhaCard({ item, sol, alturaMinima, intervalo, normal }: {
+  item: LinhaColmeia; sol: boolean; alturaMinima: number; intervalo: number; normal: NormalDaColmeia;
 }) {
   const escala = sol ? 1.15 : 1;
   const semDados = item.ultima_ms === null;
@@ -239,7 +256,10 @@ function LinhaCard({ item, sol, alturaMinima, intervalo }: {
                 </Text>
                 <Text style={[s.secundario, { fontSize: tipo.rotulo * escala }]}>
                   {t('grandeza.volateis_curto')}{' '}
-                  <Text style={s.secundarioForte}>{fmtVolateis(item.tvoc_ppb)}</Text>
+                  <Text style={s.secundarioForte}>
+                    {fmtVolateisRelativo(
+                      classificarVolateis(item.tvoc_ppb, normal), 'curta')}
+                  </Text>
                 </Text>
               </View>
             </>

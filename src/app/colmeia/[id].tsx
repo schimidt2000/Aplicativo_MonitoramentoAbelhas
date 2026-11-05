@@ -9,9 +9,14 @@ import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDb } from '@/data/provider';
 import {
-  contarExcluidas, intervaloDaPlacaNoCadastro, noTemColetaPeloCabo, obterColmeia, resumosDiarios,
-  type LinhaColmeia, type LinhaDiaria,
+  contarExcluidas, diasDeVolateis, intervaloDaPlacaNoCadastro, noTemColetaPeloCabo, obterColmeia,
+  resumosDiarios, type LinhaColmeia, type LinhaDiaria,
 } from '@/data/repo';
+import {
+  classificarVolateis, diaDeReferencia, JANELA_DO_NORMAL_DIAS, MINIMO_DE_DIAS, normalDaColmeia,
+  percentualDoNormal,
+  type NormalDaColmeia,
+} from '@/core/volateis';
 import { contarSemHora, definirIntervaloDaPlaca } from '@/data/hora';
 import { INTERVALO_PADRAO_S } from '@/core/hora';
 import { OPCOES_INTERVALO_PLACA_S, rotuloDoIntervalo } from '@/core/cabo/passos';
@@ -19,7 +24,7 @@ import { Grafico } from '@/ui/Grafico';
 import { t, tp, type ChaveTexto } from '@/core/i18n';
 import { alvo, cores, espaco, raio, tipo } from '@/ui/tokens';
 import {
-  dadoEstaVelho, fmtBateria, fmtFrescor, fmtTemp, fmtUmidade, fmtVolateis,
+  dadoEstaVelho, fmtBateria, fmtFrescor, fmtTemp, fmtUmidade, fmtVolateisRelativo,
 } from '@/core/format';
 
 type Serie = 'temp' | 'rh' | 'tvoc';
@@ -46,6 +51,8 @@ export default function DetalheColmeia() {
   // Feature 005: só a placa que já veio pelo cabo tem intervalo a escolher.
   const [placa, setPlaca] = useState<{ intervaloS: number } | null>(null);
   const [intervaloFalhou, setIntervaloFalhou] = useState(false);
+  // Feature 007: o normal de voláteis desta colmeia.
+  const [normal, setNormal] = useState<NormalDaColmeia>({ ppb: null, dias: 0 });
 
   const recarregar = useCallback(() => {
     const c = obterColmeia(db, id);
@@ -53,6 +60,8 @@ export default function DetalheColmeia() {
     if (c?.node_id) {
       setDiarias(resumosDiarios(db, c.node_id, janela));
       setExcluidas(contarExcluidas(db, c.node_id));
+      const ref = diaDeReferencia(c.ultima_ms, Date.now());
+      setNormal(normalDaColmeia(diasDeVolateis(db, c.node_id, ref, JANELA_DO_NORMAL_DIAS), ref));
       setSemHora(contarSemHora(db, c.node_id));
       setPlaca(noTemColetaPeloCabo(db, c.node_id)
         ? { intervaloS: intervaloDaPlacaNoCadastro(db, c.node_id) ?? INTERVALO_PADRAO_S }
@@ -87,7 +96,8 @@ export default function DetalheColmeia() {
   // em valor null quanto em dia faltando, porque o banco só devolve dias com linha.
   const pontos = diarias.map((d) => ({
     day: d.day,
-    valor: serie === 'temp' ? d.temp_med : serie === 'rh' ? d.rh_med : d.tvoc_med,
+    // Voláteis em % do normal desta colmeia, nunca em ppb (feature 007).
+    valor: serie === 'temp' ? d.temp_med : serie === 'rh' ? d.rh_med : percentualDoNormal(d.tvoc_med, normal),
     // Só a temperatura tem p5/p95 no resumo diário.
     faixaMin: serie === 'temp' ? d.temp_p5 : null,
     faixaMax: serie === 'temp' ? d.temp_p95 : null,
@@ -99,7 +109,7 @@ export default function DetalheColmeia() {
   const cfg = {
     temp: { sufixo: ' °C', divisor: 100, casas: 1, spanMinimo: 200 },
     rh: { sufixo: ' %', divisor: 100, casas: 0, spanMinimo: 1000 },
-    tvoc: { sufixo: ' ppb', divisor: 1, casas: 0, spanMinimo: 200 },
+    tvoc: { sufixo: ' %', divisor: 1, casas: 0, spanMinimo: 100 },
   }[serie];
 
   return (
@@ -130,7 +140,9 @@ export default function DetalheColmeia() {
             <Card rotulo={t('grandeza.temperatura')}
               valor={fmtTemp(colmeia.temp_c100, colmeia.temp_offset_c100)} />
             <Card rotulo={t('grandeza.umidade')} valor={fmtUmidade(colmeia.rh_x100)} />
-            <Card rotulo={t('grandeza.volateis')} valor={fmtVolateis(colmeia.tvoc_ppb)} />
+            <Card rotulo={t('grandeza.volateis')}
+              valor={fmtVolateisRelativo(classificarVolateis(colmeia.tvoc_ppb, normal), 'cartao')}
+              detalhe={normal.ppb !== null && colmeia.tvoc_ppb !== null ? t('volateis.cartao.detalhe') : undefined} />
             <Card rotulo={t('grandeza.bateria')} valor={fmtBateria(colmeia.batt_mv)} />
           </View>
 
@@ -142,6 +154,10 @@ export default function DetalheColmeia() {
               {'\n'}
               <Text style={s.negrito}>{t('colmeia.volateis.nao_e')}</Text>{' '}
               {t('colmeia.volateis.uso')}
+              {'\n'}
+              {normal.ppb !== null
+                ? tp('volateis.normal.explicacao', normal.dias)
+                : tp('volateis.aprendendo', normal.dias, { min: String(MINIMO_DE_DIAS) })}
             </Text>
           </View>
 
@@ -175,10 +191,17 @@ export default function DetalheColmeia() {
             <View onLayout={(e: LayoutChangeEvent) =>
               setLargura(Math.round(e.nativeEvent.layout.width))}>
               {/* width numérico explícito — na web o SVG não deriva de viewBox */}
-              <Grafico pontos={pontos} largura={largura} altura={210}
-                sufixo={cfg.sufixo} divisor={cfg.divisor} casas={cfg.casas}
-                spanMinimo={cfg.spanMinimo} />
+              {serie === 'tvoc' && normal.ppb === null ? (
+                <Text style={s.notaSemHora}>{tp('volateis.aprendendo', normal.dias, { min: String(MINIMO_DE_DIAS) })}</Text>
+              ) : (
+                <Grafico pontos={pontos} largura={largura} altura={210}
+                  sufixo={cfg.sufixo} divisor={cfg.divisor} casas={cfg.casas}
+                  spanMinimo={cfg.spanMinimo} />
+              )}
             </View>
+            {serie === 'tvoc' && normal.ppb !== null && (
+              <Text style={s.rodapeGrafico}>{t('volateis.grafico.legenda')}</Text>
+            )}
             <Text style={s.rodapeGrafico}>{tp('colmeia.grafico.dias', diarias.length)}</Text>
             {excluidas > 0 && (
               <Text style={s.rodapeGrafico}>{tp('colmeia.grafico.excluidas', excluidas)}</Text>
@@ -216,11 +239,12 @@ export default function DetalheColmeia() {
   );
 }
 
-function Card({ rotulo, valor }: { rotulo: string; valor: string }) {
+function Card({ rotulo, valor, detalhe }: { rotulo: string; valor: string; detalhe?: string }) {
   return (
     <View style={s.card}>
       <Text style={s.cardRotulo}>{rotulo}</Text>
       <Text style={s.cardValor}>{valor}</Text>
+      {detalhe !== undefined && <Text style={s.cardRotulo}>{detalhe}</Text>}
     </View>
   );
 }

@@ -4,7 +4,8 @@
  *
  * As palavras vêm do i18n (Princípio V); aqui ficam só as unidades.
  */
-import { t, tp } from '../i18n';
+import { t, tp, type ChaveTexto } from '../i18n';
+import type { EstadoDosVolateis } from '../volateis';
 
 /** Temperatura em centésimos de °C -> "34,7 °C". Offset aplicado só aqui. */
 export function fmtTemp(c100: number | null, offsetC100 = 0): string {
@@ -22,6 +23,33 @@ export function fmtUmidade(x100: number | null): string {
 export function fmtVolateis(ppb: number | null): string {
   if (ppb === null) return t('grandeza.sem_valor');
   return `${ppb.toLocaleString('pt-BR')} ppb`;
+}
+
+/**
+ * Voláteis relativos ao normal da própria colmeia (feature 007): o que as telas
+ * de campo mostram, nunca ppb. `curta` vai na linha do cartão da lista;
+ * `cartao`, no número grande do quadro da colmeia.
+ */
+export function fmtVolateisRelativo(e: EstadoDosVolateis, forma: 'curta' | 'cartao'): string {
+  const k = {
+    curta: {
+      normal: 'volateis.curta.normal', acima: 'volateis.curta.acima',
+      abaixo: 'volateis.curta.abaixo', aprendendo: 'volateis.curta.aprendendo',
+    },
+    cartao: {
+      normal: 'volateis.cartao.normal', acima: 'volateis.cartao.acima',
+      abaixo: 'volateis.cartao.abaixo', aprendendo: 'volateis.cartao.aprendendo',
+    },
+  }[forma];
+  switch (e.estado) {
+    case 'sem-valor': return t('grandeza.sem_valor');
+    case 'aprendendo': return t(k.aprendendo as ChaveTexto);
+    case 'normal': return t(k.normal as ChaveTexto);
+    case 'acima':
+    case 'abaixo':
+      return t((e.estado === 'acima' ? k.acima : k.abaixo) as ChaveTexto,
+        { p: Math.abs(e.percentual).toLocaleString('pt-BR') });
+  }
 }
 
 export type EstadoBateria = 'boa' | 'trocar-em-breve' | 'trocar-agora' | 'desconhecido';

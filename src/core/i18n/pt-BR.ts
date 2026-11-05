@@ -278,6 +278,21 @@ export const ptBR = {
   'colmeia.volateis.nao_e': 'Não é CO₂.',
   'colmeia.volateis.uso':
     'Serve para acompanhar mudanças nesta colmeia ao longo do tempo, não para comparar colmeias.',
+  /* Feature 007: voláteis relativos ao normal da própria colmeia, nunca em ppb. */
+  'volateis.curta.normal': 'normal',
+  'volateis.curta.acima': '{p} % acima do normal',
+  'volateis.curta.abaixo': '{p} % abaixo do normal',
+  'volateis.curta.aprendendo': 'aprendendo o normal',
+  'volateis.cartao.normal': 'Normal',
+  'volateis.cartao.acima': '+{p} %',
+  'volateis.cartao.abaixo': '−{p} %',
+  'volateis.cartao.aprendendo': 'Aprendendo',
+  'volateis.cartao.detalhe': 'em relação ao normal desta colmeia',
+  'volateis.normal.explicacao.um': 'O normal desta colmeia é o valor típico do último dia com leitura boa do sensor de gás.',
+  'volateis.normal.explicacao.outros': 'O normal desta colmeia é o valor típico dos últimos {n} dias com leitura boa do sensor de gás.',
+  'volateis.aprendendo.um': 'O aplicativo ainda está aprendendo o normal desta colmeia. Tem {n} dia com leitura boa do sensor de gás e precisa de pelo menos {min}.',
+  'volateis.aprendendo.outros': 'O aplicativo ainda está aprendendo o normal desta colmeia. Tem {n} dias com leitura boa do sensor de gás e precisa de pelo menos {min}.',
+  'volateis.grafico.legenda': 'Zero é o normal desta colmeia. Acima de zero, mais voláteis que o normal; abaixo, menos.',
   'colmeia.janela.um': '{n} dia',
   'colmeia.janela.outros': '{n} dias',
   'colmeia.grafico.dias.um':

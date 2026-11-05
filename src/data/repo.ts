@@ -85,6 +85,21 @@ export function resumosDiarios(db: SqlDb, nodeId: number, dias: number): LinhaDi
   );
 }
 
+/**
+ * As médias diárias de voláteis dos dias anteriores ao dia de referência, para
+ * o normal da colmeia (feature 007). Dia em UTC, como em `reading_daily`.
+ */
+export function diasDeVolateis(db: SqlDb, nodeId: number, referencia: number, janela: number): Array<{ day: number; tvoc_med: number | null }> {
+  return db.all<{ day: number; tvoc_med: number | null }>(
+    // Só a época atual do sensor: nenhum agregado cruza a troca de sensor (sync.md).
+    `SELECT day, tvoc_med FROM reading_daily
+      WHERE node_id = ? AND day >= ? AND day < ?
+        AND sensor_epoch = (SELECT sensor_epoch FROM node WHERE node_id = ?)
+      ORDER BY day`,
+    [nodeId, referencia - janela, referencia, nodeId],
+  );
+}
+
 /** Último `seq` já ingerido. É o cursor de retomada (FR-002, FR-004). */
 export function ultimoSeq(db: SqlDb, nodeId: number): number {
   const r = db.all<{ m: number | null }>(
