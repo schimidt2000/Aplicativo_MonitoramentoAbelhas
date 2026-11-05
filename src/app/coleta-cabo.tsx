@@ -17,6 +17,7 @@ import {
   AccessibilityInfo, Platform, Pressable, ScrollView, StyleSheet, Text, Vibration, View,
 } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useDb } from '@/data/provider';
 import { coletarPeloCabo } from '@/data/coletaCabo';
@@ -88,6 +89,9 @@ type Estado =
   | { fase: 'resultado'; resultado: ResultadoColeta; simulada: boolean };
 
 export default function ColetaPeloCabo() {
+  // O app desenha por baixo da barra de navegação do sistema: sem o recuo, o
+  // botão Coletar fica atrás dos botões do Android (visto no Android 9).
+  const { bottom } = useSafeAreaInsets();
   const { db } = useDb();
   const router = useRouter();
   // O ambiente não muda com a tela aberta.
@@ -323,7 +327,7 @@ export default function ColetaPeloCabo() {
 
       {/* Ação primária no terço inferior, ao alcance do polegar (Princípio V). */}
       {mostraColetar && (
-        <View style={s.rodape}>
+        <View style={StyleSheet.flatten([s.rodape, { paddingBottom: espaco.lg + bottom }])}>
           {estado.fase === 'coletando' && (
             <Text style={s.ajuda}>{t('caboColeta.manter_ligado')}</Text>
           )}
@@ -487,7 +491,8 @@ const s = StyleSheet.create({
 
   lista: { gap: alvo.espacamento },
   opcoesLinha: { flexDirection: 'row', flexWrap: 'wrap', gap: alvo.espacamento },
-  opcao: { minHeight: alvo.minimo, flexGrow: 1, flexDirection: 'row', alignItems: 'center',
+  // maxWidth: com fonte grande, a opção quebra a linha em vez de sair da tela.
+  opcao: { minHeight: alvo.minimo, flexGrow: 1, maxWidth: '100%', flexDirection: 'row', alignItems: 'center',
     gap: espaco.md, paddingHorizontal: espaco.lg, borderRadius: raio.md, borderWidth: 1,
     borderColor: cores.bordaControle, backgroundColor: cores.superficie },
   opcaoLinha: { minHeight: alvo.linha },

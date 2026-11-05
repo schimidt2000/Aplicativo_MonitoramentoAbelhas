@@ -4,7 +4,9 @@
  * O canal de gás se chama "Voláteis (COVs)" e NUNCA "CO2" (Princípio VI).
  */
 import { useCallback, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
+import {
+  Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions, type LayoutChangeEvent,
+} from 'react-native';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDb } from '@/data/provider';
@@ -240,8 +242,11 @@ export default function DetalheColmeia() {
 }
 
 function Card({ rotulo, valor, detalhe }: { rotulo: string; valor: string; detalhe?: string }) {
+  // Com a fonte do sistema grande, dois cartões lado a lado partem as palavras
+  // ("Tro-car em brev-e"): um por linha.
+  const { fontScale } = useWindowDimensions();
   return (
-    <View style={s.card}>
+    <View style={StyleSheet.flatten([s.card, fontScale > 1.3 && s.cardInteiro])}>
       <Text style={s.cardRotulo}>{rotulo}</Text>
       <Text style={s.cardValor}>{valor}</Text>
       {detalhe !== undefined && <Text style={s.cardRotulo}>{detalhe}</Text>}
@@ -262,6 +267,7 @@ const s = StyleSheet.create({
   card: { flexGrow: 1, flexBasis: '45%', padding: espaco.md,
     backgroundColor: cores.superficie, borderRadius: raio.md,
     borderWidth: 1, borderColor: cores.linha },
+  cardInteiro: { flexBasis: '100%' },
   cardRotulo: { fontSize: tipo.rotulo, color: cores.textoFraco },
   cardValor: { fontSize: tipo.leitura, fontWeight: '700', color: cores.texto,
     marginTop: 2, fontVariant: ['tabular-nums'] },

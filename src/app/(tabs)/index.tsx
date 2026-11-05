@@ -188,8 +188,11 @@ function LinhaCard({ item, sol, alturaMinima, intervalo, normal }: {
 
         <View style={s.cardCorpo}>
           <View style={s.cardTopo}>
+            {/* Sem truncar: o nome é o que identifica a colmeia. A 200% ele vira
+                "Colmei…" se dividir a linha com o frescor; com quebra, o frescor
+                desce para a linha de baixo. */}
             <Text style={[s.cardNome, { fontSize: tipo.corpo * escala }]}
-              numberOfLines={1}>
+              numberOfLines={2}>
               {item.nome}
             </Text>
             <View style={s.frescorConjunto}>
@@ -366,30 +369,32 @@ const s = StyleSheet.create({
   cardCorpo: { flex: 1, padding: espaco.md, justifyContent: 'space-between',
     gap: espaco.xs },
 
-  cardTopo: { flexDirection: 'row', justifyContent: 'space-between',
-    alignItems: 'center', gap: espaco.sm },
+  // Todas as linhas do card quebram em vez de cortar: fonte do sistema em 200%.
+  cardTopo: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between',
+    alignItems: 'center', columnGap: espaco.sm, rowGap: 2 },
   cardNome: { fontWeight: '700', color: cores.texto, flexShrink: 1 },
   cardFrescor: { color: cores.textoFraco },
   semDados: { color: cores.textoFraco },
 
-  linhaHero: { flexDirection: 'row', alignItems: 'center',
+  linhaHero: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center',
     justifyContent: 'space-between', gap: espaco.sm },
   heroValor: { fontWeight: '700', color: cores.texto, fontVariant: ['tabular-nums'] },
   chipBateria: { flexDirection: 'row', alignItems: 'center', gap: espaco.xs + 2,
     paddingHorizontal: espaco.sm, paddingVertical: 4,
     borderRadius: raio.sm, borderWidth: 1, borderColor: cores.linha,
-    backgroundColor: cores.fundo, flexShrink: 1 },
+    backgroundColor: cores.fundo },
   chipAtencao: { borderColor: cores.atencao },
   chipPerigo: { borderColor: cores.perigo },
   chipBateriaTexto: { fontWeight: '700' },
 
-  linhaSecundaria: { flexDirection: 'row', gap: espaco.lg },
+  linhaSecundaria: { flexDirection: 'row', flexWrap: 'wrap', columnGap: espaco.lg,
+    rowGap: 2 },
   secundario: { color: cores.textoFraco },
   secundarioForte: { color: cores.texto, fontWeight: '700',
     fontVariant: ['tabular-nums'] },
 
-  cardRodape: { flexDirection: 'row', justifyContent: 'space-between',
-    gap: espaco.sm },
+  cardRodape: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between',
+    columnGap: espaco.sm, rowGap: 2 },
   sync: { color: cores.neutro },
   syncForte: { fontWeight: '700', fontVariant: ['tabular-nums'] },
   syncCompleto: { color: cores.ok },

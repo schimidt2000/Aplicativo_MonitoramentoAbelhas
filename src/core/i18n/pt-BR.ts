@@ -795,7 +795,7 @@ export const ptBR = {
 
   /* Pontos de entrada. */
   'coleta.cabo.link': 'Coletar pelo cabo',
-  'coleta.cabo.ajuda': 'Para a placa ligada no cabo USB de um computador.',
+  'coleta.cabo.ajuda': 'Para a placa ligada por cabo USB, no celular ou no computador.',
   'cabo.diagnostico.coleta_titulo': 'Coletar as leituras pelo cabo',
   'cabo.diagnostico.coleta_ajuda':
     'Salva no aplicativo as leituras da placa ligada no cabo USB, no Chrome ou no Edge de um computador.',

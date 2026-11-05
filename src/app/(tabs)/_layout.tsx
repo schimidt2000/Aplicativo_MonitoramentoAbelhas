@@ -7,9 +7,24 @@
  * Palavra também é mais acessível para quem tem pouca familiaridade com apps.
  */
 import { Tabs } from 'expo-router';
+import { Text, type ColorValue } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { t } from '@/core/i18n';
 import { alvo, cores, tipo } from '@/ui/tokens';
+
+/**
+ * Rótulo da aba: uma palavra que nunca vira "Colm…". Com a fonte do sistema
+ * em 200%, quatro palavras não cabem lado a lado; o Android reduz a letra só
+ * o necessário para a palavra caber inteira na aba.
+ */
+function rotulo(texto: string) {
+  return ({ color }: { color: ColorValue }) => (
+    <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.5}
+      style={{ color, fontSize: tipo.rotulo, fontWeight: '700', textAlign: 'center' }}>
+      {texto}
+    </Text>
+  );
+}
 
 export default function TabsLayout() {
   // O app desenha por baixo da barra de navegação do sistema (Android 10+ e
@@ -33,19 +48,18 @@ export default function TabsLayout() {
           paddingTop: 6,
           paddingBottom: 6 + bottom,
         },
-        tabBarLabelStyle: { fontSize: tipo.rotulo, fontWeight: '700' },
         // Sem espaço reservado para ícone: o rótulo é o alvo inteiro.
         tabBarIconStyle: { display: 'none' },
       }}
     >
       <Tabs.Screen name="index"
-        options={{ title: t('abas.colmeias'), tabBarLabel: t('abas.colmeias') }} />
+        options={{ title: t('abas.colmeias'), tabBarLabel: rotulo(t('abas.colmeias')) }} />
       <Tabs.Screen name="coletar"
-        options={{ title: t('abas.coletar'), tabBarLabel: t('abas.coletar') }} />
+        options={{ title: t('abas.coletar'), tabBarLabel: rotulo(t('abas.coletar')) }} />
       <Tabs.Screen name="enviar"
-        options={{ title: t('abas.enviar'), tabBarLabel: t('abas.enviar') }} />
+        options={{ title: t('abas.enviar'), tabBarLabel: rotulo(t('abas.enviar')) }} />
       <Tabs.Screen name="ajustes"
-        options={{ title: t('abas.ajustes'), tabBarLabel: t('abas.ajustes') }} />
+        options={{ title: t('abas.ajustes'), tabBarLabel: rotulo(t('abas.ajustes')) }} />
     </Tabs>
   );
 }

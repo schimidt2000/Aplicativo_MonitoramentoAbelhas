@@ -12,6 +12,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   caboDeColeta, verificarCaboDeColeta, type PortaDoCabo,
 } from '@/transports/cable';
@@ -39,6 +40,7 @@ type Estado =
 
 export default function PlacaNova() {
   const router = useRouter();
+  const { bottom } = useSafeAreaInsets();
   const disponibilidade = useMemo(() => verificarCaboDeColeta(), []);
   // Feature 006: o cabo do navegador ou o do aparelho Android.
   const cabo = useMemo(() => caboDeColeta(), []);
@@ -216,7 +218,7 @@ export default function PlacaNova() {
 
       {/* Com a data errada não há botão: a tela já disse o que fazer (FR-024). */}
       {pode && plausivel && (
-        <View style={s.rodape}>
+        <View style={StyleSheet.flatten([s.rodape, { paddingBottom: espaco.lg + bottom }])}>
           <Pressable style={[s.botao, ocupado && s.botaoOcupado]} accessibilityRole="button"
             accessibilityState={{ disabled: ocupado, busy: ocupado }} disabled={ocupado} onPress={enviar}>
             <Text style={s.botaoTexto}>
