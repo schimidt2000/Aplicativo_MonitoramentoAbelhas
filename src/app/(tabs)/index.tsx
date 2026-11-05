@@ -68,9 +68,9 @@ export default function Colmeias() {
   );
 
   const totais = useMemo(() => {
-    const comDados = linhas.filter((l) => l.ultima_ms !== null);
+    const comDados = linhas.filter((l) => l.coletada_ms !== null);
     const atrasadas = comDados.filter((l) => {
-      const n = nivelColeta(l.ultima_ms, intervalo);
+      const n = nivelColeta(l.coletada_ms, intervalo);
       return n === 'atrasada' || n === 'muito-atrasada';
     });
     return {
@@ -123,7 +123,7 @@ export default function Colmeias() {
         <View style={s.avisoColeta}>
           <View style={[s.avisoBarra, {
             backgroundColor: totais.atrasadas.some(
-              (l) => nivelColeta(l.ultima_ms, intervalo) === 'muito-atrasada')
+              (l) => nivelColeta(l.coletada_ms, intervalo) === 'muito-atrasada')
               ? cores.perigo : cores.atencao,
           }]} />
           <View style={{ flex: 1 }}>
@@ -135,7 +135,7 @@ export default function Colmeias() {
             </Text>
             <Text style={s.avisoTexto}>
               {tp('colmeias.atraso.pior', Math.max(
-                ...totais.atrasadas.map((l) => diasDesde(l.ultima_ms) ?? 0),
+                ...totais.atrasadas.map((l) => diasDesde(l.coletada_ms) ?? 0),
               ))}
             </Text>
           </View>
@@ -169,8 +169,10 @@ function LinhaCard({ item, sol, alturaMinima, intervalo, normal }: {
 }) {
   const escala = sol ? 1.15 : 1;
   const semDados = item.ultima_ms === null;
+  // Coletada, mas nenhuma leitura com hora ainda (nó sem noção de tempo).
+  const semHora = semDados && item.total > 0;
   const bat = estadoBateria(item.batt_mv);
-  const nivel = nivelColeta(item.ultima_ms, intervalo);
+  const nivel = nivelColeta(item.coletada_ms, intervalo);
   const corBarra = COR_NIVEL[nivel];
   const alerta = nivel === 'atrasada' || nivel === 'muito-atrasada';
   // Fica visível até uma coleta terminar bem: o problema não some só porque a
@@ -224,7 +226,7 @@ function LinhaCard({ item, sol, alturaMinima, intervalo, normal }: {
 
           {semDados ? (
             <Text style={[s.semDados, { fontSize: tipo.corpo * escala }]}>
-              {t('colmeias.cartao.sem_leitura')}
+              {t(semHora ? 'colmeias.cartao.sem_hora' : 'colmeias.cartao.sem_leitura')}
             </Text>
           ) : (
             <>

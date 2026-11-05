@@ -259,6 +259,7 @@ export const ptBR = {
   'colmeias.atraso.pior.um': 'A mais atrasada está há {n} dia sem coleta.',
   'colmeias.atraso.pior.outros': 'A mais atrasada está há {n} dias sem coleta.',
   'colmeias.cartao.sem_leitura': 'Sem leitura ainda — toque em Coletar',
+  'colmeias.cartao.sem_hora': 'Leituras coletadas, ainda sem hora — toque para ver',
   'colmeias.cartao.no_celular': 'No celular',
   'colmeias.cartao.na_nuvem': 'Na nuvem',
   'colmeias.cartao.bateria': 'Bateria: {estado}',

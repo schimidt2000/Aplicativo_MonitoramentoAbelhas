@@ -317,6 +317,10 @@ describe('US3 — leituras sem hora calculável (SC-004)', () => {
     expect(db.all('SELECT * FROM reading_daily')).toEqual([]);
     expect(contarSemHora(db, nodeId)).toBe(193);
     expect(listarColmeias(db)[0].ultima_ms).toBeNull();
+    // A urgência de coleta usa o fim da coleta, não fica "sem coleta" (T047).
+    const coletada = listarColmeias(db)[0].coletada_ms;
+    expect(coletada).not.toBeNull();
+    expect(coletada).toBe(db.all<{ m: number }>('SELECT MAX(ended_ms) AS m FROM pull_session')[0].m);
     // A nuvem recebe a hora em branco, nunca uma inventada.
     expect(new Set(loteNaoEnviado(db, nodeId, 500).map((l) => l.tUtcMs))).toEqual(new Set([null]));
   });

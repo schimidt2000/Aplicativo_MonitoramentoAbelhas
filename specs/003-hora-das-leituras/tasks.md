@@ -155,8 +155,9 @@ mutação (quebrar de propósito, ver o teste falhar, restaurar).
 - [ ] T045 SC-006: três pessoas sem instrução diante do aviso de conflito
 - [ ] T046 Nuvem: correção de hora feita depois do envio não sobe; o servidor precisa aceitar
   `t_utc_ms` nulo (frente da 002/servidor)
-- [ ] T047 Lista de colmeias: a urgência de coleta usa a hora da última leitura com hora
-  conhecida; para um nó só com leituras sem hora, deveria usar a hora da última coleta
+- [x] T047 Lista de colmeias: a urgência de coleta usa a hora da última leitura com hora
+  conhecida; para um nó só com leituras sem hora, deveria usar a hora da última coleta —
+  feito em 2026-11-05: `coletada_ms` em `listarColmeias`, e o cartão diz "Leituras coletadas, ainda sem hora"
 
 ---
 

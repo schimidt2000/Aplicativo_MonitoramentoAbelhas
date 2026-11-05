@@ -15,6 +15,12 @@ export interface LinhaColmeia {
   node_id: number | null;
   device_id: string | null;
   ultima_ms: number | null;
+  /**
+   * Base da urgência de coleta (T047): a hora da última leitura com hora ou,
+   * para um nó só com leituras sem hora, o fim da última coleta que trouxe
+   * leituras. NULL só quando nunca houve coleta com leitura.
+   */
+  coletada_ms: number | null;
   total: number;
   pendentes: number;
   temp_c100: number | null;
@@ -47,6 +53,9 @@ export function listarColmeias(db: SqlDb): LinhaColmeia[] {
     SELECT h.id AS hive_id, h.nome,
            n.node_id, n.device_id, COALESCE(n.temp_offset_c100, 0) AS temp_offset_c100,
            u.t_utc_ms AS ultima_ms, u.temp_c100, u.rh_x100, u.tvoc_ppb, u.batt_mv,
+           COALESCE(u.t_utc_ms, (SELECT MAX(ps.ended_ms) FROM pull_session ps
+                                  WHERE ps.node_id = n.node_id AND ps.record_count > 0))
+             AS coletada_ms,
            COALESCE(c.total, 0) AS total,
            COALESCE(c.pendentes, 0) AS pendentes,
            (SELECT ps.outcome FROM pull_session ps
