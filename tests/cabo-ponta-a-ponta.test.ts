@@ -456,7 +456,7 @@ describe('colisão de chave (D-519): nunca engolida calada', () => {
     expect(no(outra).cabo?.conflitos).toBe(5);
     expect(leituras(db).slice(0, 5)).toEqual(antes);
     const aviso = montarAvisos(outra.r).find((a) => a.titulo === 'Algumas leituras ficaram salvas à parte')!;
-    expect(aviso.detalhe).toMatch(/^5 leituras desta placa têm o mesmo número/);
+    expect(aviso.detalhe).toMatch(/^5 leituras desta placa parecem repetir outras/);
     // Nada se perdeu: o arquivo inteiro está no bruto da sessão, e o registro diz por quê.
     const ultima = sessoes(db).at(-1)!;
     expect(Buffer.from(ultima.raw as Uint8Array)).toEqual(Buffer.from(arquivoDaPlaca(0, 7, 9)));

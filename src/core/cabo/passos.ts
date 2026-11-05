@@ -51,7 +51,7 @@ export function rotuloDoIntervalo(segundos: number): string {
   return segundos === INTERVALO_PADRAO_S ? t('colmeia.intervalo.padrao', { opcao: r }) : r;
 }
 
-/** A frase de cada fase da conversa (FR-027): "Salvando no celular" durante a gravação. */
+/** A frase de cada fase da conversa (FR-027): "Salvando as leituras" durante a gravação. */
 export const TEXTO_DA_FASE: Record<ProgressoDaSessao['fase'], ChaveTexto> = {
   conversando: 'caboColeta.estado.conversando',
   recebendo: 'caboColeta.estado.recebendo',

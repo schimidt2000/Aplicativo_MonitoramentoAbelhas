@@ -324,11 +324,6 @@ export class MockTransport implements Transport {
         label: t('diagnostico.preflight.simulado'),
         hint: t('diagnostico.preflight.simulado.dica'),
       },
-      {
-        id: 'armazenamento-disponivel',
-        ok: true,
-        label: t('diagnostico.preflight.armazenamento'),
-      },
     ];
   }
 

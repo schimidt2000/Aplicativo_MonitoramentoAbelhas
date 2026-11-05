@@ -273,7 +273,7 @@ export const ptBR = {
   'colmeia.sem_leitura': 'Sem leitura ainda. Toque em Coletar, no menu de baixo.',
   'colmeia.volateis.titulo': 'Sobre os voláteis (COVs)',
   'colmeia.volateis.texto':
-    'Assinatura de odor do ninho — cera, própolis, mel e feromônios.',
+    'O cheiro do ninho: cera, própolis, mel e feromônios.',
   // Única menção permitida a CO₂: dizer que NÃO é (Princípio VI).
   'colmeia.volateis.nao_e': 'Não é CO₂.',
   'colmeia.volateis.uso':
@@ -328,7 +328,6 @@ export const ptBR = {
   'diagnostico.verificar_de_novo': 'Verificar de novo',
   'diagnostico.preflight.simulado': 'Modo de demonstração ligado',
   'diagnostico.preflight.simulado.dica': 'Nesta versão, a tela Coletar usa nós sensores de exemplo, com leituras inventadas. Não precisa de nó sensor de verdade.',
-  'diagnostico.preflight.armazenamento': 'Espaço livre no celular',
 
   /* ==================================================================== */
   /* Frente: servidor e envio real (feature 002, Fatia 1).                */
@@ -338,8 +337,8 @@ export const ptBR = {
   /* ==================================================================== */
 
   /* ---------- Enviar ---------- */
-  'envio.estado.celular': 'Salvo no celular',
-  'envio.estado.nuvem': 'Salvo na nuvem',
+  'envio.estado.celular': 'No celular',
+  'envio.estado.nuvem': 'Na nuvem',
   'envio.pendentes.um': '{n} leitura ainda não enviada.',
   'envio.pendentes.outros': '{n} leituras ainda não enviadas.',
   'envio.pendentes.mais_antiga': 'A mais antiga é de {data}.',
@@ -619,11 +618,10 @@ export const ptBR = {
     'Escolha a placa na lista que o navegador abriu. Se ela não estiver lá, aperte o botão da placa: ela aparece na lista.',
   'caboColeta.estado.conversando': 'Conversando com a placa…',
   'caboColeta.estado.recebendo': 'Recebendo as leituras da placa…',
-  'caboColeta.estado.gravando': 'Salvando no celular…',
+  'caboColeta.estado.gravando': 'Salvando as leituras…',
   'caboColeta.estado.confirmando': 'Confirmando com a placa…',
   'caboColeta.estado.recomecando': 'Acertando o relógio da placa…',
   'caboColeta.progresso.rotulo': 'Progresso da coleta pelo cabo',
-  'caboColeta.progresso.bytes': '{recebidos} de {total} bytes',
   'caboColeta.progresso.leituras.um': '{n} leitura',
   'caboColeta.progresso.leituras.outros': '{n} leituras',
 
@@ -724,9 +722,9 @@ export const ptBR = {
 
   'caboColeta.aviso.conflito.titulo': 'Algumas leituras ficaram salvas à parte',
   'caboColeta.aviso.conflito.detalhe.um':
-    '1 leitura desta placa tem o mesmo número de outra já salva nesta colmeia, com valores diferentes. A que já estava salva não mudou, e esta ficou salva no celular, junto com o arquivo inteiro da coleta. Isso acontece com placa que começou a contar de uma data errada. Avise a pesquisadora.',
+    '1 leitura desta placa parece repetir uma que já estava salva nesta colmeia, mas com valores diferentes. A leitura antiga não mudou, e a nova ficou guardada à parte, junto com a coleta inteira. Isso acontece com placa que começou a contar de uma data errada. Avise a pesquisadora.',
   'caboColeta.aviso.conflito.detalhe.outros':
-    '{n} leituras desta placa têm o mesmo número de outras já salvas nesta colmeia, com valores diferentes. As que já estavam salvas não mudaram, e estas ficaram salvas no celular, junto com o arquivo inteiro da coleta. Isso acontece com placa que começou a contar de uma data errada. Avise a pesquisadora.',
+    '{n} leituras desta placa parecem repetir outras que já estavam salvas nesta colmeia, mas com valores diferentes. As leituras antigas não mudaram, e as novas ficaram guardadas à parte, junto com a coleta inteira. Isso acontece com placa que começou a contar de uma data errada. Avise a pesquisadora.',
 
   /* Resultado: notas do sucesso. */
   'caboColeta.nota.recomecou': 'As leituras já estão salvas no celular. Por isso, a placa apagou a cópia dela e recomeçou a contar.',

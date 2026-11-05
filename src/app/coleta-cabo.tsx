@@ -424,11 +424,6 @@ function Progresso({ progresso }: { progresso: ProgressoDaSessao }) {
           <Text style={s.contagemNumero}>
             {tp('caboColeta.progresso.leituras', leiturasPelosBytes(progresso.recebidos))}
           </Text>
-          <Text style={s.corpo}>
-            {t('caboColeta.progresso.bytes', {
-              recebidos: fmtNumero(progresso.recebidos), total: fmtNumero(progresso.total),
-            })}
-          </Text>
         </>
       )}
       {fracao !== null && (

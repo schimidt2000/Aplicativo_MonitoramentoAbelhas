@@ -162,8 +162,7 @@ describe('obterTransporte: cada opção da demonstração produz o que promete',
 describe('preflight do simulado', () => {
   it('os rótulos chegam em pt-BR, vindos do i18n', async () => {
     const itens = await obterTransporte().preflight();
-    expect(itens.map((i) => i.label)).toEqual([
-      'Modo de demonstração ligado', 'Espaço livre no celular',
-    ]);
+    // Sem o item de espaço livre: ele dizia "Pronto" sem medir nada (revisão de português).
+    expect(itens.map((i) => i.label)).toEqual(['Modo de demonstração ligado']);
   });
 });

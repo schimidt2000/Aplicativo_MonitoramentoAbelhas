@@ -68,7 +68,7 @@ export const ptBR = {
   'visao.vazio': 'Nenhum apicultor com esse nome. Confira a grafia ou limpe a busca.',
   'visao.sem_colmeias':
     'Ainda não há colmeias neste projeto. Elas aparecem aqui depois que o apicultor liga o celular ao projeto e envia as primeiras leituras.',
-  'visao.col.apicultor': 'Apicultor',
+  'visao.col.apicultor': 'Apicultor ou meliponicultor',
   'visao.col.colmeia': 'Colmeia',
   'visao.col.local': 'Apiário ou meliponário',
   'visao.col.municipio': 'Município',
