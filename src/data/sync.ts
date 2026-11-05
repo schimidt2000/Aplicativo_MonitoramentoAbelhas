@@ -25,11 +25,15 @@ import {
 } from './repo';
 
 const CHAVE_CURSOR_CADASTRO = 'cursor_cadastro_ms';
+/** O tamanho do lote sobrevive entre envios: a rede de ontem é a de hoje (T061). */
+const CHAVE_LOTE = 'envio_tamanho_lote';
 
 /** Lote inicial. Adaptado em campo conforme a rede responde. */
-const LOTE_INICIAL = 100;
-const LOTE_MIN = 25;
-const LOTE_MAX = 500;
+export const LOTE_INICIAL = 100;
+export const LOTE_MIN = 25;
+export const LOTE_MAX = 500;
+/** Novas tentativas, dentro do mesmo envio, para falha passageira (T061). */
+export const TENTATIVAS_POR_ENVIO = 3;
 
 export interface ProgressoEnvio {
   enviadas: number;
@@ -47,12 +51,28 @@ export interface OpcoesEnvio {
   sinal?: AbortSignal;
   /** Teto de leituras nesta execução. Sem teto, envia até acabar. */
   maximo?: number;
+  /** A espera entre tentativas. Injetável: os testes não esperam de verdade. */
+  esperar?: (ms: number) => Promise<void>;
 }
 
-/** Falhas que valem retentar depois; as outras exigem ação da pessoa. */
-function vaieTentarDepois(m: MotivoFalha): boolean {
-  return m === 'sem-rede' || m === 'portal-cativo' || m === 'servidor'
-      || m === 'tempo-esgotado';
+const esperarDeVerdade = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
+function loteGuardado(db: SqlDb): number {
+  const n = Number(lerConfig(db, CHAVE_LOTE, String(LOTE_INICIAL)));
+  return Number.isFinite(n) ? Math.min(LOTE_MAX, Math.max(LOTE_MIN, Math.floor(n))) : LOTE_INICIAL;
+}
+
+function guardarLote(db: SqlDb, n: number) {
+  try { gravarConfig(db, CHAVE_LOTE, String(n)); } catch { /* conveniência */ }
+}
+
+/**
+ * Falhas passageiras: vale tentar de novo AGORA, com espera. Sem rede e portal
+ * cativo não passam com espera de segundos: o envio para e a pessoa tenta
+ * depois. As demais exigem ação da pessoa (código, vínculo).
+ */
+function passageira(m: MotivoFalha): boolean {
+  return m === 'servidor' || m === 'tempo-esgotado';
 }
 
 /**
@@ -83,15 +103,25 @@ export async function enviarPendentes(
   const cadastro = cadastroAlteradoDesde(db, cursor);
   const temCadastro = cadastro.apiarios.length + cadastro.colmeias.length
                     + cadastro.nos.length > 0;
+  const esperar = opts.esperar ?? esperarDeVerdade;
   if (temCadastro) {
-    const r = await nuvem.enviarCadastro(cadastro);
+    let r = await nuvem.enviarCadastro(cadastro);
+    for (let t = 0; !r.ok && passageira(r.motivo) && t < TENTATIVAS_POR_ENVIO
+         && !opts.sinal?.aborted; t++) {
+      await esperar(atrasoDeRetentativa(t));
+      r = await nuvem.enviarCadastro(cadastro);
+    }
     if (!r.ok) return { enviadas, restantes: restantes(), parou: r.motivo };
     gravarConfig(db, CHAVE_CURSOR_CADASTRO, String(Math.max(cursor, marca - 1)));
   }
 
   // Fase 2 — leituras, um nó por vez.
-  let tamanhoLote = LOTE_INICIAL;
+  // Lote adaptativo (sync.md): dois esgotamentos de tempo seguidos reduzem pela
+  // metade, três sucessos dobram, e o tamanho fica guardado para o próximo envio.
+  let tamanhoLote = loteGuardado(db);
   let sucessosSeguidos = 0;
+  let tempoEsgotadoSeguidos = 0;
+  let tentativa = 0;
 
   for (;;) {
     if (opts.sinal?.aborted) break;
@@ -109,13 +139,27 @@ export async function enviarPendentes(
     const r = await nuvem.enviarLeituras(lote);
 
     if (!r.ok) {
-      if (vaieTentarDepois(r.motivo)) {
-        // Lote adaptativo: rede ruim pede lote menor, não desistência.
-        tamanhoLote = Math.max(LOTE_MIN, Math.floor(tamanhoLote / 2));
-        sucessosSeguidos = 0;
+      sucessosSeguidos = 0;
+      if (r.motivo === 'tempo-esgotado') {
+        tempoEsgotadoSeguidos += 1;
+        if (tempoEsgotadoSeguidos >= 2) {
+          // Rede ruim pede lote menor, não desistência.
+          tamanhoLote = Math.max(LOTE_MIN, Math.floor(tamanhoLote / 2));
+          tempoEsgotadoSeguidos = 0;
+          guardarLote(db, tamanhoLote);
+        }
+      }
+      if (passageira(r.motivo) && tentativa < TENTATIVAS_POR_ENVIO && !opts.sinal?.aborted) {
+        // Recuo exponencial com jitter total. Nunca desistir para sempre: o que
+        // sobrar fica para o próximo envio, pela fila de não enviadas.
+        await esperar(atrasoDeRetentativa(tentativa));
+        tentativa += 1;
+        continue;
       }
       return { enviadas, restantes: restantes(), parou: r.motivo };
     }
+    tentativa = 0;
+    tempoEsgotadoSeguidos = 0;
 
     // Confirmação numa transação. Se o processo morrer aqui, o lote é
     // reenviado e o servidor ignora — nunca se perde, nunca duplica.
@@ -132,6 +176,7 @@ export async function enviarPendentes(
     if (sucessosSeguidos >= 3) {
       tamanhoLote = Math.min(LOTE_MAX, tamanhoLote * 2);
       sucessosSeguidos = 0;
+      guardarLote(db, tamanhoLote);
     }
   }
 

@@ -6,9 +6,11 @@ import { describe, expect, it } from 'vitest';
 import type { Reading } from '@/core/ports/transport';
 import { ingerirLote } from '@/data/ingest';
 import {
-  contarLeituras, garantirApiario, garantirColmeia, garantirNode, totalPendentes,
+  contarLeituras, garantirApiario, garantirColmeia, garantirNode, lerConfig, totalPendentes,
 } from '@/data/repo';
-import { atrasoDeRetentativa, enviarPendentes } from '@/data/sync';
+import {
+  LOTE_INICIAL, TENTATIVAS_POR_ENVIO, atrasoDeRetentativa, enviarPendentes,
+} from '@/data/sync';
 import { CODIGO_DEMO, NuvemMock } from '@/nuvem/mock/cliente';
 import { bancoDeTeste } from './apoio/banco';
 
@@ -59,12 +61,79 @@ describe('envio', () => {
     expect(contarLeituras(db)).toBe(120);
   });
 
-  it('cai no meio, retoma do ponto, sem perder e sem duplicar', async () => {
+  it('a conexão cai uma vez no meio: espera, tenta de novo no mesmo envio, sem perder nem duplicar', async () => {
     const { db } = cenario(300);
     const nuvem = await nuvemVinculada({ cortarApos: 180 });
+    const esperas: number[] = [];
 
-    const primeira = await enviarPendentes(db, nuvem);
-    expect(primeira.parou).toBe('tempo-esgotado');
+    const r = await enviarPendentes(db, nuvem, { esperar: async (ms) => { esperas.push(ms); } });
+
+    expect(r.parou).toBeNull();
+    expect(esperas).toHaveLength(1);
+    expect(totalPendentes(db)).toBe(0);
+    expect(nuvem.total()).toBe(300);
+  });
+
+  it('servidor fora do ar: tenta poucas vezes, para, e o próximo envio retoma do ponto', async () => {
+    const { db } = cenario(300);
+    const nuvem = await nuvemVinculada({ servidorInstavelAte: 99 });
+    const esperas: number[] = [];
+
+    const r = await enviarPendentes(db, nuvem, { esperar: async (ms) => { esperas.push(ms); } });
+
+    expect(r.parou).toBe('servidor');
+    expect(r.enviadas).toBe(0);
+    expect(esperas).toHaveLength(TENTATIVAS_POR_ENVIO);
+    // Recuo exponencial com jitter total: cada espera cabe no teto da sua tentativa.
+    esperas.forEach((ms, i) => expect(ms).toBeLessThanOrEqual(atrasoDeRetentativa(i, () => 1)));
+    expect(totalPendentes(db)).toBe(300);
+
+    nuvem.limparFalhas();
+    const segunda = await enviarPendentes(db, nuvem, { esperar: async () => {} });
+    expect(segunda.parou).toBeNull();
+    expect(nuvem.total()).toBe(300);
+  });
+
+  it('o envio cancelado não fica esperando para tentar de novo', async () => {
+    const { db } = cenario(50);
+    const nuvem = await nuvemVinculada({ servidorInstavelAte: 99 });
+    const ctrl = new AbortController();
+    ctrl.abort();
+    let esperou = false;
+    const r = await enviarPendentes(db, nuvem, { sinal: ctrl.signal, esperar: async () => { esperou = true; } });
+    expect(esperou).toBe(false);
+    expect(totalPendentes(db)).toBe(50);
+    expect(r.parou).not.toBeNull();
+  });
+
+  it('o tamanho do lote sobrevive entre envios: rede lenta encolhe, rede boa cresce', async () => {
+    const { db } = cenario(40);
+    // Dois esgotamentos de tempo seguidos: o lote cai pela metade e fica guardado.
+    let chamadas = 0;
+    const lenta = await nuvemVinculada();
+    const original = lenta.enviarLeituras.bind(lenta);
+    lenta.enviarLeituras = async (...a: Parameters<typeof original>) => {
+      chamadas += 1;
+      return chamadas <= 2 ? { ok: false, motivo: 'tempo-esgotado' } : original(...a);
+    };
+    await enviarPendentes(db, lenta, { esperar: async () => {} });
+    expect(lerConfig(db, 'envio_tamanho_lote', '')).toBe(String(LOTE_INICIAL / 2));
+  });
+
+  it('cai no meio e a rede some: retoma do ponto no próximo envio, sem perder e sem duplicar', async () => {
+    const { db } = cenario(300);
+    const nuvem = await nuvemVinculada({ cortarApos: 180 });
+    let vez = 0;
+    const original = nuvem.enviarLeituras.bind(nuvem);
+    nuvem.enviarLeituras = async (...a: Parameters<typeof original>) => {
+      vez += 1;
+      // A conexão cai e, logo em seguida, o celular perde a rede.
+      return vez === 1 || nuvem.total() < 180 ? original(...a) : { ok: false, motivo: 'sem-rede' };
+    };
+
+    const primeira = await enviarPendentes(db, nuvem, { esperar: async () => {} });
+    nuvem.enviarLeituras = original;
+    expect(primeira.parou).toBe('sem-rede');
     expect(totalPendentes(db)).toBeGreaterThan(0);
 
     // A queda não pode ter marcado como enviado nada que não foi confirmado.

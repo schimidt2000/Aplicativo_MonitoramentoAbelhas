@@ -47,10 +47,12 @@ provável pendente (o aquecimento cruzado descrito em `docs/integracao-firmware.
   confirmação **na mesma transação SQLite**. A retomabilidade sai de graça da idempotência.
 - Trilha B, entidades editadas por pessoa: tabela `outbox`, última escrita vence —
   **pendente (T072)**: hoje o envio usa cursor pelo relógio do celular.
-- Lote adaptativo: dois timeouts seguidos reduzem pela metade, três sucessos dobram. Sem isso
-  o app simplesmente nunca termina um envio no 2G. **Pendente (T061).**
-- Backoff exponencial com jitter total — **pendente (T061)**: `atrasoDeRetentativa` existe e
-  não é usado. **Nunca desista permanentemente de uma leitura.**
+- Lote adaptativo: dois timeouts seguidos reduzem pela metade, três sucessos dobram, e o
+  tamanho fica guardado em `config` para o próximo envio. Sem isso o app simplesmente nunca
+  termina um envio no 2G.
+- Backoff exponencial com jitter total (`atrasoDeRetentativa`) para `servidor` e
+  `tempo-esgotado`, até `TENTATIVAS_POR_ENVIO` vezes no mesmo envio; o resto fica para o
+  próximo. **Nunca desista permanentemente de uma leitura.**
 - Só sincronize com `isInternetReachable === true`. Só `isConnected` dá verdadeiro em portal
   cativo rural, e aí o envio falha em silêncio. Sonda de rede **pendente (T031)**:
   `expo-network` ainda não está instalado.

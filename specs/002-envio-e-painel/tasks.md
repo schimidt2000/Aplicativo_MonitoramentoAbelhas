@@ -98,7 +98,7 @@ o Postgres descartável (`npm run servidor:teste`) e contra o Supabase falso dos
 ## Fase 6 — Fatia 5: campo de verdade
 
 - [ ] T060 [US1] Corrigir A-1: `reading_daily` do celular com chave `(node_id, day, sensor_epoch)` por migração (depende de T012); trocar o `it.fails` de `tests/resumo-golden.test.ts` por comparação com o servidor. *Desbloqueada pela 003* (T012 feita)
-- [ ] T061 [US1] Lote adaptativo que sobrevive entre tentativas e backoff com jitter total de fato aplicado (`atrasoDeRetentativa` existe e não é usado) — achado A-4
+- [x] T061 [US1] Lote adaptativo que sobrevive entre tentativas e backoff com jitter total de fato aplicado — achado A-4 (lote guardado em `config`; até 3 novas tentativas por envio, também no cadastro)
 - [ ] T062 [US1] Nó recusado para sempre não bloqueia os outros nós — achado A-4
 - [ ] T063 [US2] Teste de negação com dois apicultores no Supabase real, por HTTP (repete `servidor/teste/rls.sql` pela API)
 - [ ] T064 [US1] 100 mil leituras em EDGE, com portal cativo e interrupções, no aparelho de referência: nada perdido, nada duplicado (SC-006)
