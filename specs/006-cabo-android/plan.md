@@ -55,6 +55,11 @@ Android.
   gera o APK com o código embutido e instala pelo cabo (adb). O tablet funciona depois sem o
   computador, e a porta fica livre para a placa. A pasta `android/` é gerada (CNG) e continua
   fora do git.
+- **D-608 Versão instalada enxuta (2026-11-05)**: R8 e redução de recursos ligados, e só as
+  arquiteturas ARM (`expo-build-properties` no `app.json`). Medido no emulador Android 9 de
+  2 GB: APK de 112 MB para 53 MB; arranque (`am start -W`) de ~1,26 s para ~0,92 s; PSS total
+  de ~119 MB para ~108 MB no arranque e de ~142 MB para ~116 MB depois de uma coleta. O
+  módulo USB, o cofre e a sonda de rede continuam carregando. Emulador x86 não roda esse APK.
 
 ## Project Structure
 

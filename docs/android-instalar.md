@@ -25,10 +25,10 @@ código JavaScript falha com "Unable to resolve module .../expo-router/entry": o
 "ã" de um jeito e o empacotador procura de outro. Por isso, compile numa cópia:
 
 ```bash
-git clone --branch feat/006-cabo-android ~/Desktop/Bee-sertão ~/bee-sertao-android && cp ~/Desktop/Bee-sertão/.env.local ~/bee-sertao-android/ && cd ~/bee-sertao-android && npm ci
+git clone ~/Desktop/Bee-sertão ~/bee-sertao-android && cp ~/Desktop/Bee-sertão/.env.local ~/bee-sertao-android/ && cd ~/bee-sertao-android && npm ci
 ```
 
-Para atualizar a cópia depois de mudanças: `cd ~/bee-sertao-android && git pull`. Dentro dela:
+Para atualizar a cópia depois de mudanças: `cd ~/bee-sertao-android && git pull && npm ci`. Dependência nativa nova (como `expo-secure-store` e `expo-network`) exige rodar o `prebuild` de novo. Dentro dela:
 
 ```bash
 export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home" ANDROID_HOME="$HOME/Library/Android/sdk"
@@ -51,6 +51,9 @@ cd android && ./gradlew assembleRelease && cd ..
 - A variante `release` leva o código dentro: depois de instalado, o app funciona sem o
   computador, e a porta do aparelho fica livre para a placa.
 - A primeira compilação leva uns 10 a 20 minutos. As seguintes, poucos minutos.
+- O APK sai com uns 53 MB, só para processadores ARM (todo celular e tablet Android comum),
+  com o código reduzido pelo R8 (`expo-build-properties` no `app.json`). Emulador x86 não
+  roda esse arquivo.
 
 ## Coletar a placa no aparelho
 
