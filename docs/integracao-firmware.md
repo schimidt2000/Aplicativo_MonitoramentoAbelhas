@@ -368,6 +368,41 @@ começo não aparecia por causa da ligação (cabo ou permissão de acessório d
 real; a temperatura ao lado de um termômetro (aquecimento pelo ENS160); quanto tempo entre o
 botão e a porta aparecer.
 
+## Firmware de 2026-11-03 (commit `8a19f0a`) e placa regravada (2026-11-05)
+
+`main` do repositório do grupo, "ens160 measurement flow fixed". Em relação ao `4cc7ed8`, no
+`firmware/firmware.ino`:
+
+| Mudança | Efeito no app |
+|---|---|
+| `getNextMeasurementId` desconta o MAC (`18 + 8`): **numeração começa em 0** | nenhum: o leitor `arquivo-1` aceita 0 e 1 (a hora sai da posição, D-520) |
+| ENS160 no endereço `ENS160_I2CADDR_1` (0x53), I²C a 100 kHz, testes de `begin()`/`setMode()` corrigidos (a biblioteca devolve `bool`) | nenhum (só a placa) |
+| `deleteMeasurementFile` removido | nenhum |
+| Conversa, formato do arquivo, textos de linha | **iguais** |
+
+Também entraram `formatacao_esp/` (utilitário que apaga o LittleFS depois de digitar `FORMAT`)
+e a mesma correção no `teste_de_firmware`. Continuam abertos os riscos 2 a 4 da seção anterior
+(o ENS160 não dorme antes do sono profundo; `LittleFS.begin(false)`; arquivo vazio sem MAC).
+
+**A placa sobre a mesa (USB serial `58:E6:C5:1B:4C:B0`, outra placa, não a `…16:5E:48` de
+04/11) estava com o `formatacao_esp`, não com o firmware.** Com a autorização do João ("a não
+ser que esteja desatualizado da versão do GitHub"), foi gravado o `firmware/firmware.ino` do
+`8a19f0a` **sem alteração**: arduino-cli 1.5.1, `esp32:esp32@3.3.12`, placa `XIAO_ESP32C6`
+com as opções padrão (USB CDC no boot, partição padrão: LittleFS de 1.441.792 bytes, o mesmo
+que o formatador mostrava), bibliotecas "ENS160 - Adafruit Fork" 3.0.1 e "Adafruit AHTX0"
+2.0.6. Cópia da memória inteira antes de gravar: `~/bee-sertao-placa-backup/` no Mac (4 MB,
+SHA-256 `5f0e8ddf…b040d`).
+
+| Item | Resultado |
+|---|---|
+| Primeiro boot | ✅ "Measurement file does not exists." → "Aguardando timestamp inicial do dispositivo..." |
+| Hora inicial | ✅ `1793933864` (05/11 23h57, −03) → "Timestamp inicial salvo com sucesso!" → sensores achados (nenhum `ERRO`), mediu e dormiu: a USB sumiu em segundos. Mandada por script, ver abaixo |
+| Abrir a porta pelo Chrome reinicia a placa? | ✅ **não** (porta aberta, nada lido, nenhum log de boot). Já `pyserial` com DTR/RTS em 0 antes de abrir **reinicia** (a transição passa por RTS=1, DTR=0). O app não toca nos sinais (D-512) |
+| "Configurar placa nova" pelo app | ❌ → corrigido. O Chrome do Mac lembrava só uma porta **sem fabricante USB** (`getInfo()` = `{}`, sempre "ligada": a porta Bluetooth do macOS), e o app pegava `getPorts()[0]`: mandou a hora para o Bluetooth e disse "a placa não confirmou". Agora porta sem fabricante USB é ignorada e a Espressif (0x303A) tem a preferência. Na coleta, a mesma porta faria a tela dizer "placa ligada" com a placa dormindo |
+
+**Falta conferir:** coleta pelo cabo desta placa (precisa apertar o botão: a placa dorme 2 h);
+"Configurar placa nova" pelo app depois da correção (só numa placa recém-gravada ou formatada).
+
 ---
 
 ## Notas técnicas

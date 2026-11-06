@@ -102,7 +102,8 @@ airplane-mode test result and a 7-row Constitution Check.
 
 - The payload is another team's contract (CONFIRMED vs ASSUMED: `docs/integracao-firmware.md`).
   Firmware 4cc7ed8 (2026-10-28): o arquivo começa com o MAC (17 caracteres + 0x00) antes da
-  hora de início, e a numeração começa em 1 por defeito conhecido; a placa apaga o arquivo
+  hora de início; a numeração começa em 1 (corrigido para 0 no 8a19f0a, 2026-11-03: o leitor
+  aceita os dois); a placa apaga o arquivo
   após SESSION_COMPLETE e recomeça a contar. A placa real só entra pela tela "Coletar pelo
   cabo" (005: seq = início×1e6 + POSIÇÃO no arquivo, D-520), nunca pelo Coletar das abas,
   que é o mock. A hora do celular vai DEPOIS da transferência, em segundos Unix.
@@ -133,5 +134,7 @@ airplane-mode test result and a 7-row Constitution Check.
 - Android 8/9 GATT connect throws status=133 constantly: stopScan, wait ~200ms,
   autoConnect=false, refresh cache, retry with backoff, single GATT queue.
 - `androidNeverForLocation` does nothing on Android 8/9/10 — it is API 31+ only.
+- Chrome on macOS remembers the Bluetooth serial port (`getInfo()` = `{}`, always
+  "connected"). Never use a port without `usbVendorId` as the board (2026-11-05).
 - Web Bluetooth does not exist on iOS Safari. The web build never ingests over BLE;
   cable (Web Serial, desktop Chrome) is its only ingestion path.

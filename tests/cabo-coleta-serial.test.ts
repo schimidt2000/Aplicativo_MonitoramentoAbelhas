@@ -200,6 +200,31 @@ describe('a porta que some e reaparece (D-512)', () => {
     expect(await portaJaAutorizada(null)).toBeNull();
   });
 
+  it('porta sem USB (Bluetooth do Mac) nunca é a placa; a Espressif vem primeiro', async () => {
+    const comInfo = (info: { usbVendorId?: number; usbProductId?: number }) =>
+      Object.assign(new PortaFalsa(), { getInfo: () => info });
+    const bluetooth = comInfo({});
+    const outraUsb = comInfo({ usbVendorId: 0x10c4, usbProductId: 0xea60 });
+    const placa = comInfo({ usbVendorId: 0x303a, usbProductId: 0x1001 });
+    const serial = new SerialFalsa();
+
+    // Visto em 2026-11-05: só o Bluetooth lembrado, placa dormindo.
+    serial.portas = [bluetooth];
+    expect(await portaJaAutorizada(serial)).toBeNull();
+
+    serial.portas = [bluetooth, outraUsb, placa];
+    expect(await portaJaAutorizada(serial)).toBe(placa);
+    serial.portas = [bluetooth, outraUsb];
+    expect(await portaJaAutorizada(serial)).toBe(outraUsb);
+
+    const vistas: PortaDeColeta[] = [];
+    const parar = vigiarPortas(serial, (p) => vistas.push(p));
+    serial.aparecer(bluetooth);
+    serial.aparecer(placa);
+    parar();
+    expect(vistas).toEqual([placa]);
+  });
+
   it('esperar a placa acordar: resolve no evento connect e para de vigiar', async () => {
     const serial = new SerialFalsa();
     const p = new PortaFalsa();

@@ -32,6 +32,27 @@ export interface PortaDeColeta {
   close(): Promise<void>;
   readonly readable: ReadableStream<Uint8Array> | null;
   readonly writable: WritableStream<Uint8Array> | null;
+  /** Fabricante e produto USB. Porta sem USB (Bluetooth do Mac) devolve `{}`. */
+  getInfo?(): { usbVendorId?: number; usbProductId?: number };
+}
+
+/** Espressif: a XIAO ESP32-C6 do grupo do firmware (D-603, confirmado 2026-11-04). */
+export const FABRICANTE_DA_PLACA = 0x303a;
+
+function fabricanteUsb(p: PortaDeColeta): number | undefined {
+  try { return p.getInfo?.().usbVendorId; } catch { return undefined; }
+}
+
+/**
+ * A placa é USB. Uma porta sem fabricante USB nunca é ela: no Mac, o Chrome
+ * lembra `cu.Bluetooth-Incoming-Port`, sempre "ligada", e escrever nela é
+ * falar sozinho (visto em 2026-11-05: "Acertar o relógio" mandou a hora para o
+ * Bluetooth enquanto a placa esperava). Implementação sem `getInfo` (testes,
+ * navegador antigo) passa: não há como saber.
+ */
+export function pareceAPlaca(p: PortaDeColeta): boolean {
+  if (typeof p.getInfo !== 'function') return true;
+  return fabricanteUsb(p) !== undefined;
 }
 
 /** O que usamos de `navigator.serial` na coleta. */
@@ -46,8 +67,8 @@ export interface SerialDeColeta {
 export async function portaJaAutorizada(serial: SerialDeColeta | null): Promise<PortaDeColeta | null> {
   if (!serial) return null;
   try {
-    const portas = await serial.getPorts();
-    return portas[0] ?? null;
+    const portas = (await serial.getPorts()).filter(pareceAPlaca);
+    return portas.find((p) => fabricanteUsb(p) === FABRICANTE_DA_PLACA) ?? portas[0] ?? null;
   } catch {
     return null;
   }
@@ -63,7 +84,12 @@ export function vigiarPortas(
   aoSumir?: (p: PortaDeColeta) => void,
 ): () => void {
   if (!serial) return () => {};
-  const apareceu = (e: Event) => { try { aoAparecer(e.target as unknown as PortaDeColeta); } catch { /* a tela segue */ } };
+  const apareceu = (e: Event) => {
+    try {
+      const p = e.target as unknown as PortaDeColeta;
+      if (pareceAPlaca(p)) aoAparecer(p);
+    } catch { /* a tela segue */ }
+  };
   // A placa voltou a dormir: a porta some.
   const sumiu = (e: Event) => { try { aoSumir?.(e.target as unknown as PortaDeColeta); } catch { /* a tela segue */ } };
   serial.addEventListener('connect', apareceu);
