@@ -41,8 +41,9 @@ Dado · Spec Antes do Código. Spec Kit commands are Agent Skills — HYPHEN: `/
     src/data/        ddl, migracoes (user_version), hora, repo, ingest, sync, coleta (nunca
                      lança), semente (demo), provider.tsx. Metro: db.*; TS: db.d.ts.
     src/ui/          tokens, Grafico, ModoSol, PerguntaHora, demo.ts (ROTULO_DEMO)
-    src/app/         rotas: (tabs)/{index,coletar,enviar,ajustes}, diagnostico, cabo,
-                     vincular, colmeia/[id]
+    src/app/         rotas sem abas (008): index (Início), coleta-cabo, coletar (sem fio
+                     simulada), enviar, ajustes, diagnostico, cabo, placa-nova, vincular,
+                     colmeia/[id]
     tests/           vitest do app de campo; scripts/  check-fronteira.sh
     servidor/        Postgres + RLS (001..004.sql), teste/, lgpd/, golden/. Fora do Metro.
     painel/          painel das pesquisadoras (Vite). Sem banco local. Fora do Metro.
@@ -105,8 +106,9 @@ airplane-mode test result and a 7-row Constitution Check.
   hora de início; a numeração começa em 1 (corrigido para 0 no 8a19f0a, 2026-11-03: o leitor
   aceita os dois); a placa apaga o arquivo
   após SESSION_COMPLETE e recomeça a contar. A placa real só entra pela tela "Coletar pelo
-  cabo" (005: seq = início×1e6 + POSIÇÃO no arquivo, D-520), nunca pelo Coletar das abas,
-  que é o mock. A hora do celular vai DEPOIS da transferência, em segundos Unix.
+  cabo" (005: seq = início×1e6 + POSIÇÃO no arquivo, D-520), aonde o Coletar do Início leva
+  desde a 008; nunca pela coleta sem fio de Ajustes (`/coletar`), que é o mock. A hora do
+  celular vai DEPOIS da transferência, em segundos Unix.
 - The node has NO clock of its own (firmware group, 2026-10-14). In THIS branch (modelo da
   003, mock) the phone offers UTC time via `setTime` before every pull — best effort, 5 s
   cap, never blocks the pull, never sent if `core/relogio.ts` finds the phone clock

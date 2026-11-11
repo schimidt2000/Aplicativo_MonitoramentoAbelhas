@@ -326,14 +326,14 @@ export const ptBR = {
   'diagnostico.item.rotulo_acessivel_dica': '{estado}. {rotulo}. {dica}',
   'diagnostico.nesta_versao.titulo': 'Nesta versão',
   'diagnostico.nesta_versao.texto':
-    'A tela Coletar usa nós sensores simulados, sem Bluetooth. A placa de verdade já pode ser coletada pelo cabo, num computador (veja abaixo). A coleta pelo Bluetooth ainda vai chegar. Quando chegar, esta tela vai mostrar se o Bluetooth e a Localização estão ligados.',
+    'O botão Coletar do Início abre a coleta pelo cabo, que é como a placa de verdade é coletada. A coleta sem fio que aparece em Ajustes é só demonstração, com nós sensores simulados. A coleta pelo Bluetooth ainda vai chegar. Quando chegar, esta tela vai mostrar se o Bluetooth e a Localização estão ligados.',
   'diagnostico.nao_verificou.titulo': 'Não consegui fazer a verificação agora',
   'diagnostico.nao_verificou.detalhe':
     'Toque em Verificar de novo. Se continuar assim, feche o aplicativo, abra de novo e avise a pesquisadora.',
   'diagnostico.verificando': 'Verificando…',
   'diagnostico.verificar_de_novo': 'Verificar de novo',
   'diagnostico.preflight.simulado': 'Modo de demonstração ligado',
-  'diagnostico.preflight.simulado.dica': 'Nesta versão, a tela Coletar usa nós sensores de exemplo, com leituras inventadas. Não precisa de nó sensor de verdade.',
+  'diagnostico.preflight.simulado.dica': 'A coleta sem fio de Ajustes usa nós sensores de exemplo, com leituras inventadas. Não precisa de nó sensor de verdade.',
 
   /* ==================================================================== */
   /* Frente: servidor e envio real (feature 002, Fatia 1).                */
