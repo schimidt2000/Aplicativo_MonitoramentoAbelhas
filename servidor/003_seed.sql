@@ -1,5 +1,5 @@
 -- =============================================================================
--- Bee-sertão — semente de DEMONSTRAÇÃO (feature 002, Fatia 1)
+-- Monitor de Colmeias — semente de DEMONSTRAÇÃO (feature 002, Fatia 1)
 --
 -- Nenhuma pessoa real. Os nomes dizem que são de demonstração; os municípios
 -- são reais porque município não identifica ninguém. Nenhuma coordenada
@@ -26,7 +26,7 @@
 -- =============================================================================
 
 insert into public.project (id, name) values
-  ('11111111-1111-4111-8111-111111111111', 'Projeto piloto Bee-sertão (demonstração)'),
+  ('11111111-1111-4111-8111-111111111111', 'Projeto piloto (demonstração)'),
   ('22222222-2222-4222-8222-222222222222', 'Outro projeto (demonstração)')
 on conflict (id) do nothing;
 

@@ -189,7 +189,7 @@ describe('cabeçalho de proveniência', () => {
 
 describe('arquivo', () => {
   it('nome com as datas do recorte, sem nome de pessoa', () => {
-    expect(nomeDoArquivo(DIA, DIA + 6)).toBe('bee-sertao-leituras-2026-10-01-a-2026-10-07.csv');
+    expect(nomeDoArquivo(DIA, DIA + 6)).toBe('monitor-colmeias-leituras-2026-10-01-a-2026-10-07.csv');
   });
 
   it('o limite é o do orçamento do painel (50 mil linhas)', () => {

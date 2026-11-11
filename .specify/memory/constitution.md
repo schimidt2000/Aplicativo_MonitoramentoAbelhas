@@ -79,7 +79,7 @@ alta (MUST, MUST NOT, SHOULD), permanecem em inglês por serem interface de máq
 e todo conflito com um MUST é tratado como CRITICAL.
 -->
 
-# Bee-sertão Constitution
+# Monitor de Colmeias Constitution
 
 Aplicativo de coleta e sincronização de dados de microclima de colmeias, para
 apicultores e meliponicultores do semiárido brasileiro.

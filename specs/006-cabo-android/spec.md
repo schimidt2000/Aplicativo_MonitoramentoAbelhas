@@ -119,7 +119,7 @@ no app instalado por arquivo ou no computador, sem botão que não funciona.
 - O apicultor recusa a permissão de USB: a tela diz que o Android não deixou usar a placa e
   como permitir.
 - A permissão vale só enquanto a placa está na porta: a placa que dorme e reaparece pode pedir
-  de novo. Se o Android oferecer "sempre abrir com o Bee-sertão", o app usa isso para não
+  de novo. Se o Android oferecer "sempre abrir com o Monitor de Colmeias", o app usa isso para não
   perguntar a cada coleta.
 - Mais de um aparelho USB ligado (hub, outro acessório): o app só considera a placa
   (fabricante Espressif); outros aparelhos são ignorados.

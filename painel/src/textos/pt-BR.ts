@@ -15,7 +15,7 @@
  */
 export const ptBR = {
   /* ---------- Moldura ---------- */
-  'app.nome': 'Painel Bee-sertão',
+  'app.nome': 'Monitor de Colmeias',
   'app.subtitulo': 'Painel das pesquisadoras',
   'nav.rotulo': 'Seções do painel',
   'nav.visao_geral': 'Visão geral',
@@ -203,12 +203,12 @@ export const ptBR = {
     'Não há leituras nas colmeias e no período escolhidos. Escolha outras datas ou outras colmeias.',
   'planilha.sobre':
     'No topo, a planilha diz de onde veio o dado: o nó sensor, a versão do formato de dados, quais grandezas são derivadas, quantas amostras foram excluídas, a qualidade da hora e a declaração de que coordenadas não são coletadas. Ela não traz o nome do apicultor.',
-  'planilha.arquivo': 'bee-sertao-leituras-{de}-a-{ate}.csv',
+  'planilha.arquivo': 'monitor-colmeias-leituras-{de}-a-{ate}.csv',
   'planilha.sim': 'sim',
   'planilha.nao': 'não',
 
   /* ---------- Planilha (arquivo: cabeçalho de proveniência) ---------- */
-  'planilha.cab.titulo': 'Bee-sertão: leituras de colmeias, painel das pesquisadoras',
+  'planilha.cab.titulo': 'Monitor de Colmeias: leituras de colmeias, painel das pesquisadoras',
   'planilha.cab.gerada_em': 'Gerada em',
   'planilha.cab.utc': '{quando} (UTC)',
   'planilha.cab.periodo': 'Período',

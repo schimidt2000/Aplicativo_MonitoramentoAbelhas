@@ -554,7 +554,7 @@ export const ptBR = {
     'Tire e recoloque o cabo e toque em Conectar de novo. Se continuar, recarregue a página.',
 
   'cabo.planilha.arquivo': 'bancada-{data}.csv',
-  'cabo.planilha.titulo': 'Bee-sertão: leitura da placa pelo cabo (bancada)',
+  'cabo.planilha.titulo': 'Monitor de Colmeias: leitura da placa pelo cabo (bancada)',
   'cabo.planilha.origem':
     'Origem: monitor de bancada pelo cabo USB. Nada foi gravado no aplicativo.',
   'cabo.planilha.formato':
@@ -652,7 +652,7 @@ export const ptBR = {
     'Nas configurações do navegador, procure a permissão "Portas seriais" e libere este endereço. Depois toque em Tentar de novo.',
   'caboColeta.porta.sem_permissao_usb.titulo': 'O Android não deixou usar a placa',
   'caboColeta.porta.sem_permissao_usb.detalhe':
-    'Aperte o botão da placa e toque em Tentar de novo. Quando o Android perguntar se o Bee-sertão pode usar a placa, toque em OK.',
+    'Aperte o botão da placa e toque em Tentar de novo. Quando o Android perguntar se o Monitor de Colmeias pode usar a placa, toque em OK.',
 
   /* Resultado: problemas (nada novo ficou salvo, ou há algo a fazer na placa). */
   'caboColeta.problema.nao_respondeu.titulo': 'A placa da {nome} não respondeu',

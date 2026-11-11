@@ -1,4 +1,9 @@
-# Bee-sertão
+# Monitor de Colmeias (software para o monitoramento de colmeias)
+
+Projeto da faculdade, em apoio a pesquisadoras do Nordeste brasileiro. Nome nas telas, no painel
+e na planilha: "Monitor de Colmeias". "Bee-sertão" era o nome provisório: não usar em texto novo.
+A pasta, os bancos locais (`bee-sertao`) e o pacote Android (`br.beesertao.app`) mantêm o nome
+antigo de propósito: trocar esconderia os dados já gravados nos aparelhos.
 
 Offline-first app that pulls hive microclimate data (temperature, humidity, gas, battery)
 off a sensor node at the hive, stores it in SQLite, and syncs it later for specialists to

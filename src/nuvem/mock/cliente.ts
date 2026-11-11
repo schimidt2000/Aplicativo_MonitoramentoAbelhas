@@ -80,7 +80,7 @@ export class NuvemMock implements ClienteNuvem {
 
     this.vinculo = {
       apicultorNome: 'Apicultor de demonstração',
-      projetoNome: 'Bee-sertão — piloto',
+      projetoNome: 'Projeto piloto',
     };
     return { ok: true, vinculo: this.vinculo };
   }

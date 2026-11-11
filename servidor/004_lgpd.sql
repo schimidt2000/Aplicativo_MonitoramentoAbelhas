@@ -1,5 +1,5 @@
 -- =============================================================================
--- Bee-sertão — apagamento por LGPD (FR-039; constituição, "Direito ao
+-- Monitor de Colmeias — apagamento por LGPD (FR-039; constituição, "Direito ao
 -- apagamento").
 --
 -- O apicultor pode revogar o consentimento e exigir a exclusão dos dados dele

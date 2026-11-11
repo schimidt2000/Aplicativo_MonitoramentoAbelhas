@@ -1,5 +1,5 @@
 -- =============================================================================
--- Bee-sertão — acesso (feature 002, Fatia 1)
+-- Monitor de Colmeias — acesso (feature 002, Fatia 1)
 --
 -- Nega por padrão (FR-018). Quem pode o quê:
 --

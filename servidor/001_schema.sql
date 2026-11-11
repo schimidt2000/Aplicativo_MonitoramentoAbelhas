@@ -1,5 +1,5 @@
 -- =============================================================================
--- Bee-sertão — esquema do servidor (feature 002, Fatia 1)
+-- Monitor de Colmeias — esquema do servidor (feature 002, Fatia 1)
 --
 -- Postgres puro. Roda igual num Supabase (sa-east-1) e num Postgres local de
 -- teste (`servidor/teste/rodar.sh`). A única dependência do Supabase é o
