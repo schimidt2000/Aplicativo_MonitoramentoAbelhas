@@ -25,7 +25,11 @@ Sem configuração de nuvem, o app usa a **nuvem simulada**. Código de demonstr
 
 ## 3. Ligar uma nuvem de verdade (quando a hospedagem for decidida)
 
-Nada disto foi feito ainda.
+**Situação em 2026-11-11:** existe um projeto Supabase com o esquema aplicado e a entrada
+anônima ligada, e o `.env.local` do app e do painel apontam para ele. Mas o banco responde
+na região `us-east-1` (visto pelo endereço público), não em `sa-east-1`: o passo 1 e a T032
+continuam abertos. O cadastro público por e-mail ainda está ligado (passo 2) e nenhuma conta
+de pesquisadora foi conferida (passo 4).
 
 1. Criar o projeto Supabase na região **São Paulo (`sa-east-1`)**.
 2. Authentication → Providers: ligar **Anonymous sign-ins**. Desligar cadastro público

@@ -59,10 +59,10 @@ cd android && ./gradlew assembleRelease && cd ..
 
 1. Tire o cabo do computador e ligue a placa na porta do aparelho com um cabo USB-C dos dois
    lados (ou um adaptador USB-C para USB-A).
-2. Abra o Bee-sertão, aba **Coletar**, **Coletar pelo cabo**, **Usar a placa de verdade**.
+2. Abra o Bee-sertão, toque em **Coletar** no Início e em **Usar a placa de verdade**.
 3. Aperte o botão da placa. O app avisa "A placa acordou".
 4. Toque em **Coletar**. Na primeira vez, o Android pergunta se o Bee-sertão pode usar a placa:
    toque em **OK**. Como a placa volta como aparelho novo a cada vez que acorda, o Android
    pode perguntar de novo.
 
-Placa nova: **Ajustes > Abrir diagnóstico > Configurar placa nova**, como no computador.
+Placa nova: **Ajustes > Configurar placa nova** (em Ferramentas da equipe), como no computador.

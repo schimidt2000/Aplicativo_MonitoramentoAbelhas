@@ -30,8 +30,8 @@ com a placa: [`teste-com-a-placa.md`](./teste-com-a-placa.md).
 (nós) e **armazenamento**.
 
 A coleta com esse protocolo é a feature **005** (tela "Coletar pelo cabo", no app de campo
-no navegador). O botão **Coletar** das abas continua contra o transporte `mock`, com o
-formato provisório nosso, e a tela da 004 só **lê** as linhas de bancada, sem gravar. A
+no navegador). Desde a 008 (2026-11-10) o botão **Coletar** do Início leva a essa tela; a
+coleta sem fio de Ajustes continua contra o transporte `mock`, com o formato provisório nosso, e a tela da 004 só **lê** as linhas de bancada, sem gravar. A
 `002` (envio e painel) não depende do firmware.
 
 | Hardware | Estado |
@@ -71,7 +71,8 @@ disse ou escreveu) do **intermediário** (quem repassou ao grupo do aplicativo).
 
 Suposições do modelo da 001/003 que o protocolo real derrubou. O tratamento de cada uma
 está na feature 005 (coleta pelo cabo). **A placa real só deve ser ligada pela tela
-"Coletar pelo cabo"; o Coletar das abas continua sendo o transporte `mock`.**
+"Coletar pelo cabo" (o Coletar do Início, desde a 008); a coleta sem fio de Ajustes continua
+sendo o transporte `mock`.**
 
 | Suposição antiga | Pergunta | O que o firmware faz | Impacto |
 |---|---|---|---|

@@ -37,4 +37,9 @@
 
 - [x] T811 Textos novos em `pt-BR.ts`; `npm test`, `npm run typecheck`, `npm run check:fronteira`
 - [ ] T812 Conferir no navegador em 375 px (feito) e com o modo avião no aparelho (pendente): Início, Coletar,
-  Colmeia, Enviar
+  Colmeia, Enviar — **parcial (2026-11-11, emulador Android 9, 2 GB, arm64 num Mac; não substitui o
+  aparelho):** APK release do `b821db0`, modo avião ligado, 9.315 leituras no banco: Início,
+  Colmeia, Coletar (placa simulada: 37 leituras salvas) e Enviar abriram sem erro; "Enviar
+  agora" sem ligação ao projeto leva a "Ligar o celular ao projeto". `am start -W` 0,45–0,68 s
+  em 10 arranques a frio (média ~0,60 s); PSS total ~106 MB ao abrir e ~125 MB depois de abrir
+  uma colmeia e coletar

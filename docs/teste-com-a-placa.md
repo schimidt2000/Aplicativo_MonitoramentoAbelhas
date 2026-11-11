@@ -30,7 +30,8 @@ Depois abra http://localhost:8081 no Chrome.
 Logo depois de gravado o programa, a placa fica esperando a hora e ainda não mede.
 
 1. Ligue a placa no computador pelo cabo.
-2. No app: aba **Ajustes**, depois **Abrir diagnóstico**, depois **Configurar placa nova**.
+2. No app: **Ajustes** (no alto do Início), depois **Configurar placa nova**, em Ferramentas
+   da equipe.
    Se a tela estiver na placa simulada, toque em **Usar a placa de verdade**.
 3. Confira a data e a hora do computador e toque em **Acertar o relógio**.
 4. O Chrome abre uma lista. Escolha a placa, que aparece como "USB JTAG/serial debug unit".
@@ -58,7 +59,7 @@ Enquanto a placa dorme, ela some do computador e volta quando acorda. Isso é no
 
 ## Passo 3: coletar
 
-1. Em **Coletar pelo cabo**, toque em **Usar a placa de verdade**.
+1. No Início, toque em **Coletar** e depois em **Usar a placa de verdade**.
 2. Na primeira vez, escolha a colmeia desta placa. Anote qual foi.
 3. Aperte o botão da placa e toque em **Coletar** em até 30 segundos. Se o Chrome abrir a
    lista, escolha a placa de novo.
@@ -89,7 +90,7 @@ anote: pode ser que abrir a porta reinicie a placa (pergunta 1 da lista do fim).
 
 ## Passo 5: enviar e ver no painel
 
-1. Com internet, abra a aba **Enviar** e toque em **Enviar agora**. O app precisa estar
+1. Com internet, toque em **Enviar agora** no Início. O app precisa estar
    ligado ao projeto pelo código.
 2. Abra o painel das pesquisadoras:
 
