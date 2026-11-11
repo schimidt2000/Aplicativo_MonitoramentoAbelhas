@@ -84,7 +84,7 @@ describe('feature 004: a tela de cabo não grava nada', () => {
 
   it('o detector pega um import do banco, se alguém puser um', () => {
     // Sanidade do próprio teste: a tela de Coletar grava, e o grafo dela chega a src/data.
-    const coletar = [...alcancaveis(join(SRC, 'app', '(tabs)', 'coletar.tsx'))].map(rel);
+    const coletar = [...alcancaveis(join(SRC, 'app', 'coletar.tsx'))].map(rel);
     expect(coletar.some((p) => p.startsWith('src/data/'))).toBe(true);
   });
 });

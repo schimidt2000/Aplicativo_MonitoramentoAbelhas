@@ -23,7 +23,7 @@ describe('encanamento do repositório', () => {
     expect(bloqueia('painel/src/main.tsx')).toBe(true);
     expect(bloqueia('servidor/001_schema.sql')).toBe(true);
 
-    expect(bloqueia('src/app/(tabs)/enviar.tsx')).toBe(false);
+    expect(bloqueia('src/app/enviar.tsx')).toBe(false);
     expect(bloqueia('src/ui/painel/qualquer.tsx')).toBe(false);
     expect(bloqueia('node_modules/um-pacote/painel/x.js')).toBe(false);
   });

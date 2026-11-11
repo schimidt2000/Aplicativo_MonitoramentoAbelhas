@@ -55,6 +55,8 @@ export default function DetalheColmeia() {
   const [intervaloFalhou, setIntervaloFalhou] = useState(false);
   // Feature 007: o normal de voláteis desta colmeia.
   const [normal, setNormal] = useState<NormalDaColmeia>({ ppb: null, dias: 0 });
+  // Feature 008: a explicação dos voláteis começa recolhida.
+  const [explicar, setExplicar] = useState(false);
 
   const recarregar = useCallback(() => {
     const c = obterColmeia(db, id);
@@ -148,21 +150,6 @@ export default function DetalheColmeia() {
             <Card rotulo={t('grandeza.bateria')} valor={fmtBateria(colmeia.batt_mv)} />
           </View>
 
-          {/* O texto que impede o erro metodológico. Não é tooltip, é o cartão. */}
-          <View style={s.explicacao}>
-            <Text style={s.explicacaoTitulo}>{t('colmeia.volateis.titulo')}</Text>
-            <Text style={s.explicacaoTexto}>
-              {t('colmeia.volateis.texto')}
-              {'\n'}
-              <Text style={s.negrito}>{t('colmeia.volateis.nao_e')}</Text>{' '}
-              {t('colmeia.volateis.uso')}
-              {'\n'}
-              {normal.ppb !== null
-                ? tp('volateis.normal.explicacao', normal.dias)
-                : tp('volateis.aprendendo', normal.dias, { min: String(MINIMO_DE_DIAS) })}
-            </Text>
-          </View>
-
           <View>
             <View style={s.abas} accessibilityRole="radiogroup">
               {(['temp', 'rh', 'tvoc'] as Serie[]).map((k) => (
@@ -211,6 +198,32 @@ export default function DetalheColmeia() {
             {/* Feature 003 (FR-017): fora do gráfico, mas contadas — em tom neutro (FR-020). */}
             {semHora > 0 && <Text style={s.notaSemHora}>{tp('hora.sem_hora', semHora)}</Text>}
           </View>
+          {/*
+            O texto que impede o erro metodológico. Feature 008 (FR-009): fica
+            recolhido, a um toque, aqui mesmo — não é tooltip nem outra tela. O
+            rótulo "Voláteis (COVs)" e "em relação ao normal" seguem no cartão.
+          */}
+          <Pressable onPress={() => setExplicar((v) => !v)} accessibilityRole="button"
+            accessibilityState={{ expanded: explicar }} style={s.botaoExplicar}>
+            <Text style={s.botaoExplicarTexto}>
+              {t(explicar ? 'colmeia.volateis.fechar' : 'colmeia.volateis.abrir')}
+            </Text>
+          </Pressable>
+          {explicar && (
+            <View style={s.explicacao}>
+              <Text style={s.explicacaoTitulo}>{t('colmeia.volateis.titulo')}</Text>
+              <Text style={s.explicacaoTexto}>
+                {t('colmeia.volateis.texto')}
+                {'\n'}
+                <Text style={s.negrito}>{t('colmeia.volateis.nao_e')}</Text>{' '}
+                {t('colmeia.volateis.uso')}
+                {'\n'}
+                {normal.ppb !== null
+                  ? tp('volateis.normal.explicacao', normal.dias)
+                  : tp('volateis.aprendendo', normal.dias, { min: String(MINIMO_DE_DIAS) })}
+              </Text>
+            </View>
+          )}
         </>
       )}
 
@@ -272,6 +285,10 @@ const s = StyleSheet.create({
   cardValor: { fontSize: tipo.leitura, fontWeight: '700', color: cores.texto,
     marginTop: 2, fontVariant: ['tabular-nums'] },
 
+  botaoExplicar: { minHeight: alvo.minimo, justifyContent: 'center', alignSelf: 'flex-start',
+    paddingHorizontal: espaco.md, borderRadius: raio.md, borderWidth: 1,
+    borderColor: cores.bordaControle, backgroundColor: cores.superficie },
+  botaoExplicarTexto: { fontSize: tipo.corpo, fontWeight: '700', color: cores.acento },
   explicacao: { padding: espaco.md, backgroundColor: cores.superficie,
     borderRadius: raio.md, borderLeftWidth: 4, borderLeftColor: cores.acento,
     borderWidth: 1, borderColor: cores.linha },

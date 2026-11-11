@@ -189,10 +189,9 @@ export const ptBR = {
    * ======================================================================== */
 
   /* ---------- Navegação ---------- */
-  'abas.colmeias': 'Colmeias',
-  'abas.coletar': 'Coletar',
-  'abas.enviar': 'Enviar',
-  'abas.ajustes': 'Ajustes',
+  'titulo.enviar': 'Enviar',
+  'titulo.ajustes': 'Ajustes',
+  'titulo.coletar_sem_fio': 'Coleta sem fio (demonstração)',
   'titulo.diagnostico': 'Diagnóstico de conexão',
   'titulo.colmeia': 'Colmeia',
 
@@ -249,15 +248,6 @@ export const ptBR = {
   'colmeias.sem_coleta.outros': '{n} ainda sem coleta',
   'colmeias.para_enviar.um': '{n} leitura para enviar',
   'colmeias.para_enviar.outros': '{n} leituras para enviar',
-  'colmeias.sol.alternar': 'Modo sol',
-  'colmeias.sol.ligado': 'Modo sol ligado',
-  'colmeias.sol.desligado': 'Modo sol',
-  'colmeias.atraso.titulo.um': 'Uma colmeia está com a coleta atrasada',
-  'colmeias.atraso.titulo.outros': '{n} colmeias estão com a coleta atrasada',
-  'colmeias.atraso.intervalo.um': 'Você escolheu coletar a cada {n} dia.',
-  'colmeias.atraso.intervalo.outros': 'Você escolheu coletar a cada {n} dias.',
-  'colmeias.atraso.pior.um': 'A mais atrasada está há {n} dia sem coleta.',
-  'colmeias.atraso.pior.outros': 'A mais atrasada está há {n} dias sem coleta.',
   'colmeias.cartao.sem_leitura': 'Sem leitura ainda — toque em Coletar',
   'colmeias.cartao.sem_hora': 'Leituras coletadas, ainda sem hora — toque para ver',
   'colmeias.cartao.no_celular': 'No celular',
@@ -599,7 +589,7 @@ export const ptBR = {
    * Toda mensagem diz o que ficou salvo no celular, o que a placa ainda tem e
    * o que fazer. Nenhuma mostra código de erro da placa.
    * ======================================================================== */
-  'titulo.coleta_cabo': 'Coletar pelo cabo',
+  'titulo.coleta_cabo': 'Coletar',
   'titulo.placa_nova': 'Configurar placa nova',
 
   'caboColeta.intro': 'Coleta das leituras da placa ligada no cabo USB deste computador.',
@@ -799,6 +789,42 @@ export const ptBR = {
   'cabo.diagnostico.coleta_titulo': 'Coletar as leituras pelo cabo',
   'cabo.diagnostico.coleta_ajuda':
     'Salva no aplicativo as leituras da placa ligada no cabo USB, no Chrome ou no Edge de um computador.',
+
+  /* Feature 008: tela simples. Início sem abas, uma linha de situação por colmeia. */
+  'inicio.ajustes': 'Ajustes',
+  'inicio.coletar': 'Coletar',
+  'inicio.para_visitar.um': '{n} precisa de visita',
+  'inicio.para_visitar.outros': '{n} precisam de visita',
+  'inicio.nenhuma': 'Nenhuma colmeia ainda. Toque em Coletar para trazer as leituras da primeira placa.',
+  'inicio.envio.celular': 'No celular',
+  'inicio.envio.nuvem': 'Na nuvem',
+  'inicio.envio.botao': 'Enviar agora',
+  'inicio.envio.enviando': 'Enviando…',
+  'inicio.envio.esperando.um': '{n} leitura vai sair do celular quando tiver internet.',
+  'inicio.envio.esperando.outros': '{n} leituras vão sair do celular quando tiver internet.',
+  'inicio.sol.alternar': 'Modo sol',
+  'inicio.sol.ligado': 'Sol ligado',
+  'inicio.sol.desligado': 'Modo sol',
+  'inicio.envio.tudo': 'Todas as leituras já estão na nuvem.',
+  'inicio.envio.ver': 'Ver detalhes do envio',
+  'situacao.incompleta': 'Coleta incompleta: colete de novo',
+  'situacao.bateria_agora': 'Trocar a bateria',
+  'situacao.muito_atrasada.um': 'Ir coletar: {n} dia sem coleta',
+  'situacao.muito_atrasada.outros': 'Ir coletar: {n} dias sem coleta',
+  'situacao.atrasada.um': 'Ir coletar: {n} dia sem coleta',
+  'situacao.atrasada.outros': 'Ir coletar: {n} dias sem coleta',
+  'situacao.bateria_breve': 'Bateria acabando',
+  'situacao.chegando': 'Coletar em breve',
+  'situacao.sem_coleta': 'Ainda sem coleta',
+  'situacao.em_dia': 'Tudo certo',
+  'caboColeta.colmeia.escolhida': 'Colmeia desta placa',
+  'caboColeta.colmeia.trocar': 'Trocar',
+  'colmeia.volateis.abrir': 'O que são voláteis?',
+  'colmeia.volateis.fechar': 'Esconder explicação',
+  'ajustes.demo.sem_fio': 'Abrir a coleta sem fio simulada',
+  'ajustes.equipe.titulo': 'Ferramentas da equipe',
+  'ajustes.equipe.ajuda':
+    'Para quem monta e testa as placas: diagnóstico, placa nova e leitura ao vivo pelo cabo.',
 } as const;
 
 export type ChaveTexto = keyof typeof ptBR;

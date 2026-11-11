@@ -76,7 +76,7 @@ function SemCabo({ motivo }: { motivo: MotivoSemCabo }) {
       </View>
       {texto.oferecerColeta && (
         <Pressable style={s.botaoSecundario} accessibilityRole="button"
-          onPress={() => router.replace('/coletar')}>
+          onPress={() => router.replace('/coleta-cabo')}>
           <Text style={s.botaoSecundarioTexto}>{t('cabo.botao.ir_coletar')}</Text>
         </Pressable>
       )}

@@ -110,6 +110,12 @@ export default function Ajustes() {
               );
             })}
           </View>
+          {/* Feature 008: a coleta sem fio simulada saiu do caminho principal (FR-011). */}
+          <Link href="/coletar" asChild>
+            <Pressable style={s.botao} accessibilityRole="button">
+              <Text style={s.botaoTexto}>{t('ajustes.demo.sem_fio')}</Text>
+            </Pressable>
+          </Link>
         </View>
       )}
 
@@ -122,6 +128,21 @@ export default function Ajustes() {
           </Pressable>
         </Link>
       </View>
+
+      <View style={s.bloco}>
+        <Text style={s.titulo}>{t('ajustes.equipe.titulo')}</Text>
+        <Text style={s.ajuda}>{t('ajustes.equipe.ajuda')}</Text>
+        <Link href="/placa-nova" asChild>
+          <Pressable style={s.botao} accessibilityRole="button">
+            <Text style={s.botaoTexto}>{t('titulo.placa_nova')}</Text>
+          </Pressable>
+        </Link>
+        <Link href="/cabo" asChild>
+          <Pressable style={s.botao} accessibilityRole="button">
+            <Text style={s.botaoTexto}>{t('cabo.titulo')}</Text>
+          </Pressable>
+        </Link>
+      </View>
     </ScrollView>
   );
 }
@@ -130,7 +151,7 @@ const s = StyleSheet.create({
   tela: { flex: 1, backgroundColor: cores.fundo },
   conteudo: { padding: espaco.lg, gap: espaco.lg, paddingBottom: espaco.xxl },
   bloco: { backgroundColor: cores.superficie, borderRadius: raio.md,
-    borderWidth: 1, borderColor: cores.linha, padding: espaco.md, gap: espaco.sm },
+    borderWidth: 1, borderColor: cores.linha, padding: espaco.md, gap: alvo.espacamento },
   titulo: { fontSize: tipo.corpo + 1, fontWeight: '700', color: cores.texto },
   ajuda: { fontSize: tipo.rotulo, color: cores.textoFraco, lineHeight: 20 },
   // 12 dp entre alvos de toque (Princípio V): com luva, 8 dp vira toque no vizinho.

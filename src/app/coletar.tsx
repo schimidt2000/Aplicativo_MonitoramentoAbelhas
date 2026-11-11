@@ -140,7 +140,7 @@ export default function Coletar() {
         aoResponderHora={responderHora}
         agora={relogioDoCelular(demoDaColeta.current)}
         aoTentarDeNovo={coletar}
-        aoVerColmeias={() => router.replace('/')}
+        aoVerColmeias={() => router.dismissTo('/')}
         aoAbrirDiagnostico={() => router.push('/diagnostico')}
       />
     );

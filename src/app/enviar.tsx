@@ -14,7 +14,7 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useDb } from '@/data/provider';
 import { contarLeituras, pendenteMaisAntiga, totalPendentes } from '@/data/repo';
-import { enviarPendentes } from '@/data/sync';
+import { enviarUmPorVez } from '@/data/envioUnico';
 import { obterNuvem } from '@/nuvem';
 import type { MotivoFalha, Vinculo } from '@/core/ports/nuvem';
 import { mensagemDeParada } from '@/core/envio/mensagens';
@@ -63,7 +63,8 @@ export default function Enviar() {
     setParada(null);
     setConcluido(0);
     try {
-      const r = await enviarPendentes(db, nuvem, {
+      // Um envio por vez: se o Início já está enviando, espera esse mesmo (008, FR-007).
+      const r = await enviarUmPorVez(db, nuvem, {
         aoProgredir: (p) => setProgresso(p.enviadas),
       });
       setParada(r.parou);

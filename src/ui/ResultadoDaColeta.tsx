@@ -1,6 +1,6 @@
 /**
  * A tela de resultado de uma coleta: manchete, avisos (cor + ícone + palavra) e
- * os dois botões no rodapé fixo. Extraída de `(tabs)/coletar.tsx` sem mudar o
+ * os dois botões no rodapé fixo. Extraída de `coletar.tsx` sem mudar o
  * comportamento, para a coleta pelo cabo (feature 005, FR-028) mostrar os
  * MESMOS avisos e a mesma manchete da coleta das colmeias.
  *

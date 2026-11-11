@@ -24,8 +24,8 @@ describe('texto literal em componente', () => {
   it('varre as telas e os componentes (e não uma lista vazia)', () => {
     const nomes = arquivos.map((a) => relative(RAIZ, a));
     expect(nomes).toEqual(expect.arrayContaining([
-      'src/app/(tabs)/coletar.tsx', 'src/app/(tabs)/enviar.tsx', 'src/app/(tabs)/ajustes.tsx',
-      'src/app/(tabs)/index.tsx', 'src/app/(tabs)/_layout.tsx', 'src/app/diagnostico.tsx',
+      'src/app/coletar.tsx', 'src/app/enviar.tsx', 'src/app/ajustes.tsx',
+      'src/app/index.tsx', 'src/app/_layout.tsx', 'src/app/diagnostico.tsx',
       'src/app/colmeia/[id].tsx', 'src/ui/Grafico.tsx',
     ]));
   });

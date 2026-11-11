@@ -102,6 +102,8 @@ export default function ColetaPeloCabo() {
 
   const [colmeias, setColmeias] = useState<Colmeia[]>([]);
   const [hiveId, setHiveId] = useState<string | null>(null);
+  // Feature 008 (FR-008): a lista só abre sem colmeia lembrada ou com "Trocar".
+  const [listaAberta, setListaAberta] = useState(false);
   const [simulada, setSimulada] = useState(!disponibilidade.ok);
   const [estado, setEstado] = useState<Estado>({ fase: 'pronto' });
   const [acordouMs, setAcordouMs] = useState<number | null>(null);
@@ -131,6 +133,7 @@ export default function ColetaPeloCabo() {
         if (atual && vistas.has(atual)) return atual;
         return vistas.has(ultima) ? ultima : lista[0]?.id ?? null;
       });
+      setListaAberta(!vistas.has(ultima));
     } catch {
       setColmeias([]);
     }
@@ -244,7 +247,7 @@ export default function ColetaPeloCabo() {
       <ResultadoDaColeta
         resultado={estado.resultado}
         aoTentarDeNovo={voltar}
-        aoVerColmeias={() => router.replace('/')}
+        aoVerColmeias={() => router.dismissTo('/')}
         topo={(estado.simulada || placaNova) ? (
           <>
             {estado.simulada && <RotuloSimulada />}
@@ -266,6 +269,7 @@ export default function ColetaPeloCabo() {
   const podeColetarDeVerdade = disponibilidade.ok;
   const usandoSimulada = simulada || !podeColetarDeVerdade;
   const semColmeia = colmeias.length === 0;
+  const escolhida = colmeias.find((c) => c.id === hiveId) ?? null;
   const restam = usandoSimulada ? null : segundosAteDormir(acordouMs, agora);
   const ocupado = estado.fase === 'escolhendo' || estado.fase === 'coletando';
   // Sem cabo e sem demonstração não há o que coletar: nenhum botão (FR-032).
@@ -292,29 +296,40 @@ export default function ColetaPeloCabo() {
               </View>
             )}
 
+            {(podeColetarDeVerdade || temDemo) && (
+              <Passos noCelular={cabo?.origem === 'aparelho'} simulada={usandoSimulada} placaLigada={placaLigada} restam={restam} />
+            )}
             <Text style={s.titulo} accessibilityRole="header">{t('caboColeta.colmeia.titulo')}</Text>
             {semColmeia ? (
               <>
                 <Text style={s.corpo}>{t('caboColeta.colmeia.nenhuma')}</Text>
                 <Pressable style={s.botaoSecundario} accessibilityRole="button"
-                  onPress={() => router.replace('/')}>
+                  onPress={() => router.dismissTo('/')}>
                   <Text style={s.botaoSecundarioTexto}>{t('coleta.botao.ver_colmeias')}</Text>
                 </Pressable>
               </>
-            ) : (
+            ) : listaAberta || !escolhida ? (
               <>
                 <Text style={s.ajuda}>{t('caboColeta.colmeia.ajuda')}</Text>
                 <View style={s.lista} accessibilityRole="radiogroup">
                   {colmeias.map((c) => (
                     <Opcao key={c.id} rotulo={c.nome} marcada={c.id === hiveId} linha
-                      aoTocar={() => setHiveId(c.id)} desligada={ocupado} />
+                      aoTocar={() => { setHiveId(c.id); setListaAberta(false); }} desligada={ocupado} />
                   ))}
                 </View>
               </>
-            )}
-
-            {(podeColetarDeVerdade || temDemo) && (
-              <Passos noCelular={cabo?.origem === 'aparelho'} simulada={usandoSimulada} placaLigada={placaLigada} restam={restam} />
+            ) : (
+              <View style={s.escolhida}>
+                <View style={s.passoCorpo}>
+                  <Text style={s.passoRotulo}>{t('caboColeta.colmeia.escolhida')}</Text>
+                  <Text style={s.escolhidaNome}>{escolhida.nome}</Text>
+                </View>
+                <Pressable style={s.botaoTrocar} accessibilityRole="button" disabled={ocupado}
+                  accessibilityLabel={`${t('caboColeta.colmeia.trocar')} ${escolhida.nome}`}
+                  onPress={() => setListaAberta(true)}>
+                  <Text style={s.botaoSecundarioTexto}>{t('caboColeta.colmeia.trocar')}</Text>
+                </Pressable>
+              </View>
             )}
 
             {estado.fase === 'escolhendo' && (
@@ -490,6 +505,13 @@ const s = StyleSheet.create({
   linhaIcone: { flexDirection: 'row', alignItems: 'center', gap: espaco.sm },
 
   lista: { gap: alvo.espacamento },
+  escolhida: { flexDirection: 'row', alignItems: 'center', gap: alvo.espacamento,
+    minHeight: alvo.linha, padding: espaco.md, borderRadius: raio.md, borderWidth: 1,
+    borderColor: cores.bordaControle, backgroundColor: cores.superficie },
+  escolhidaNome: { fontSize: tipo.corpo + 2, fontWeight: '700', color: cores.texto },
+  botaoTrocar: { minHeight: alvo.minimo, minWidth: 88, alignItems: 'center', justifyContent: 'center',
+    paddingHorizontal: espaco.md, borderRadius: raio.md, borderWidth: 1,
+    borderColor: cores.bordaControle, backgroundColor: cores.fundo },
   opcoesLinha: { flexDirection: 'row', flexWrap: 'wrap', gap: alvo.espacamento },
   // maxWidth: com fonte grande, a opção quebra a linha em vez de sair da tela.
   opcao: { minHeight: alvo.minimo, flexGrow: 1, maxWidth: '100%', flexDirection: 'row', alignItems: 'center',

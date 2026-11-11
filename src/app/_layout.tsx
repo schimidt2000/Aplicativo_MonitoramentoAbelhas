@@ -31,7 +31,11 @@ export default function RootLayout() {
                 contentStyle: { backgroundColor: cores.fundo },
               }}
             >
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              {/* Feature 008: sem abas. O Início é a raiz e desenha o próprio cabeçalho. */}
+              <Stack.Screen name="index" options={{ headerShown: false }} />
+              <Stack.Screen name="enviar" options={{ title: t('titulo.enviar') }} />
+              <Stack.Screen name="ajustes" options={{ title: t('titulo.ajustes') }} />
+              <Stack.Screen name="coletar" options={{ title: t('titulo.coletar_sem_fio') }} />
               <Stack.Screen name="diagnostico" options={{ title: t('titulo.diagnostico') }} />
               <Stack.Screen name="colmeia/[id]" options={{ title: t('titulo.colmeia') }} />
               <Stack.Screen name="cabo" options={{ title: t('cabo.titulo') }} />
