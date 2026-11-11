@@ -15,6 +15,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Base64
+import android.util.Log
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.exception.CodedException
 import expo.modules.kotlin.modules.Module
@@ -167,11 +168,14 @@ class BeeUsbSerialModule : Module() {
           ((b shr 16) and 0xff).toByte(), ((b shr 24) and 0xff).toByte(),
           0, 0, 8,
         )
-        conexao.controlTransfer(0x21, 0x20, 0, controle.id, linha, linha.size, 1000)
+        val r = conexao.controlTransfer(0x21, 0x20, 0, controle.id, linha, linha.size, 1000)
+        Log.i(TAG, "abrir: SET_LINE_CODING 115200 8N1 -> $r")
       }
       val alca = proximaAlca.getAndIncrement()
       val c = Conexao(dispositivo, conexao, presas, entrada, saida)
       conexoes[alca] = c
+      Log.i(TAG, "abrir: alca=$alca ${dispositivo.deviceName} serie=${try { dispositivo.serialNumber } catch (_: Exception) { "?" }} " +
+        "interfaces presas=${presas.map { it.id }} entrada=0x${Integer.toHexString(entrada.address)} saida=0x${Integer.toHexString(saida.address)}")
       c.leitor = Thread({ ler(alca, c) }, "bee-usb-serial-$alca").apply { isDaemon = true; start() }
       alca
     }
@@ -184,6 +188,7 @@ class BeeUsbSerialModule : Module() {
         // Sem o bulkTransfer com deslocamento (só Android 9+): manda o trecho que falta.
         val trecho = if (enviados == 0) bytes else bytes.copyOfRange(enviados, bytes.size)
         val n = c.conexao.bulkTransfer(c.saida, trecho, trecho.size, 2000)
+        Log.i(TAG, "escrever: alca=$alca pedidos=${trecho.size} aceitos=$n \"${visivel(trecho, trecho.size)}\"")
         if (n <= 0) {
           fechar(alca, "escrever")
           throw CodedException("ERR_CAIU", "A placa não recebeu", null)
@@ -204,6 +209,7 @@ class BeeUsbSerialModule : Module() {
     while (c.aberta.get()) {
       val n = c.conexao.bulkTransfer(c.entrada, buffer, buffer.size, 200)
       if (n > 0) {
+        Log.i(TAG, "ler: alca=$alca $n bytes \"${visivel(buffer, n)}\"")
         sendEvent("onDados", mapOf("alca" to alca, "b64" to Base64.encodeToString(buffer, 0, n, Base64.NO_WRAP)))
         continue
       }
@@ -217,6 +223,7 @@ class BeeUsbSerialModule : Module() {
 
   private fun fechar(alca: Int, motivo: String?) {
     val c = conexoes.remove(alca) ?: return
+    Log.i(TAG, "fechar: alca=$alca motivo=${motivo ?: "pedido do app"}")
     if (!c.aberta.compareAndSet(true, false)) return
     for (itf in c.interfaces) {
       try { c.conexao.releaseInterface(itf) } catch (_: Exception) {}
@@ -225,7 +232,24 @@ class BeeUsbSerialModule : Module() {
     if (motivo != null) sendEvent("onFim", mapOf("alca" to alca, "motivo" to motivo))
   }
 
+  /** Os primeiros bytes como texto, para o registro: o que não é letra vira \\xNN. */
+  private fun visivel(b: ByteArray, n: Int): String {
+    val s = StringBuilder()
+    for (i in 0 until minOf(n, 96)) {
+      val v = b[i].toInt() and 0xff
+      when {
+        v == 10 -> s.append("\\n")
+        v == 13 -> s.append("\\r")
+        v in 32..126 -> s.append(v.toChar())
+        else -> s.append("\\x").append(String.format("%02X", v))
+      }
+    }
+    if (n > 96) s.append("...")
+    return s.toString()
+  }
+
   companion object {
+    private const val TAG = "BeeUsbSerial"
     private const val VID_ESPRESSIF = 0x303A
   }
 }
