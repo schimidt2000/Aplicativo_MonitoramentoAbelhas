@@ -28,8 +28,20 @@ Sem configuração de nuvem, o app usa a **nuvem simulada**. Código de demonstr
 **Situação em 2026-11-11:** existe um projeto Supabase com o esquema aplicado e a entrada
 anônima ligada, e o `.env.local` do app e do painel apontam para ele. Mas o banco responde
 na região `us-east-1` (visto pelo endereço público), não em `sa-east-1`: o passo 1 e a T032
-continuam abertos. O cadastro público por e-mail ainda está ligado (passo 2) e nenhuma conta
-de pesquisadora foi conferida (passo 4).
+continuam abertos. O cadastro público por e-mail ainda está ligado (passo 2).
+
+O passo 4 foi conferido em 2026-11-11 com uma **conta de teste**: ela entrou no painel
+(rodando em `localhost`), viu a Visão geral e baixou a planilha de 29/09 a 28/10/2026
+(3.239 leituras de 3 colmeias; o cabeçalho confere com as linhas, nenhuma leitura repetida,
+voláteis ausentes como célula vazia). Falta trocar a conta de teste pela da pesquisadora e
+apagar a de teste. Os dados desse projeto são quase todos de demonstração: a `003_seed.sql`
+mais envios do app com leituras de exemplo. Na planilha conferida todos os nós sensores são
+simulados (`DEMO-A1`, `DEMO-A2` e o `A1B2C3D4E5F60002` do transporte simulado).
+
+No mesmo dia, depois da planilha, o app no Chrome foi ligado ao projeto pelo código de
+demonstração do apicultor A e enviou as primeiras leituras da placa real: 28 (13 da coleta de 04/11 e 15 de hoje), com
+`src = cable`, todas sem hora (ver `docs/integracao-firmware.md`, "Segunda coleta com a
+placa real"). Elas contam no painel, mas não entram na planilha.
 
 1. Criar o projeto Supabase na região **São Paulo (`sa-east-1`)**.
 2. Authentication → Providers: ligar **Anonymous sign-ins**. Desligar cadastro público

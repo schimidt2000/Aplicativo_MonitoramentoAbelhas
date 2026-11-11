@@ -401,8 +401,48 @@ SHA-256 `5f0e8ddf…b040d`).
 | Abrir a porta pelo Chrome reinicia a placa? | ✅ **não** (porta aberta, nada lido, nenhum log de boot). Já `pyserial` com DTR/RTS em 0 antes de abrir **reinicia** (a transição passa por RTS=1, DTR=0). O app não toca nos sinais (D-512) |
 | "Configurar placa nova" pelo app | ❌ → corrigido. O Chrome do Mac lembrava só uma porta **sem fabricante USB** (`getInfo()` = `{}`, sempre "ligada": a porta Bluetooth do macOS), e o app pegava `getPorts()[0]`: mandou a hora para o Bluetooth e disse "a placa não confirmou". Agora porta sem fabricante USB é ignorada e a Espressif (0x303A) tem a preferência. Na coleta, a mesma porta faria a tela dizer "placa ligada" com a placa dormindo |
 
-**Falta conferir:** coleta pelo cabo desta placa (precisa apertar o botão: a placa dorme 2 h);
-"Configurar placa nova" pelo app depois da correção (só numa placa recém-gravada ou formatada).
+**Falta conferir:** "Configurar placa nova" pelo app depois da correção (só numa placa
+recém-gravada ou formatada). A coleta pelo cabo desta placa aconteceu em 11/11 (seção
+seguinte).
+
+### Segunda coleta com a placa real e primeiro envio à nuvem (2026-11-11)
+
+No dia da apresentação final, app no Chrome do macOS. Desta vez não há registro da conversa
+pelo cabo: o que segue vem do relato do João, da tela do Início e de duas consultas no
+banco do servidor (`public.reading`: recebidas em 11/11 por `device_id` e `src`; e as de
+`src = cable` por início de arquivo).
+
+| Item | Resultado |
+|---|---|
+| Coleta pelo cabo | ✅ **15 leituras** salvas (posições 0 a 14). Poucas: a bateria da placa tinha acabado |
+| Hora das leituras | ⏳ **não fechou, como devia**: o app avisou que não deu para calcular a hora. A placa parou de medir quando ficou sem energia, e a falta de energia não fica registrada nela (risco já listado acima). As leituras ficaram sem hora |
+| Ligar ao projeto | ✅ com o código de demonstração do apicultor A (`servidor/003_seed.sql`), no projeto Supabase de verdade |
+| Envio | ✅ Início depois do envio: "No celular 3.522 · Na nuvem 3.522 · Todas as leituras já estão na nuvem" |
+| No servidor | ✅ **28 leituras com `src = cable`**, todas sem hora (`t_utc_ms` nulo), no nó sensor da Colmeia 03: 13 do arquivo iniciado em `1793744856` (posições 0 a 12) e 15 do iniciado em `1793933864` (posições 0 a 14) |
+| No painel | ✅ a Colmeia 03 passou de 5.495 para 5.926 leituras: 403 de exemplo (`src = mock`, 5496 a 5898) e as 28 do cabo. Sem hora, elas contam no total, mas não geram resumo diário nem entram na planilha |
+
+É a primeira vez que leituras da placa real saem do banco local para a nuvem e entram na
+contagem do painel.
+
+**O que o `seq` diz (início do arquivo × 1.000.000 + posição):**
+
+- `1793744856` é 03/11 às 19h27 (−03): o arquivo da coleta de 04/11 (13 leituras). Elas
+  estavam no banco local desde então e só subiram hoje.
+- `1793933864` é 05/11 às 23h57min44 (−03): exatamente a hora inicial mandada por script à
+  placa `58:E6:C5:1B:4C:B0` depois da gravação do `8a19f0a`. Então o arquivo coletado hoje
+  é **dessa** placa, a regravada em 05/11: é a primeira coleta dela e a primeira com o
+  firmware `8a19f0a` gravado por nós. O João descreve a placa como a que está com ele desde
+  03–04/11; o MAC não foi conferido hoje, e o servidor não guarda o MAC.
+- 15 medições a 2 h cobrem umas 28 h, e de 05/11 até hoje cabem cerca de 65. A conta não
+  fecha, e o app não tem como saber onde a placa parou: por isso as 15 ficaram sem hora.
+
+**Achado:** as leituras do cabo ficaram no mesmo `device_id` das leituras de exemplo da
+Colmeia 03 (`A1B2C3D4E5F6…`), porque a placa foi ligada a uma colmeia da demonstração. No
+servidor, só o `src` separa umas das outras. Num apiário de verdade a colmeia não tem
+leitura de exemplo; para a demonstração, a Colmeia 03 mistura as duas.
+
+**Falta conferir:** o MAC da placa coletada hoje; a hora fechar numa coleta em ritmo, com a
+placa alimentada o tempo todo.
 
 ---
 

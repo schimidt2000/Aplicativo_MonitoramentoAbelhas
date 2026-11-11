@@ -136,7 +136,11 @@ que pega (lista em plan.md, "Verificação").
 - [ ] T554 Primeiro teste com a placa real (`docs/teste-com-a-placa.md`): é o T546 com o
   firmware 4cc7ed8 — **parcial (2026-11-04):** primeira coleta real pelo cabo no Chrome do
   macOS, 13 leituras, conversa completa, MAC no arquivo, placa recomeçou com a hora enviada
-  (resultado em `docs/integracao-firmware.md`, "Primeiro teste com a placa real"). **Falta:**
+  (resultado em `docs/integracao-firmware.md`, "Primeiro teste com a placa real").
+  **2026-11-11:** segunda coleta no Chrome do macOS, da placa regravada em 05/11 com o
+  `8a19f0a` (15 leituras: a bateria da placa tinha acabado; a hora não fechou, como devia) e primeiro envio de leituras da placa real
+  ao projeto Supabase: 28 leituras `src = cable` no servidor (13 de 04/11 e 15 de hoje), todas sem hora, contadas no
+  painel (Colmeia 03 de 5.495 para 5.926, com 403 de exemplo). **Falta:**
   a hora fechar numa coleta em ritmo (2 h sem apertar o botão, ou o `teste_de_firmware`),
   Configurar placa nova com a placa real e a temperatura ao lado de um termômetro
 
