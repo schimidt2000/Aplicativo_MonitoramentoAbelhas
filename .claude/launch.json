@@ -4,8 +4,41 @@
     {
       "name": "web",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "web"],
+      "runtimeArgs": [
+        "run",
+        "web"
+      ],
       "port": 8081
+    },
+    {
+      "name": "android",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "expo",
+        "start",
+        "--android",
+        "--port",
+        "8082"
+      ],
+      "port": 8082
+    },
+    {
+      "name": "painel",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-c",
+        "cd painel && npx vite --port 5173 --strictPort"
+      ],
+      "port": 5173
+    },
+    {
+      "name": "painel-demo",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-c",
+        "cd painel && VITE_SUPABASE_URL= VITE_SUPABASE_ANON_KEY= npx vite --port 5175 --strictPort"
+      ],
+      "port": 5175
     }
   ]
 }

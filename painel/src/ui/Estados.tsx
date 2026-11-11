@@ -4,9 +4,15 @@
  */
 import type { MotivoProblema } from '../dados/porta';
 import { t } from '../textos';
+import { Icone } from './Icones';
 
 export function Carregando() {
-  return <p role="status">{t('carregando')}</p>;
+  return (
+    <p role="status" className="carregando">
+      <Icone desenho="relogio" />
+      {t('carregando')}
+    </p>
+  );
 }
 
 export function Problema({ motivo, onTentar }: { motivo: MotivoProblema; onTentar: () => void }) {

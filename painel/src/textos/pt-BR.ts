@@ -41,6 +41,8 @@ export const ptBR = {
   'entrar.problema.credenciais':
     'E-mail ou senha não conferem. Confira o que digitou e tente de novo. Se esqueceu a senha, fale com a coordenação do projeto.',
   'entrar.problema.vazio': 'Preencha o e-mail e a senha para entrar.',
+  'entrar.marca.texto':
+    'Temperatura, umidade e voláteis de dentro das colmeias do Semiárido, coletados pelos apicultores e meliponicultores e organizados para análise.',
 
   /* ---------- Rede e servidor ---------- */
   'rede.sem_internet.titulo': 'Sem internet agora',
@@ -75,6 +77,11 @@ export const ptBR = {
   'visao.col.ultima_leitura': 'Última leitura',
   'visao.col.leituras': 'Leituras',
   'visao.col.excluidas': 'Amostras excluídas',
+  'visao.resumo.rotulo': 'Números do projeto',
+  'visao.resumo.colmeias': 'Colmeias',
+  'visao.resumo.apicultores': 'Apicultores e meliponicultores',
+  'visao.resumo.locais': 'Apiários e meliponários',
+  'visao.resumo.leituras': 'Leituras recebidas',
   'visao.municipio': '{municipio} ({uf})',
   'visao.sem_municipio': 'Município não informado',
 
@@ -184,6 +191,8 @@ export const ptBR = {
   'planilha.marcadas.outros': '{n} colmeias marcadas',
   'planilha.periodo': 'Período (dias em UTC)',
   'planilha.botao': 'Baixar planilha',
+  'planilha.passo.montar': 'Montar e baixar',
+  'planilha.passo.montar_texto': 'O arquivo é montado neste navegador e não fica guardado no painel.',
   'planilha.montando': 'Montando a planilha…',
   'planilha.nenhuma': 'Marque pelo menos uma colmeia.',
   'planilha.pronta.um': 'Planilha pronta: {n} leitura. O navegador já está baixando o arquivo.',

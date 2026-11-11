@@ -93,6 +93,8 @@ const LETRAS = /\p{L}{2,}/u;
 const ATRIBUTOS_TECNICOS = new Set([
   'className', 'id', 'htmlFor', 'type', 'role', 'scope', 'name', 'method', 'autoComplete',
   'aria-live', 'path', 'to', 'key', 'motivo', 'lang', 'rel', 'target', 'href', 'inputMode', 'ref',
+  // `<Icone desenho="...">`: chave tipada do traço do ícone (`NomeIcone`), nunca texto.
+  'desenho',
 ]);
 
 /**

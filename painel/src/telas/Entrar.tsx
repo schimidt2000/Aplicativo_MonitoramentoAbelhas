@@ -10,6 +10,7 @@
 import { useState, type FormEvent } from 'react';
 import type { FontePainel, Sessao } from '../dados/porta';
 import { t, type ChaveTexto } from '../textos';
+import { Marca } from '../ui/Icones';
 
 interface Props {
   fonte: FontePainel;
@@ -44,45 +45,64 @@ export function Entrar({ fonte, onEntrou }: Props) {
     );
   }
 
+  const marca = (
+    <div className="entrada-marca">
+      <div className="entrada-marca-topo">
+        <Marca tamanho={48} />
+        <span className="marca-texto">
+          <strong>{t('app.nome')}</strong>
+          <small>{t('app.subtitulo')}</small>
+        </span>
+      </div>
+      <p>{t('entrar.marca.texto')}</p>
+    </div>
+  );
+
   if (fonte.modo === 'demonstracao') {
     return (
-      <section className="entrar">
-        <h1>{t('entrar.titulo')}</h1>
-        <div className="caixa aviso">
-          <h2>{t('entrar.demo.titulo')}</h2>
-          <p>{t('entrar.demo.explicacao')}</p>
-          <button type="button" onClick={() => void tentar()} disabled={entrando}>
+      <div className="entrada-grade">
+        {marca}
+        <section className="entrada-cartao">
+          <h1>{t('entrar.titulo')}</h1>
+          <div className="caixa aviso">
+            <h2>{t('entrar.demo.titulo')}</h2>
+            <p>{t('entrar.demo.explicacao')}</p>
+          </div>
+          <button type="button" className="largo" onClick={() => void tentar()} disabled={entrando}>
             {t('entrar.demo.botao')}
           </button>
-        </div>
-      </section>
+        </section>
+      </div>
     );
   }
 
   return (
-    <section className="entrar">
-      <h1>{t('entrar.titulo')}</h1>
-      <p className="secundario-texto">{t('entrar.explicacao')}</p>
-      <form method="post" onSubmit={(e) => void tentar(e)} noValidate>
-        <div className="campo">
-          <label htmlFor="email">{t('entrar.email')}</label>
-          <input
-            id="email" type="email" autoComplete="username" value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div className="campo">
-          <label htmlFor="senha">{t('entrar.senha')}</label>
-          <input
-            id="senha" type="password" autoComplete="current-password" value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-          />
-        </div>
-        {problema ? <p className="caixa problema" role="alert">{t(problema)}</p> : null}
-        <button type="submit" disabled={entrando}>
-          {entrando ? t('entrar.entrando') : t('entrar.botao')}
-        </button>
-      </form>
-    </section>
+    <div className="entrada-grade">
+      {marca}
+      <section className="entrada-cartao">
+        <h1>{t('entrar.titulo')}</h1>
+        <p className="secundario-texto">{t('entrar.explicacao')}</p>
+        <form method="post" onSubmit={(e) => void tentar(e)} noValidate>
+          <div className="campo">
+            <label htmlFor="email">{t('entrar.email')}</label>
+            <input
+              id="email" type="email" autoComplete="username" value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="campo">
+            <label htmlFor="senha">{t('entrar.senha')}</label>
+            <input
+              id="senha" type="password" autoComplete="current-password" value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+            />
+          </div>
+          {problema ? <p className="caixa problema" role="alert">{t(problema)}</p> : null}
+          <button type="submit" className="largo" disabled={entrando}>
+            {entrando ? t('entrar.entrando') : t('entrar.botao')}
+          </button>
+        </form>
+      </section>
+    </div>
   );
 }

@@ -24,6 +24,7 @@ import { t, tp } from '../textos';
 import { Carregando, Problema } from '../ui/Estados';
 import { Grafico, type SerieGrafico } from '../ui/Grafico';
 import { useCarregar, useFonte } from '../ui/carregar';
+import { Icone } from '../ui/Icones';
 import { rotuloCriacao, rotuloMunicipio } from '../ui/rotulos';
 
 /** Uma cor por trilha; todas com contraste ≥ 3:1 sobre o branco. */
@@ -134,7 +135,7 @@ export function Colmeia() {
     return (
       <section>
         <p className="caixa">{t('colmeia.nao_encontrada')}</p>
-        <Link to="/">{t('colmeia.voltar')}</Link>
+        <Link to="/" className="voltar"><Icone desenho="voltar" tamanho={18} />{t('colmeia.voltar')}</Link>
       </section>
     );
   }
@@ -154,62 +155,73 @@ export function Colmeia() {
 
   return (
     <section>
-      <p><Link to="/">{t('colmeia.voltar')}</Link></p>
-      <h1>{colmeia.colmeiaNome}</h1>
-      <p>
-        {t('colmeia.de', {
-          local: colmeia.localNome, apicultor: colmeia.apicultorNome, municipio: rotuloMunicipio(colmeia),
-        })}
-        <br />
-        <span className="secundario-texto">
-          {rotuloCriacao(colmeia.criacao)}
-          {' · '}
-          {t('colmeia.ultima_leitura', { quando: frescor(colmeia.ultimaLeituraMs, Date.now()) })}
-        </span>
-      </p>
-
-      <fieldset className="periodo">
-        <legend>{t('colmeia.periodo')}</legend>
-        {(['7', '30', 'livre'] as const).map((tipo) => (
-          <label key={tipo}>
-            <input
-              type="radio" name="periodo" checked={escolha.tipo === tipo}
-              onChange={() => escolher(tipo)}
-            />
-            {t(`colmeia.periodo.${tipo}`)}
-          </label>
-        ))}
-      </fieldset>
-      {escolha.tipo === 'livre' ? (
-        <div className="linha-campos">
-          <div className="campo">
-            <label htmlFor="de">{t('colmeia.periodo.inicio')}</label>
-            <input
-              id="de" type="date" value={escolha.deIso}
-              onChange={(e) => setEscolha({ ...escolha, deIso: e.target.value })}
-            />
-          </div>
-          <div className="campo">
-            <label htmlFor="ate">{t('colmeia.periodo.fim')}</label>
-            <input
-              id="ate" type="date" value={escolha.ateIso}
-              onChange={(e) => setEscolha({ ...escolha, ateIso: e.target.value })}
-            />
-          </div>
+      <Link to="/" className="voltar"><Icone desenho="voltar" tamanho={18} />{t('colmeia.voltar')}</Link>
+      <header className="cabecalho-colmeia">
+        <span className="cabecalho-colmeia-icone"><Icone desenho="colmeia" tamanho={28} /></span>
+        <div>
+          <h1>{colmeia.colmeiaNome}</h1>
+          <p>
+            {t('colmeia.de', {
+              local: colmeia.localNome, apicultor: colmeia.apicultorNome, municipio: rotuloMunicipio(colmeia),
+            })}
+          </p>
+          <p className="etiquetas">
+            <span className="etiqueta">{rotuloCriacao(colmeia.criacao)}</span>
+            <span className="etiqueta">
+              <Icone desenho="relogio" tamanho={16} />
+              {t('colmeia.ultima_leitura', { quando: frescor(colmeia.ultimaLeituraMs, Date.now()) })}
+            </span>
+          </p>
         </div>
-      ) : null}
+      </header>
 
-      {!periodo.ok ? (
-        <p className="caixa aviso" role="status">
-          {periodo.motivo === 'invalido' ? t('colmeia.periodo.invalido')
-            : periodo.motivo === 'longo' ? t('colmeia.periodo.longo', { n: inteiro(MAX_DIAS_PERIODO) })
-              : t('colmeia.periodo.sem_leitura')}
-        </p>
-      ) : (
-        <p className="secundario-texto">
-          {t('colmeia.periodo.mostrando', { de: fmtDia(periodo.deDia), ate: fmtDia(periodo.ateDia) })}
-        </p>
-      )}
+      <div className="cartao painel-periodo">
+        <fieldset className="segmentos">
+          <legend>{t('colmeia.periodo')}</legend>
+          <div className="segmentos-opcoes">
+            {(['7', '30', 'livre'] as const).map((tipo) => (
+              <label key={tipo}>
+                <input
+                  type="radio" name="periodo" checked={escolha.tipo === tipo}
+                  onChange={() => escolher(tipo)}
+                />
+                <span>{t(`colmeia.periodo.${tipo}`)}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+        {escolha.tipo === 'livre' ? (
+          <div className="linha-campos">
+            <div className="campo">
+              <label htmlFor="de">{t('colmeia.periodo.inicio')}</label>
+              <input
+                id="de" type="date" value={escolha.deIso}
+                onChange={(e) => setEscolha({ ...escolha, deIso: e.target.value })}
+              />
+            </div>
+            <div className="campo">
+              <label htmlFor="ate">{t('colmeia.periodo.fim')}</label>
+              <input
+                id="ate" type="date" value={escolha.ateIso}
+                onChange={(e) => setEscolha({ ...escolha, ateIso: e.target.value })}
+              />
+            </div>
+          </div>
+        ) : null}
+
+        {!periodo.ok ? (
+          <p className="caixa aviso" role="status">
+            {periodo.motivo === 'invalido' ? t('colmeia.periodo.invalido')
+              : periodo.motivo === 'longo' ? t('colmeia.periodo.longo', { n: inteiro(MAX_DIAS_PERIODO) })
+                : t('colmeia.periodo.sem_leitura')}
+          </p>
+        ) : (
+          <p className="secundario-texto mostrando">
+            <Icone desenho="calendario" tamanho={18} />
+            <span>{t('colmeia.periodo.mostrando', { de: fmtDia(periodo.deDia), ate: fmtDia(periodo.ateDia) })}</span>
+          </p>
+        )}
+      </div>
 
       {periodo.ok && res.estado === 'carregando' ? <Carregando /> : null}
       {periodo.ok && res.estado === 'problema' ? <Problema motivo={res.motivo} onTentar={tentarRes} /> : null}
@@ -229,7 +241,10 @@ export function Colmeia() {
 
           <div className="dia" aria-live="polite">
             {diaAtual === undefined ? (
-              <span className="secundario-texto">{t('colmeia.dia.dica')}</span>
+              <span className="secundario-texto dia-dica">
+                <Icone desenho="info" tamanho={18} />
+                {t('colmeia.dia.dica')}
+              </span>
             ) : (
               <>
                 <strong>{t('colmeia.dia.titulo', { data: fmtDia(diaAtual) })}</strong>
@@ -244,66 +259,70 @@ export function Colmeia() {
             )}
           </div>
 
-          <Grafico
-            titulo={t('grafico.temp.titulo')}
-            subtitulo={desenho.legendaTemp}
-            dias={desenho.dias}
-            series={desenho.seriesTemp}
-            formatoY={eixoTemp}
-            onDia={setDiaApontado}
-          />
-          <Grafico
-            titulo={t('grafico.umid.titulo')}
-            dias={desenho.dias}
-            series={desenho.seriesUmid}
-            formatoY={eixoInteiro}
-            onDia={setDiaApontado}
-          />
-          <Grafico
-            titulo={t('grafico.vol.titulo')}
-            subtitulo={t('grafico.vol.subtitulo')}
-            dias={desenho.dias}
-            series={desenho.seriesVol}
-            formatoY={eixoInteiro}
-            onDia={setDiaApontado}
-          />
+          <div className="graficos">
+            <Grafico
+              titulo={t('grafico.temp.titulo')}
+              subtitulo={desenho.legendaTemp}
+              dias={desenho.dias}
+              series={desenho.seriesTemp}
+              formatoY={eixoTemp}
+              onDia={setDiaApontado}
+            />
+            <Grafico
+              titulo={t('grafico.umid.titulo')}
+              dias={desenho.dias}
+              series={desenho.seriesUmid}
+              formatoY={eixoInteiro}
+              onDia={setDiaApontado}
+            />
+            <Grafico
+              titulo={t('grafico.vol.titulo')}
+              subtitulo={t('grafico.vol.subtitulo')}
+              dias={desenho.dias}
+              series={desenho.seriesVol}
+              formatoY={eixoInteiro}
+              onDia={setDiaApontado}
+            />
+          </div>
           {desenho.semBase.map((tr) => (
             <p key={`${tr.noId}-${tr.epoca}`} className="caixa aviso">
               {t('grafico.vol.sem_base', { trilha: desenho.rotulo(tr), n: MIN_DIAS_LINHA_BASE })}
             </p>
           ))}
 
-          <h2>{t('colmeia.resumo.titulo')}</h2>
-          <p className="secundario-texto">{t('colmeia.resumo.explicacao')}</p>
-          <div className="tabela-rolavel">
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">{t('colmeia.resumo.trilha')}</th>
-                  <th scope="col" className="numero">{t('colmeia.resumo.dias')}</th>
-                  <th scope="col">{t('colmeia.resumo.temp')}</th>
-                  <th scope="col">{t('colmeia.resumo.umid')}</th>
-                  <th scope="col" className="numero">{t('colmeia.resumo.validas')}</th>
-                  <th scope="col" className="numero">{t('colmeia.resumo.excluidas')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {desenho.agregados.map((a) => {
-                  const corr = desenho.correcao.get(a.noId) ?? 0;
-                  return (
-                    <tr key={`${a.noId}-${a.epoca}`}>
-                      <th scope="row">{desenho.rotulo(a)}</th>
-                      <td className="numero">{inteiro(a.diasComLinha)}</td>
-                      <td>{t('colmeia.resumo.faixa', { min: fmtTemp(a.tempMenorC100, corr), max: fmtTemp(a.tempMaiorC100, corr) })}</td>
-                      <td>{t('colmeia.resumo.faixa', { min: fmtUmid(a.umidMediaMenorX100), max: fmtUmid(a.umidMediaMaiorX100) })}</td>
-                      <td className="numero">{inteiro(a.validas)}</td>
-                      <td className="numero">{inteiro(a.excluidas)}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <section className="cartao">
+            <h2>{t('colmeia.resumo.titulo')}</h2>
+            <p className="secundario-texto">{t('colmeia.resumo.explicacao')}</p>
+            <div className="tabela-rolavel">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">{t('colmeia.resumo.trilha')}</th>
+                    <th scope="col" className="numero">{t('colmeia.resumo.dias')}</th>
+                    <th scope="col">{t('colmeia.resumo.temp')}</th>
+                    <th scope="col">{t('colmeia.resumo.umid')}</th>
+                    <th scope="col" className="numero">{t('colmeia.resumo.validas')}</th>
+                    <th scope="col" className="numero">{t('colmeia.resumo.excluidas')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {desenho.agregados.map((a) => {
+                    const corr = desenho.correcao.get(a.noId) ?? 0;
+                    return (
+                      <tr key={`${a.noId}-${a.epoca}`}>
+                        <th scope="row">{desenho.rotulo(a)}</th>
+                        <td className="numero">{inteiro(a.diasComLinha)}</td>
+                        <td>{t('colmeia.resumo.faixa', { min: fmtTemp(a.tempMenorC100, corr), max: fmtTemp(a.tempMaiorC100, corr) })}</td>
+                        <td>{t('colmeia.resumo.faixa', { min: fmtUmid(a.umidMediaMenorX100), max: fmtUmid(a.umidMediaMaiorX100) })}</td>
+                        <td className="numero">{inteiro(a.validas)}</td>
+                        <td className="numero">{inteiro(a.excluidas)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
 
           <div className="acoes">
             <button
@@ -313,6 +332,7 @@ export function Colmeia() {
                 state: { colmeiaIds: [id], deIso: isoDeDia(periodo.deDia), ateIso: isoDeDia(periodo.ateDia) },
               })}
             >
+              <Icone desenho="baixar" />
               {t('colmeia.baixar_planilha')}
             </button>
           </div>

@@ -28,6 +28,8 @@ interface Props {
 }
 
 const ALTURA = 260;
+/** Cabe num celular de 360 px com as margens do cartão. */
+const LARGURA_MIN = 240;
 /** Fonte do sistema, nunca fonte web (`.claude/rules/ui.md`). */
 const FONTE = '14px system-ui, sans-serif';
 
@@ -40,7 +42,7 @@ export function Grafico({ titulo, subtitulo, dias, series, formatoY, onDia }: Pr
     const el = area.current;
     if (!el) return;
     const opcoes: uPlot.Options = {
-      width: Math.max(320, el.clientWidth),
+      width: Math.max(LARGURA_MIN, el.clientWidth),
       height: ALTURA,
       tzDate: (ts) => uPlot.tzDate(new Date(ts * 1000), 'Etc/UTC'),
       scales: { x: { time: true } },
@@ -49,17 +51,19 @@ export function Grafico({ titulo, subtitulo, dias, series, formatoY, onDia }: Pr
       cursor: { drag: { x: false, y: false }, sync: { key: 'colmeia' } },
       axes: [
         {
-          stroke: '#111111',
+          stroke: '#3d372f',
           font: FONTE,
-          grid: { stroke: '#e1e1e1' },
+          grid: { stroke: '#ebe5d9', width: 1 },
+          ticks: { stroke: '#d8d1c3', width: 1 },
           // Marcas só em dias inteiros: o resumo é diário, hora não faz sentido aqui.
           incrs: [1, 2, 7, 14, 30, 61, 91, 182, 365].map((d) => d * SEG_DIA),
           values: (_u, ticks) => ticks.map((s) => fmtDia(Math.floor(s / SEG_DIA)).slice(0, 5)),
         },
         {
-          stroke: '#111111',
+          stroke: '#3d372f',
           font: FONTE,
-          grid: { stroke: '#e1e1e1' },
+          grid: { stroke: '#ebe5d9', width: 1 },
+          ticks: { stroke: '#d8d1c3', width: 1 },
           size: 64,
           values: (_u, ticks) => ticks.map((v) => formatoY(v)),
         },
@@ -73,7 +77,7 @@ export function Grafico({ titulo, subtitulo, dias, series, formatoY, onDia }: Pr
     const grafico = new uPlot(opcoes, dados, el);
 
     const observador = new ResizeObserver(() => {
-      grafico.setSize({ width: Math.max(320, el.clientWidth), height: ALTURA });
+      grafico.setSize({ width: Math.max(LARGURA_MIN, el.clientWidth), height: ALTURA });
     });
     observador.observe(el);
     return () => {
@@ -83,7 +87,7 @@ export function Grafico({ titulo, subtitulo, dias, series, formatoY, onDia }: Pr
   }, [dias, series, formatoY]);
 
   return (
-    <section className="grafico">
+    <section className="grafico cartao">
       <h3>{titulo}</h3>
       {subtitulo ? <p className="subtitulo">{subtitulo}</p> : null}
       <div className="grafico-area" ref={area} onMouseLeave={() => aoDia.current(null)} />

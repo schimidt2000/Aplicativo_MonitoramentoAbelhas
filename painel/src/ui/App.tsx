@@ -46,10 +46,10 @@ export function App() {
     return () => { vivo = false; };
   }, [tentativa]);
 
-  if (inicio.estado === 'carregando') return <main><Carregando /></main>;
+  if (inicio.estado === 'carregando') return <main className="conteudo"><Carregando /></main>;
   if (inicio.estado === 'configuracao') {
     return (
-      <main>
+      <main className="conteudo">
         <div className="caixa problema" role="alert">
           <h1>{t('config.insegura.titulo')}</h1>
           <p>{t('config.insegura.texto')}</p>
@@ -58,7 +58,7 @@ export function App() {
     );
   }
   if (inicio.estado === 'problema') {
-    return <main><Problema motivo="servidor" onTentar={() => setTentativa((n) => n + 1)} /></main>;
+    return <main className="conteudo"><Problema motivo="servidor" onTentar={() => setTentativa((n) => n + 1)} /></main>;
   }
 
   const { fonte } = inicio;
@@ -68,7 +68,7 @@ export function App() {
     return (
       <>
         {demo ? <FaixaDemo /> : null}
-        <main><Entrar fonte={fonte} onEntrou={setSessao} /></main>
+        <main className="entrada"><Entrar fonte={fonte} onEntrou={setSessao} /></main>
       </>
     );
   }

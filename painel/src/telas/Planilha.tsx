@@ -21,6 +21,7 @@ import type { MotivoProblema } from '../dados/porta';
 import { t, tp } from '../textos';
 import { Carregando, Problema } from '../ui/Estados';
 import { motivoDe, useCarregar, useFonte } from '../ui/carregar';
+import { Icone } from '../ui/Icones';
 import { rotuloMunicipio } from '../ui/rotulos';
 
 interface PreSelecao {
@@ -111,85 +112,105 @@ export function Planilha() {
 
   return (
     <section>
-      <h1>{t('planilha.titulo')}</h1>
-      <p>{t('planilha.explicacao')}</p>
-      <p className="secundario-texto">{t('planilha.sobre')}</p>
+      <header className="cabecalho-pagina">
+        <h1>{t('planilha.titulo')}</h1>
+        <p>{t('planilha.explicacao')}</p>
+        <p className="secundario-texto">{t('planilha.sobre')}</p>
+      </header>
 
       {carga.estado === 'carregando' ? <Carregando /> : null}
       {carga.estado === 'problema' ? <Problema motivo={carga.motivo} onTentar={tentar} /> : null}
       {carga.estado === 'ok' && todas.length === 0 ? <p className="caixa">{t('visao.sem_colmeias')}</p> : null}
 
       {carga.estado === 'ok' && todas.length > 0 ? (
-        <>
-          <h2>{t('planilha.colmeias')}</h2>
-          <div className="campo">
-            <label htmlFor="filtro">{t('planilha.filtro')}</label>
-            <input
-              id="filtro" type="search" value={filtro} autoComplete="off"
-              placeholder={t('visao.busca.dica')}
-              onChange={(e) => setFiltro(e.target.value)}
-            />
-          </div>
-          <div className="acoes">
-            <button
-              type="button" className="secundario"
-              onClick={() => setMarcadas((m) => new Set([...m, ...mostradas.map((c) => c.colmeiaId)]))}
-            >
-              {t('planilha.marcar_todas')}
-            </button>
-            <button type="button" className="secundario" onClick={() => setMarcadas(new Set())}>
-              {t('planilha.desmarcar_todas')}
-            </button>
-          </div>
-          {mostradas.length === 0 ? <p className="caixa">{t('visao.vazio')}</p> : (
-            <ul className="lista-colmeias">
-              {mostradas.map((c) => (
-                <li key={c.colmeiaId}>
-                  <label>
-                    <input
-                      type="checkbox" checked={marcadas.has(c.colmeiaId)}
-                      onChange={() => alternar(c.colmeiaId)}
-                    />
-                    <span>
-                      <strong>{c.colmeiaNome}</strong>
-                      {' · '}
-                      {c.localNome}
-                      {' · '}
-                      <span className="secundario-texto">{c.apicultorNome}, {rotuloMunicipio(c)}</span>
-                    </span>
-                  </label>
-                </li>
-              ))}
-            </ul>
-          )}
-          <p role="status">{tp('planilha.marcadas', marcadas.size)}</p>
-
-          <h2>{t('planilha.periodo')}</h2>
-          <div className="linha-campos">
-            <div className="campo">
-              <label htmlFor="p-de">{t('colmeia.periodo.inicio')}</label>
-              <input id="p-de" type="date" value={deIso} onChange={(e) => setDeIso(e.target.value)} />
+        <ol className="passos">
+          <li className="cartao passo passo-colmeias">
+            <h2>{t('planilha.colmeias')}</h2>
+            <div className="barra">
+              <div className="campo">
+                <label htmlFor="filtro">{t('planilha.filtro')}</label>
+                <div className="busca">
+                  <Icone desenho="busca" />
+                  <input
+                    id="filtro" type="search" value={filtro} autoComplete="off"
+                    placeholder={t('visao.busca.dica')}
+                    onChange={(e) => setFiltro(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="acoes">
+                <button
+                  type="button" className="secundario"
+                  onClick={() => setMarcadas((m) => new Set([...m, ...mostradas.map((c) => c.colmeiaId)]))}
+                >
+                  {t('planilha.marcar_todas')}
+                </button>
+                <button type="button" className="secundario" onClick={() => setMarcadas(new Set())}>
+                  {t('planilha.desmarcar_todas')}
+                </button>
+              </div>
             </div>
-            <div className="campo">
-              <label htmlFor="p-ate">{t('colmeia.periodo.fim')}</label>
-              <input id="p-ate" type="date" value={ateIso} onChange={(e) => setAteIso(e.target.value)} />
+            {mostradas.length === 0 ? <p className="caixa">{t('visao.vazio')}</p> : (
+              <ul className="lista-colmeias">
+                {mostradas.map((c) => (
+                  <li key={c.colmeiaId}>
+                    <label>
+                      <input
+                        type="checkbox" checked={marcadas.has(c.colmeiaId)}
+                        onChange={() => alternar(c.colmeiaId)}
+                      />
+                      <span className="lista-colmeias-texto">
+                        <strong>{c.colmeiaNome}</strong>
+                        <span>{c.localNome}</span>
+                        <span className="secundario-texto">{c.apicultorNome}, {rotuloMunicipio(c)}</span>
+                      </span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <p role="status" className="contagem">
+              <Icone desenho="certo" tamanho={18} />
+              {tp('planilha.marcadas', marcadas.size)}
+            </p>
+          </li>
+
+          <li className="passo-coluna">
+            <div className="cartao passo">
+              <h2>{t('planilha.periodo')}</h2>
+              <div className="linha-campos">
+                <div className="campo">
+                  <label htmlFor="p-de">{t('colmeia.periodo.inicio')}</label>
+                  <input id="p-de" type="date" value={deIso} onChange={(e) => setDeIso(e.target.value)} />
+                </div>
+                <div className="campo">
+                  <label htmlFor="p-ate">{t('colmeia.periodo.fim')}</label>
+                  <input id="p-ate" type="date" value={ateIso} onChange={(e) => setAteIso(e.target.value)} />
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div className="acoes">
-            <button type="button" onClick={() => void montar()} disabled={situacao.tipo === 'montando'}>
-              {situacao.tipo === 'montando' ? t('planilha.montando') : t('planilha.botao')}
-            </button>
-          </div>
+            <div className="cartao passo">
+              <h2>{t('planilha.passo.montar')}</h2>
+              <p className="secundario-texto">{t('planilha.passo.montar_texto')}</p>
+              <button
+                type="button" className="largo"
+                onClick={() => void montar()} disabled={situacao.tipo === 'montando'}
+              >
+                <Icone desenho="baixar" />
+                {situacao.tipo === 'montando' ? t('planilha.montando') : t('planilha.botao')}
+              </button>
 
-          {situacao.tipo === 'aviso' ? <p className="caixa aviso" role="alert">{situacao.texto}</p> : null}
-          {situacao.tipo === 'pronta' ? (
-            <p className="caixa" role="status">{tp('planilha.pronta', situacao.leituras)}</p>
-          ) : null}
-          {situacao.tipo === 'problema' ? (
-            <Problema motivo={situacao.motivo} onTentar={() => void montar()} />
-          ) : null}
-        </>
+              {situacao.tipo === 'aviso' ? <p className="caixa aviso" role="alert">{situacao.texto}</p> : null}
+              {situacao.tipo === 'pronta' ? (
+                <p className="caixa pronta" role="status">{tp('planilha.pronta', situacao.leituras)}</p>
+              ) : null}
+              {situacao.tipo === 'problema' ? (
+                <Problema motivo={situacao.motivo} onTentar={() => void montar()} />
+              ) : null}
+            </div>
+          </li>
+        </ol>
       ) : null}
     </section>
   );
