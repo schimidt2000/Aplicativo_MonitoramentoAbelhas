@@ -258,8 +258,11 @@ function Card({ rotulo, valor, detalhe }: { rotulo: string; valor: string; detal
   // Com a fonte do sistema grande, dois cartões lado a lado partem as palavras
   // ("Tro-car em brev-e"): um por linha.
   const { fontScale } = useWindowDimensions();
+  // Palavra comprida ("Aprendendo", "informada") não cabe em meio cartão no tamanho de
+  // leitura e era partida no meio em tela de 360-375 dp: o cartão ocupa a linha inteira.
+  const palavraComprida = valor.split(/\s+/).some((p) => p.length > 7);
   return (
-    <View style={StyleSheet.flatten([s.card, fontScale > 1.3 && s.cardInteiro])}>
+    <View style={StyleSheet.flatten([s.card, (fontScale > 1.3 || palavraComprida) && s.cardInteiro])}>
       <Text style={s.cardRotulo}>{rotulo}</Text>
       <Text style={s.cardValor}>{valor}</Text>
       {detalhe !== undefined && <Text style={s.cardRotulo}>{detalhe}</Text>}
