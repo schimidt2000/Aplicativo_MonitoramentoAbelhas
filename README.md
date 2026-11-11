@@ -27,9 +27,11 @@ O nó sensor (placa Seeed XIAO ESP32-C6 com AHT21 e ENS160) e o firmware dele pe
 confirmado por eles, com data e fonte, e o que ainda é suposição nossa está em
 [`docs/integracao-firmware.md`](docs/integracao-firmware.md).
 
-O botão **Coletar** das abas ainda coleta de **nós sensores simulados**. A coleta da placa
-real é pela tela **Coletar pelo cabo** (feature 005), no app de campo no navegador, com o
-protocolo do firmware de 2026-10-21. Ela ainda não foi testada com a placa de verdade.
+O botão **Coletar** do Início leva à **coleta pelo cabo** (features 005, 006 e 008), o único
+caminho da placa real: no Chrome ou no Edge de um computador, ou no app Android com a placa
+na porta USB-C. O protocolo é o do firmware `8a19f0a` (2026-11-03). A primeira coleta com a
+placa de verdade foi em 2026-11-04, no Chrome do macOS; no tablet Android ainda falta. A
+coleta sem fio que aparece em Ajustes é só demonstração, com **nós sensores simulados**.
 
 ## Como rodar
 
