@@ -1,4 +1,7 @@
-# Bee-sertão
+# Software para o monitoramento de colmeias
+
+Projeto acadêmico, em apoio a pesquisadoras do Nordeste brasileiro. Nas telas do aplicativo, do
+painel e na planilha, o sistema se chama **Monitor de Colmeias**.
 
 Monitoramento do microclima de colmeias para apicultores e meliponicultores do semiárido
 brasileiro. Um nó sensor dentro da colmeia mede temperatura, umidade e voláteis (COVs); o
@@ -30,7 +33,8 @@ confirmado por eles, com data e fonte, e o que ainda é suposição nossa está 
 O botão **Coletar** do Início leva à **coleta pelo cabo** (features 005, 006 e 008), o único
 caminho da placa real: no Chrome ou no Edge de um computador, ou no app Android com a placa
 na porta USB-C. O protocolo é o do firmware `8a19f0a` (2026-11-03). A primeira coleta com a
-placa de verdade foi em 2026-11-04, no Chrome do macOS; no tablet Android ainda falta. A
+placa de verdade foi em 2026-11-04, no Chrome do macOS; em 2026-11-11 ela foi coletada pela
+primeira vez por um celular Android. No tablet Android ainda falta. A
 coleta sem fio que aparece em Ajustes é só demonstração, com **nós sensores simulados**.
 
 ## Como rodar

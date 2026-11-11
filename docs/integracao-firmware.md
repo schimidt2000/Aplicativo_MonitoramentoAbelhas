@@ -444,6 +444,50 @@ leitura de exemplo; para a demonstração, a Colmeia 03 mistura as duas.
 **Falta conferir:** o MAC da placa coletada hoje; a hora fechar numa coleta em ritmo, com a
 placa alimentada o tempo todo.
 
+### Placa `…16:5E:48` regravada com o firmware de coleta (2026-11-11)
+
+Na primeira tentativa de coleta num Android (Samsung Galaxy A32 5G, tarefa T609 da 006), o
+registro da conversa mostrou que a placa `58:E6:C5:16:5E:48` não estava com o firmware de
+coleta: ao abrir a porta ela escreveu "LEITOR DE MEDICOES … Data/Hora: 04/11/2026 14:12:42 …
+Quantidade de medicoes: 4 … Leitura finalizada." e não respondeu a nenhum `HELLO`. É o
+`leitura_de_arquivo/leitura_de_arquivo.ino` do repositório do grupo, que só imprime o arquivo
+e não dorme. Não se sabe quem o gravou nela depois da coleta de 04/11.
+
+A pedido do João ("coloca a coleta nela"), foi gravado o `firmware/firmware.ino` do `8a19f0a`
+**sem alteração** (o mesmo arquivo da `main` de hoje, que só ganhou um README no `06db799`),
+com as mesmas ferramentas de 05/11: arduino-cli 1.5.1, `esp32:esp32@3.3.12`, placa
+`XIAO_ESP32C6` com as opções padrão, "ENS160 - Adafruit Fork" 3.0.1 e "Adafruit AHTX0" 2.0.6.
+Cópia da memória inteira antes de gravar:
+`~/bee-sertao-placa-backup/placa-58E6C5165E48-leitor-2026-11-11.bin` (4 MB, SHA-256
+`7f8450d4…e3df99`).
+
+| Item | Resultado |
+|---|---|
+| Gravação | ✅ quatro trechos gravados e conferidos ("Hash of data verified"); a memória não foi apagada, só o programa foi trocado |
+| Depois de ligar | ✅ a placa sumiu do USB em menos de 30 s (dormiu). Com o leitor ela ficava ligada por minutos |
+| Texto de partida | não capturado (a escuta de 14 s não pegou nada) |
+| Arquivo de 4 medições que o leitor mostrou | não conferido: se a divisão da memória do leitor era a mesma, ele continua lá e sai na próxima coleta, sem hora (a conta de 2 h não fecha desde 04/11) |
+
+**Coleta pelo Android, logo depois (Samsung Galaxy A32 5G, Android 13, app instalado com o
+registro `BeeUsbSerial`):** é a primeira coleta real num Android.
+
+| Item | Resultado |
+|---|---|
+| 1ª tentativa | placa ligada pela energia do cabo, não pelo botão: dois `HELLO` sem resposta, e ela dormiu 12,5 s depois de aparecer. Confirma que a conversa só abre no despertar pelo botão |
+| 2ª tentativa, com o botão | ✅ `HELLO` → `READY` em 16 ms → `FILE_INFO:122:1C89096C` → 122 bytes → `RECEIVED` → `TRANSFER_OK` → `REQUEST_TIMESTAMP` → `1794416385` → `SESSION_COMPLETE`, tudo em 0,14 s |
+| Arquivo | ✅ 26 + 6 × 16 bytes; MAC `58:E6:C5:16:5E:48`; início `1793812362` (04/11 às 14h12min42, −03), a hora mandada na coleta de 04/11. O arquivo sobreviveu à regravação |
+| Leituras | 6: as 4 que o leitor mostrava e mais 2. De 04/11 até hoje cabem 84 a 2 h, então a hora não fecha e elas ficam sem hora |
+| Sinais DTR/RTS | ✅ o módulo não manda SET_CONTROL_LINE_STATE (D-602) e a conversa funcionou assim |
+
+O João confirmou que a tela de resultado do app mostrou as 6 leituras salvas.
+
+Depois, o celular foi ligado ao projeto (código de demonstração do apicultor A) e enviou tudo:
+"No celular 3.499 · Na nuvem 3.499 · Todas as leituras já estão na nuvem", com as 6 leituras
+reais na Colmeia 03. É a primeira vez que uma leitura real vai de um Android até a nuvem.
+
+**Falta conferir:** a contagem dessas 6 no servidor (consulta por `src = cable`); a coleta desta
+placa pelo Chrome; o mesmo no tablet Samsung (SC-001 da 006).
+
 ---
 
 ## Notas técnicas

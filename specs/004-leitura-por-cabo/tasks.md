@@ -114,7 +114,7 @@ pontos críticos). Cada teste crítico foi quebrado de propósito uma vez para c
 - [ ] T025 Abrir a tela no Firefox, no Safari, no Chrome do Android e no app Android e
   conferir que nenhum botão inerte aparece (SC-006) — **pendente: navegador real**
 - [ ] T026 Medir no aparelho de referência o arranque a frio com a rota nova (Princípio II) —
-  **pendente: aparelho físico** — **parcial (2026-11-05, emulador Android 9, 2 GB, arm64 num Mac; não substitui o aparelho de referência):** APK release com R8, 9.315 leituras no banco: `am start -W` ~0,92 s (5 arranques a frio, 0,87–1,01 s), PSS total ~108 MB no arranque e ~116 MB depois de uma coleta. O emulador não conta memória de gráficos (Graphics: 0) e a CPU do Mac é várias vezes mais rápida que um Snapdragon 425
+  **pendente: aparelho de referência** — **parcial (2026-11-11, tablet físico Samsung SM-T595, Android 10; não é o aparelho de referência):** arranque a frio de 2,31–2,35 s em 10 medições, dentro do orçamento; a memória passa do teto ao abrir a tela Coletar (detalhe na T812 da 008) — **parcial (2026-11-05, emulador Android 9, 2 GB, arm64 num Mac; não substitui o aparelho de referência):** APK release com R8, 9.315 leituras no banco: `am start -W` ~0,92 s (5 arranques a frio, 0,87–1,01 s), PSS total ~108 MB no arranque e ~116 MB depois de uma coleta. O emulador não conta memória de gráficos (Graphics: 0) e a CPU do Mac é várias vezes mais rápida que um Snapdragon 425
 
 ## Dependencies
 
